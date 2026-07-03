@@ -1,0 +1,10 @@
+# Editor / harness local config
+.claude/
+
+# OS junk
+Thumbs.db
+.DS_Store
+
+# Never commit secrets
+*token*.txt
+*.pem
