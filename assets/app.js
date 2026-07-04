@@ -1,10 +1,11 @@
 (function(){
- var SITE = {"sections": [{"slug": "market-structure", "title": "Market structure", "tag": "structure", "desc": "How the parts of the lending system connect, and where the structure itself creates the risk.", "items": [{"slug": "servicers-the-next-rail", "title": "Servicers \u2014 the next rail in lending", "min": "8 min", "date": "Jul 2026"}]}, {"slug": "quant-insights", "title": "Quant insights", "tag": "quant", "desc": "The maths under lending and markets \u2014 variance, pricing, curves and optimisation.", "items": [{"slug": "variance-of-default", "title": "It\u2019s not default \u2014 it\u2019s the variance of default", "min": "7 min", "date": "Jul 2026"}]}, {"slug": "consulting", "title": "Consulting", "tag": "consulting", "desc": "Selected engagements across India and the GCC, described by structure and mandate; specifics under NDA on request.", "items": []}, {"slug": "teaching", "title": "Teaching", "tag": "teaching", "desc": "A lecture series on quantifying risk; modules deliverable as guest lectures or a semester elective.", "items": []}]};
+ var SITE = {"sections": [{"slug": "market-structure", "title": "Market structure", "tag": "structure", "desc": "How the parts of the lending system connect, and where the structure itself creates the risk.", "items": [{"slug": "servicers-the-next-rail", "title": "Servicers \u2014 the next rail in lending", "min": "8 min", "date": "Jul 2026", "summary": "Why lending needs a dedicated servicer rail, and what real bankruptcy-remoteness at scale unlocks.", "tags": ["structuring", "collections", "cost of funds", "portfolio"]}]}, {"slug": "quant-insights", "title": "Quant insights", "tag": "quant", "desc": "The maths under lending and markets \u2014 variance, pricing, curves and optimisation.", "items": [{"slug": "variance-of-default", "title": "It\u2019s not default \u2014 it\u2019s the variance of default", "min": "7 min", "date": "Jul 2026", "summary": "Stable default can be priced; its variance often can't. How tenor, FOIR and LTV should flex with it.", "tags": ["credit", "portfolio"]}]}, {"slug": "technology", "title": "Technology", "tag": "tech", "desc": "Where the lending stack should be rebuilt \u2014 AI across origination, underwriting, servicing and RCU, and the data products beneath them.", "items": []}, {"slug": "risk", "title": "Risk", "tag": "risk", "desc": "Risk beyond the credit model \u2014 model and standardisation risk, concentration, operational, fraud and conduct.", "items": []}, {"slug": "consulting", "title": "Consulting", "tag": "consulting", "desc": "Selected engagements across India and the GCC, described by structure and mandate; specifics under NDA on request.", "items": []}, {"slug": "teaching", "title": "Teaching", "tag": "teaching", "desc": "A lecture series on quantifying risk; modules deliverable as guest lectures or a semester elective.", "items": []}]};
  var root = document.documentElement;
  try{var st=localStorage.getItem('ci-theme'); if(st) root.setAttribute('data-theme',st);
      var sa=localStorage.getItem('ci-accent'); if(sa) root.setAttribute('data-accent',sa);}catch(e){}
  if(!root.getAttribute('data-accent')) root.setAttribute('data-accent','petrol');
  var path = location.pathname.replace(/index\.html$/,'').replace(/\/$/,'/') || '/';
+ function postCard(s,it){ var u='/'+s.slug+'/'+it.slug+'.html'; var tags=(it.tags||[]).map(function(t){return '<span class="tagchip">'+t+'</span>';}).join(''); return '<a class="post" href="'+u+'"><div class="pt">'+it.title+'</div>'+(it.summary?'<div class="ps">'+it.summary+'</div>':'')+'<div class="pm"><span>'+(it.date||'')+'</span>'+(it.min?'<span>&middot;</span><span>'+it.min+'</span>':'')+'</div>'+(tags?'<div class="ptags">'+tags+'</div>':'')+'</a>'; }
 
  var navlinks = SITE.sections.map(function(s){return '<a href="/'+s.slug+'/">'+s.title+'</a>';}).join('') + '<a href="/about/">About</a>';
  var header = '<div class="nav"><div class="wrap">'
@@ -48,20 +49,23 @@
  // home
  var rec=document.getElementById('recent');
  if(rec){ var all=[]; SITE.sections.forEach(function(s){ s.items.forEach(function(it){ all.push({s:s,it:it}); }); });
-   rec.innerHTML = all.map(function(x){ var u='/'+x.s.slug+'/'+x.it.slug+'.html'; return '<a class="item" href="'+u+'" style="text-decoration:none"><div><div class="it-t">'+x.it.title+'</div><div class="it-d">'+(x.it.date||'')+'</div></div><span class="it-tag">'+x.s.tag+'</span></a>'; }).join(''); }
+   rec.innerHTML = all.map(function(x){ return postCard(x.s,x.it); }).join(''); }
  var sc=document.getElementById('sectioncards');
  if(sc){ sc.innerHTML = SITE.sections.map(function(s){ var n=s.items.length; var cnt=n?(n+' note'+(n>1?'s':'')):'in preparation'; return '<a class="themecard" href="/'+s.slug+'/" style="text-decoration:none"><span class="no">'+s.tag+'</span><h3>'+s.title+'</h3><p>'+s.desc+'</p><span class="n">'+cnt+' &rarr;</span></a>'; }).join(''); }
 
  // section index
  var list=document.getElementById('seclist');
  if(list){ var slug=document.body.getAttribute('data-section'); var sec=SITE.sections.filter(function(s){return s.slug===slug;})[0];
-   if(sec && sec.items.length){ list.innerHTML = sec.items.map(function(it){ var u='/'+sec.slug+'/'+it.slug+'.html'; return '<a class="row" href="'+u+'" style="text-decoration:none"><div><div class="row-t">'+it.title+'</div></div><div class="row-m">'+(it.min||'')+'</div></a>'; }).join(''); }
+   if(sec && sec.items.length){ list.innerHTML = sec.items.map(function(it){ return postCard(sec,it); }).join(''); }
    else { list.innerHTML = '<p style="color:var(--muted)">Notes are in preparation — check back soon.</p>'; } }
 
  // article back link
  if(document.body.getAttribute('data-page')==='article'){
    var slug2=document.body.getAttribute('data-section'); var sec2=SITE.sections.filter(function(s){return s.slug===slug2;})[0]; var c=document.getElementById('content');
    if(sec2 && c) c.insertAdjacentHTML('afterbegin','<a class="back" href="/'+sec2.slug+'/">&larr; '+sec2.title+'</a>');
+   var curSlug=(location.pathname.split('/').pop()||'').replace('.html','');
+   var cit=sec2?sec2.items.filter(function(x){return x.slug===curSlug;})[0]:null;
+   if(cit && cit.tags && cit.tags.length){ var meta=document.querySelector('#content .meta'); var chips='<div class="ptags" style="margin:2px 0 20px">'+cit.tags.map(function(t){return '<span class="tagchip">'+t+'</span>';}).join('')+'</div>'; if(meta) meta.insertAdjacentHTML('afterend', chips); }
  }
 
  // ambient quant background
