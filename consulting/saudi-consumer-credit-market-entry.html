@@ -32,180 +32,107 @@
     <a href="#underwriting">The underwriting engine</a>
     <a href="#pricing">Price for the variance</a>
     <a href="#operations">The operating stack</a>
+    <a href="#team">A lean team, six functions</a>
     <a href="#landscape">The pricing map</a>
   </nav>
   <article id="content" class="doc case-content">
     <div class="eyebrow">consulting &middot; anonymised engagement</div>
     <h1>Saudi Arabia&rsquo;s credit gap is widest where banks can&rsquo;t go</h1>
-    <div class="meta"><span>16 min read</span><span>Saudi Arabia &middot; payday + microfinance</span><span>market entry</span></div>
+    <div class="meta"><span>market entry</span><span>Saudi Arabia &middot; payday + microfinance</span><span>2026</span></div>
 
     <section id="brief">
       <h2>The brief: is there a venture here &mdash; and how would you build it?</h2>
-      <p>An anonymised GCC investor asked a simple question: does Saudi Arabia&rsquo;s consumer-credit market have room for a new entrant, and if so, what should it look like? This is the resulting market-entry study &mdash; market sizing, a competitive read, a strategy, an alternative-data underwriting engine, and five-year unit economics.</p>
-      <p class="srcnote">Client details are withheld. Figures below are built on public GASTAT and SAMA data plus modelled estimates, and are illustrative of the analytical approach rather than a live business plan.</p>
+      <p>An anonymised GCC investor asked a simple question: does Saudi Arabia&rsquo;s consumer-credit market have room for a new entrant, and if so, what should it look like? The slides below are the working deck &mdash; market sizing, a competitive read, a five-pillar strategy, an alternative-data underwriting engine, the operating stack, and five-year unit economics.</p>
+      <p class="srcnote">Client identity is withheld and the deck has been anonymised. Figures are built on public GASTAT and SAMA data plus modelled estimates, and are illustrative of the analytical approach.</p>
     </section>
 
     <section id="market">
       <h2>Saudi Arabia is 35 million people &mdash; and half the workforce earns under SAR 5,000.</h2>
-      <div class="statgrid">
-        <div class="sg"><div class="v">35.3M</div><div class="k">total population (2024)</div></div>
-        <div class="sg"><div class="v">19.6M</div><div class="k">Saudi nationals (55.6%)</div></div>
-        <div class="sg"><div class="v">15.7M</div><div class="k">expats (44.4%)</div></div>
-        <div class="sg"><div class="v">17.2M</div><div class="k">workforce &mdash; 23% Saudi / 77% expat</div></div>
-      </div>
-      <p>The wage split is stark. Saudi nationals average <b>SAR 10,100</b> a month (workers); expats average <b>SAR 4,202</b> &mdash; a 2.4&times; ratio. Around 55% of expats earn below SAR 2,500. Formal credit is designed around the first group; the second is largely invisible to it.</p>
-      <p class="srcnote">Sources: GASTAT 2024, Argaam, Expatica.</p>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide1.png" alt="Saudi Arabia population and income snapshot"></figure>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide2.png" alt="Age distribution and average income: Saudi nationals vs expats"></figure>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide3.png" alt="Monthly income distribution: Saudi nationals vs expats"></figure>
     </section>
 
     <section id="gap">
       <h2>Three independent lenses point to a widening retail credit gap.</h2>
-      <div class="tbl-wrap"><table class="ci">
-        <tr><th>Lens</th><th>What it shows</th></tr>
-        <tr><td><b>Loan book vs spend</b></td><td>Retail loan book SAR 1.39T (SAMA 2024); retail credit growing 9.6% YoY vs 22% corporate; consumer finance USD 357B (2024) &rarr; USD 974B by 2030; &lt;15% of expat workers hold any bank credit; low-income Saudis (&lt;SAR 5k) structurally excluded.</td></tr>
-        <tr><td><b>Loan-book growth signals</b></td><td>Total credit SAR 3.1T, +16% YoY (SAMA Mar 2025); banks pivoting to corporate (now 55% of book); only 3 licensed consumer-microfinance firms; BNPL nascent &mdash; demand far exceeds licensed supply.</td></tr>
-        <tr><td><b>Third-party research</b></td><td>McKinsey (Apr 2025): banks pivoting away from retail; S&amp;P Global (Dec 2025): a &ldquo;significant&rdquo; private-credit gap; IMF Art. IV 2024: a SAR 77B housing guarantee signals the gap; FSDP targets 525 fintechs to address inclusion.</td></tr>
-      </table></div>
-      <p>Three unrelated lenses &mdash; balance-sheet, regulatory and third-party &mdash; all point the same way: the retail credit gap is <b>widening, not closing</b>.</p>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide4.png" alt="The credit gap, sized three ways"></figure>
     </section>
 
     <section id="tam">
       <h2>Twenty-seven million working-age adults, sized by age and income.</h2>
-      <p>Cross-multiplying GASTAT age and income distributions gives ~13.1M working-age Saudis and ~14.4M working-age expats (20+) &mdash; a combined addressable base of <b>~27.5 million</b>. Sizing each product as eligible population &times; average ticket &times; take-up rate:</p>
-      <div class="tbl-wrap"><table class="ci">
-        <tr><th>Segment</th><th>Saudi eligible</th><th>Expat eligible</th><th>Avg ticket</th><th>Tenor</th><th>Saudi TAM</th><th>Expat TAM</th></tr>
-        <tr><td><b>Payday / short-term</b></td><td class="num">9.4M</td><td class="num">11.2M</td><td class="num">SAR 2k&ndash;5k</td><td class="num">1&ndash;6 mo</td><td class="num">SAR 6&ndash;14B/yr</td><td class="num">SAR 13&ndash;33B/yr</td></tr>
-        <tr><td><b>Personal loan (unsecured)</b></td><td class="num">9.5M</td><td class="num">7.8M</td><td class="num">SAR 15k&ndash;60k</td><td class="num">12&ndash;48 mo</td><td class="num">SAR 14&ndash;56B</td><td class="num">SAR 12&ndash;47B</td></tr>
-        <tr><td><b>Auto loan (asset-backed)</b></td><td class="num">9.5M</td><td class="num">7.8M</td><td class="num">SAR 40k&ndash;120k</td><td class="num">24&ndash;60 mo</td><td class="num">SAR 37&ndash;112B</td><td class="num">SAR 31&ndash;94B</td></tr>
-        <tr><td><b>Home / mortgage</b></td><td class="num">2.6M</td><td class="num">~130k (PR)</td><td class="num">SAR 400k&ndash;1M</td><td class="num">15&ndash;25 yr</td><td class="num">~SAR 1T (stock)</td><td class="num">SAR 52B (stock)</td></tr>
-      </table></div>
-      <p class="srcnote">TAM modelled from GASTAT/SAMA cross-distributions; age and income treated as independent, so true eligible may be 10&ndash;20% lower. Confidence: Low&ndash;Medium.</p>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide5.png" alt="Population matrix, Saudi nationals"></figure>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide6.png" alt="Population matrix, expats"></figure>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide7.png" alt="Total addressable market by product segment"></figure>
     </section>
 
     <section id="product">
       <h2>Payday and microfinance are the best risk-adjusted way in.</h2>
-      <p>Ranking products on data yield, asset backing, ecosystem integration, initial capital and effective lender return:</p>
-      <div class="tbl-wrap"><table class="ci">
-        <tr><th>Product</th><th>Ticket / tenor</th><th>Lender IRR</th><th>Data play</th><th>Capital</th></tr>
-        <tr><td><b>BNPL</b></td><td class="num">SAR 500&ndash;20k / 6wk&ndash;6mo</td><td class="num">48&ndash;84%</td><td>merchant &amp; basket data</td><td>SAR 5M min; 20&times; leverage cap</td></tr>
-        <tr><td><b>Payday</b></td><td class="num">SAR 500&ndash;30k / 1&ndash;6mo</td><td class="num">34&ndash;152%</td><td>salary + bank-statement ML</td><td>SAR 5&ndash;10M; no asset backing</td></tr>
-        <tr><td><b>Microfinance</b></td><td class="num">SAR 5&ndash;30k / 12&ndash;24mo</td><td class="num">22&ndash;34%</td><td>bureau-lite + statement analysis</td><td>SAR 10&ndash;30M; scales with book</td></tr>
-        <tr><td><b>Used auto loan</b></td><td class="num">SAR 5&ndash;120k / 12&ndash;60mo</td><td class="num">6&ndash;15%</td><td>asset valuation, VIN, GPS</td><td>asset-backed; 70&ndash;85% LTV</td></tr>
-      </table></div>
-      <p>Payday offers the highest return and the richest behavioural-data yield at low capital; microfinance is the natural graduation. That pairing became the entry wedge.</p>
-      <p class="srcnote">Sources: SAMA 2024; Mordor BNPL 2026; ChampX 2026. IRR = annualised effective lender return.</p>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide8.png" alt="Product evaluation across BNPL, payday, microfinance and auto"></figure>
     </section>
 
     <section id="competition">
       <h2>Incumbents are structurally locked out of the expat and informal segments.</h2>
-      <p>The largest lenders cannot follow the borrower into the whitespace &mdash; by policy, not by choice.</p>
-      <div class="tbl-wrap"><table class="ci">
-        <tr><th>Player</th><th>Segment</th><th>Est. book</th><th>Structural weakness</th><th>Threat</th></tr>
-        <tr><td><b>Al Rajhi Bank</b></td><td>Payday</td><td class="num">&gt;SAR 5B</td><td>Serves only formal-sector Saudis (SIMAH &gt;650); cannot process expat salary structures.</td><td class="num">Low</td></tr>
-        <tr><td><b>SNB / ANB</b></td><td>Payday</td><td class="num">&gt;SAR 3B</td><td>Same formal-Saudi exclusion; no appetite for thin-file or expat credit.</td><td class="num">Low</td></tr>
-        <tr><td><b>Fintech A</b></td><td>Payday</td><td class="num">~SAR 200&ndash;400M</td><td>SIMAH-first model leaves the thin-bureau expat segment unserved; salary-link excludes gig workers.</td><td class="num">Medium</td></tr>
-        <tr><td><b>Fintech B</b></td><td>Payday + micro</td><td class="num">~SAR 100&ndash;200M</td><td>Book too small for a data moat; no differentiated no-payslip underwriting.</td><td class="num">Medium</td></tr>
-        <tr><td><b>Listed micro-lender</b></td><td>Microfinance</td><td class="num">~SAR 2&ndash;2.5B</td><td>H1 2025 profit &minus;30% YoY on rising impairments; branch-heavy; minimal expat coverage.</td><td class="num">Low&ndash;Med</td></tr>
-        <tr><td><b>Telco-backed micro</b></td><td>Microfinance</td><td class="num">~SAR 300&ndash;500M</td><td>Parent limits risk appetite; limited expat underwriting; narrow product range.</td><td class="num">High</td></tr>
-      </table></div>
-      <p class="srcnote">Sources: SAMA 2024; Tadawul; audited financials. Specific players anonymised; book sizes estimated.</p>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide9.png" alt="Competitive landscape and structural weaknesses"></figure>
     </section>
 
     <section id="penetration">
       <h2>Under 10% of the market is served &mdash; this is nascent, not competitive.</h2>
-      <div class="tbl-wrap"><table class="ci">
-        <tr><th>Segment</th><th>TAM (customers)</th><th>Served today</th><th>Penetration</th><th>Key gap</th></tr>
-        <tr><td>Payday &mdash; Saudi (formal)</td><td class="num">3.6M</td><td class="num">~2.5&ndash;3.0M</td><td class="num">70&ndash;80%</td><td>Near-saturated &mdash; not the target.</td></tr>
-        <tr><td><b>Payday &mdash; expats</b></td><td class="num">6.6M</td><td class="num">~300&ndash;500k</td><td class="num">5&ndash;8%</td><td>Banks excluded &mdash; the primary whitespace.</td></tr>
-        <tr><td>Payday &mdash; informal Saudi (&lt;5k)</td><td class="num">0.72M</td><td class="num">~50&ndash;100k</td><td class="num">7&ndash;14%</td><td>Needs telecom/device underwriting to unlock.</td></tr>
-        <tr><td>Microfinance &mdash; Saudi</td><td class="num">3.6M</td><td class="num">~300&ndash;400k</td><td class="num">8&ndash;11%</td><td>Banks excluded below SAR 5k income.</td></tr>
-        <tr><td><b>Microfinance &mdash; expats</b></td><td class="num">6.6M</td><td class="num">~50&ndash;100k</td><td class="num">&lt;2%</td><td>Near-zero institutional coverage.</td></tr>
-      </table></div>
-      <p>Even with every current competitor combined, fewer than 10% of the expat payday TAM and under 2% of the expat microfinance TAM is formally served. The question isn&rsquo;t how to beat incumbents in their segment &mdash; it&rsquo;s how to build the underwriting infrastructure to reach the <b>12+ million</b> customers nobody has.</p>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide10.png" alt="Market penetration by segment"></figure>
     </section>
 
     <section id="vision">
       <h2>The vision: a payday-to-microfinance lender for the underserved.</h2>
-      <p>Build a leading payday and microfinance lender for the geography, focused on the underserved informal-Saudi and expat segments, using alternative data, ML/AI and a fully digital stack &mdash; reaching the customers formal lenders structurally skip.</p>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide11.png" alt="Goal and vision"></figure>
     </section>
 
     <section id="pillars">
       <h2>Five pillars, each built on what incumbents cannot do.</h2>
-      <div class="pillar-block"><div class="ptag">01 &middot; where banks cannot follow</div><h3>Expat &amp; informal segment first</h3><p>Target the 6.6M expat and 0.72M informal-Saudi TAM, structurally excluded from bank payday (no SADAD salary link, no SIMAH history). The first mover to build alternative underwriting for this segment owns the data moat.</p></div>
-      <div class="pillar-block"><div class="ptag">02 &middot; don&rsquo;t skip the data factory</div><h3>Payday &rarr; microfinance via loan-cycle data</h3><p>Launch payday to accumulate behavioural data at 6&ndash;12 cycles a year. A borrower who repays 4&ndash;6 cycles cleanly is a verified good payor &mdash; the proprietary signal used to upgrade them into microfinance without relying on SIMAH.</p></div>
-      <div class="pillar-block"><div class="ptag">03 &middot; bureau is thin &mdash; use everything else</div><h3>Alternative underwriting / AI-ML stack</h3><p>Four layers for thin-file customers: telecom &amp; device (top-up frequency, SIM age, device value as income proxy); bank-statement scoring; SIMAH where available, not as a gate; and employer verification.</p></div>
-      <div class="pillar-block"><div class="ptag">04 &middot; no branches, no field agents, no paper</div><h3>Fully digital origination &amp; fulfilment</h3><p>App onboarding &rarr; Iqama/passport OCR + liveness &rarr; statement parse &rarr; NACH mandate &rarr; disbursal in &lt;4 hours. A cost-to-income target of 35&ndash;40% versus incumbents&rsquo; 60%+ funds aggressive acquisition pricing.</p></div>
-      <div class="pillar-block"><div class="ptag">05 &middot; market is nascent, not competitive</div><h3>Penetration play &mdash; volume before margin</h3><p>Price to penetrate in Years 1&ndash;2 (5% flat fee versus informal lenders at 15&ndash;20%); extract margin in Year 3+ as behavioural data enables tiered pricing of proven payors. In a nascent market, share of data beats share of margin.</p></div>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide12.png" alt="Five competitive pillars"></figure>
     </section>
 
     <section id="roadmap">
       <h2>Payday first to build the data factory, then microfinance.</h2>
-      <p>Capital-constrained: ~USD 25&ndash;40M of Year-1 equity, ~80% deployed as AUM, leverage scaling as the book seasons.</p>
-      <div class="tbl-wrap"><table class="ci">
-        <tr><th>&nbsp;</th><th>Year 1</th><th>Year 2</th><th>Year 3</th><th>Year 4</th><th>Year 5</th></tr>
-        <tr><td><b>Phase</b></td><td>Payday</td><td>Payday</td><td>Transition</td><td>Microfinance</td><td>Microfinance</td></tr>
-        <tr><td><b>AUM</b></td><td class="num">SAR ~98M</td><td class="num">~244M</td><td class="num">~960M</td><td class="num">~1.08B</td><td class="num">~1.08B</td></tr>
-        <tr><td><b>Leverage</b></td><td class="num">1&times;</td><td class="num">2.5&times; +WH</td><td class="num">4&times;</td><td class="num">4.5&times;</td><td class="num">4.5&times;</td></tr>
-        <tr><td><b>Avg ticket</b></td><td class="num">SAR 1,500</td><td class="num">2,500</td><td class="num">7,500</td><td class="num">12,000</td><td class="num">18,000</td></tr>
-        <tr><td><b>Avg tenor</b></td><td class="num">6 mo</td><td class="num">6 mo</td><td class="num">12 mo</td><td class="num">15 mo</td><td class="num">18 mo</td></tr>
-        <tr><td><b>Customers</b></td><td class="num">~130k</td><td class="num">~195k</td><td class="num">~128k</td><td class="num">~72k</td><td class="num">~40k</td></tr>
-        <tr><td><b>Gross revenue</b></td><td class="num">SAR ~20M</td><td class="num">~49M</td><td class="num">~192M</td><td class="num">~216M</td><td class="num">~216M</td></tr>
-      </table></div>
-      <p class="srcnote">Year 3 needs a ~USD 47M Series A to fund the micro book at 4&times;. Revenue = gross, pre credit losses (~3&ndash;5% of AUM) and pre opex. Benchmarks: Tabby KSA AUM ~SAR 3.7B; Tamara ~SAR 5.8B.</p>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide13.png" alt="Product roadmap and five-year financial projections"></figure>
     </section>
 
     <section id="economics">
       <h2>Behavioural data compresses losses &mdash; the economics work at 4&ndash;4.5&times; leverage.</h2>
-      <p>One benchmark makes the case: a leading BNPL lender&rsquo;s ECL fell <b>9.6% &rarr; 3.8%</b> in a single year as its book seasoned &mdash; direct evidence that behavioural data compresses credit losses. Against listed and estimated peers, the venture&rsquo;s targets:</p>
-      <div class="tbl-wrap"><table class="ci">
-        <tr><th>Metric (% of AUM)</th><th>BNPL peer FY24</th><th>BNPL peer FY25</th><th>Micro peer FY25</th><th>Venture Y1</th><th>Venture Y5</th></tr>
-        <tr><td>AUM (SAR M)</td><td class="num">1,652</td><td class="num">4,052</td><td class="num">~1,900e</td><td class="num">98</td><td class="num">1,080</td></tr>
-        <tr><td>Revenue / AUM</td><td class="num">42.9%</td><td class="num">33.3%</td><td class="num">~17%e</td><td class="num">30%</td><td class="num">30%</td></tr>
-        <tr><td>Cost of funds / AUM</td><td class="num">8.8%</td><td class="num">5.4%</td><td class="num">~2%e</td><td class="num">8%</td><td class="num">6%</td></tr>
-        <tr><td>Ops cost / AUM</td><td class="num">32.3%</td><td class="num">18.6%</td><td class="num">~12%e</td><td class="num">20%</td><td class="num">12%</td></tr>
-        <tr><td>ECL / AUM</td><td class="num">9.6%</td><td class="num">3.8%</td><td class="num">~2.4%e</td><td class="num">8%</td><td class="num">5%</td></tr>
-        <tr><td>Leverage (A/E)</td><td class="num">6.4&times;</td><td class="num">9.0&times;</td><td class="num">~1.5&times;e</td><td class="num">1&times;</td><td class="num">4.5&times;</td></tr>
-        <tr><td>ROE</td><td class="num">(37.3%)</td><td class="num">34.7%</td><td class="num">~9.1%</td><td class="num">&mdash;</td><td class="num">15&ndash;25%</td></tr>
-      </table></div>
-      <p class="srcnote">% of AUM (net book). Peer figures anonymised, from audited financials or estimates (e). The micro peer&rsquo;s 9.1% ROE on a large equity base reads as a deployment gap, not a margin problem.</p>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide14.png" alt="Unit economics vs peer benchmarks over the five-year plan"></figure>
     </section>
 
     <section id="underwriting">
       <h2>The edge is an alternative-data underwriting engine.</h2>
-      <p>For thin-file borrowers, the model reads four data layers instead of a bureau score:</p>
-      <ul>
-        <li><b>Application</b> &mdash; age, employer category, dependents, education, salaried flag, address/pincode.</li>
-        <li><b>Device &amp; telecom</b> &mdash; device make/age/price, data usage, SIM vintage, number porting/recycling, app footprint (financial, loan, gambling), call and SMS patterns.</li>
-        <li><b>Banking</b> &mdash; 3/6-month credit stability and growth, salary regularity, bounce rates, remittance and related-party patterns, regular expenses like rent and school fees.</li>
-        <li><b>Bureau &amp; cycle</b> &mdash; SIMAH where available, DPD strings and tradeline velocity; and, once on book, clean-cycle counts and max-DPD per cycle.</li>
-      </ul>
-      <p>A five-stage flow turns those signals into a decision: <b>(1)</b> dedupe and hard-reject (negative area/profile, fraud, AML); <b>(2)</b> a cycle-bucketed ML credit score (random forest / GBM); <b>(3)</b> line &amp; tenor by DTI and risk band, with expat cut-offs tied to visa duration; <b>(4)</b> pricing; <b>(5)</b> disbursal. Each loan cycle retrains the model on fresh behaviour.</p>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide16.png" alt="AI, ML and data play"></figure>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide17.png" alt="Data collection: application, device, telecom, banking"></figure>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide18.png" alt="Data collection: bureau, collections and cycle data"></figure>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide19.png" alt="Five-stage underwriting flow"></figure>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide20.png" alt="Cycle-wise machine-learning model inputs"></figure>
     </section>
 
     <section id="pricing">
       <h2>Amount, tenor and price all flex by risk bin and cycle.</h2>
-      <p>Amount caps and tenor widen as a borrower completes clean cycles and their risk bin improves &mdash; a Bin-1 borrower can move from SAR 5k to SAR 16k over cycles, while a Bin-5 borrower stays short and small. Price is built as a full waterfall, not a flat rate:</p>
-      <p><b>Rate = cost of funds + acquisition cost + default cost + operations cost + target ROA</b> (5% post-tax). The default term is priced on risk grade <b>and the variance of default (&mu; + &sigma;)</b> &mdash; adjusting only for the mean underprices risk. Processing fee and rate are a function of risk grade, amount, tenor and channel cost.</p>
-      <p>Payday runs on one combined acquisition/behaviour/collections scorecard; microfinance splits them, with separate credit, behavioural and collections models.</p>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide21.png" alt="Risk-based amount and tenor strategy"></figure>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide22.png" alt="Risk-based amount and tenor strategy, continued"></figure>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide23.png" alt="Default- and variance-adjusted rate strategy"></figure>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide24.png" alt="Acquisition, collection and behavioural scorecards"></figure>
     </section>
 
     <section id="operations">
       <h2>The operating stack: originate, manage, collect &mdash; agentic and LLM-native.</h2>
-      <p>The build-versus-buy split puts origination and underwriting in-house and procures the loan-management system. Origination is an agentic, LLM-native flow: an LLM/chat LOS extracts information with no forms; an SMS and device scraper plus open-banking and bureau APIs feed it; DS APIs orchestrate underwriting with credit policy executed via RAG; and fulfilment runs KYC/Video-KYC, e-NACH and digital signing. Each step is an AI agent.</p>
-      <p>Collections is likewise agentic, driven by three variables &mdash; amount, DPD and collections risk bucket &mdash; escalating from WhatsApp/SMS nudges to pre-EMI and soft/hard calls, then visits for large cases and legal notices. Every step is an agent except the physical visit.</p>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide25.png" alt="Systems and processes"></figure>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide26.png" alt="Processes to manage across origination, LMS and collections"></figure>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide27.png" alt="Loan origination as an agentic, LLM-native flow"></figure>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide28.png" alt="Collections as an agentic workflow"></figure>
+    </section>
+
+    <section id="team">
+      <h2>Six functions, built lean around the model.</h2>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide30.png" alt="Team structure across sourcing, product and engineering, risk and data science, operations, collections and finance"></figure>
     </section>
 
     <section id="landscape">
       <h2>A pricing map across every product and ticket band.</h2>
-      <p>Underneath the strategy sits a full pricing landscape &mdash; DTI bands, income tiers, ticket sizes and lender yields, mapped to the banks and fintechs that play at each level:</p>
-      <div class="tbl-wrap"><table class="ci">
-        <tr><th>Product</th><th>Ticket (SAR)</th><th>Lender yield / IRR</th><th>Who plays</th></tr>
-        <tr><td><b>BNPL</b></td><td class="num">500&ndash;5,000</td><td class="num">18&ndash;45%</td><td>fintech-led; banks entering</td></tr>
-        <tr><td><b>Payday (1&ndash;6mo)</b></td><td class="num">1,500&ndash;30,000</td><td class="num">25&ndash;60%</td><td>banks (formal Saudis) + fintech</td></tr>
-        <tr><td><b>Personal loan / micro (12mo+)</b></td><td class="num">15,000&ndash;150,000</td><td class="num">banks 7&ndash;18% &middot; fintech 18&ndash;30%</td><td>banks dominant above SAR 5k income</td></tr>
-        <tr><td><b>Mortgage</b></td><td class="num">150k&ndash;2.5M</td><td class="num">7&ndash;10%</td><td>banks only</td></tr>
-      </table></div>
-      <p>It confirms the pattern the whole study turns on: banks own the high-income, large-ticket, low-yield end; fintechs and non-banks compete for the thin-file, small-ticket, high-yield segments &mdash; and the expat and informal rows are exactly where supply is thinnest.</p>
-      <p class="srcnote">Sources: SAMA consumer-finance regulations; SAIBOR Q1 2025 (~5.3%); market pricing guides 2025&ndash;26. IRR = lender effective return.</p>
+      <figure class="slidefig"><img loading="lazy" src="/assets/consulting/saudi/slide33.png" alt="Competitive pricing landscape across products and ticket bands"></figure>
     </section>
 
     <div class="author"><div class="avatar">SA</div><div><div style="font-size:15px">Saket Anand</div><div style="font-size:13px;color:var(--muted)">Consulting &middot; market entry &amp; credit strategy</div></div></div>
