@@ -1,0 +1,2550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Platform Finance Strategy</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; color: #1a1a1a; background: #eeeeed; }
+.app { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+/* HEADER */
+.hdr { height: 44px; min-height: 44px; background: #1B2A4A; display: flex; align-items: center; padding: 0 20px; gap: 14px; flex-shrink: 0; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+.hdr-logo { font-size: 14px; font-weight: 700; color: #fff; }
+.hdr-logo span { color: #6db3f2; }
+.hdr-div { width: 1px; height: 18px; background: rgba(255,255,255,0.2); }
+.hdr-sub { font-size: 11px; color: rgba(255,255,255,0.5); letter-spacing: 0.04em; }
+.hdr-space { flex: 1; }
+.hdr-badge { font-size: 10px; background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6); border-radius: 20px; padding: 2px 10px; }
+
+/* BODY */
+.body { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+
+/* NAV */
+.nav { width: 210px; min-width: 210px; background: #fff; border-right: 1px solid #e4e4e2; overflow-y: auto; padding: 14px 0; flex-shrink: 0; }
+.nav-sec { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #bbb; padding: 0 14px 6px; margin-top: 10px; }
+.nav-sec:first-child { margin-top: 0; }
+.nav-item { display: flex; align-items: flex-start; gap: 8px; padding: 7px 14px; cursor: pointer; border-left: 3px solid transparent; transition: all 0.12s; user-select: none; }
+.nav-item:hover { background: #f5f5f3; }
+.nav-item.active { background: #eef4fd; border-left-color: #378ADD; }
+.nav-num { font-size: 9px; font-weight: 700; color: #ccc; min-width: 16px; padding-top: 1px; }
+.nav-item.active .nav-num { color: #378ADD; }
+.nav-lbl { font-size: 11px; color: #555; line-height: 1.35; }
+.nav-item.active .nav-lbl { color: #1B2A4A; font-weight: 600; }
+.nav-div { height: 1px; background: #f0f0ee; margin: 6px 14px; }
+
+/* MAIN */
+.main { flex: 1; overflow-y: auto; padding: 20px 24px; background: #f4f4f2; min-height: 0; }
+
+/* SLIDE */
+.slide { display: none; background: #fff; border-radius: 8px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); padding: 24px 28px 28px; animation: fadeIn 0.15s ease; }
+.slide.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(3px); } to { opacity:1; transform:translateY(0); } }
+.slide-tag { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #aaa; margin-bottom: 4px; }
+.slide-title { font-size: 17px; font-weight: 700; color: #1B2A4A; margin-bottom: 16px; }
+.callout { background: #eef4fd; border-left: 3px solid #378ADD; border-radius: 5px; padding: 10px 14px; margin-bottom: 16px; font-size: 12px; line-height: 1.6; }
+.callout strong { color: #1B56A0; }
+.placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 300px; color: #ccc; gap: 10px; }
+.placeholder-icon { font-size: 36px; }
+
+/* TABLE */
+.nt { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+.nt th { padding: 8px 10px; font-size: 10px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; text-align: left; background: #1B2A4A; position: sticky; top: 0; z-index: 2; }
+.nt td { padding: 7px 10px; border-bottom: 0.5px solid #efefed; vertical-align: middle; }
+.nt tr:hover td { background: #fafaf9; }
+.st { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; text-align: center; writing-mode: vertical-rl; transform: rotate(180deg); border-right: 0.5px solid #efefed; }
+.sub { font-size: 11px; color: #666; font-weight: 500; border-right: 0.5px solid #efefed; white-space: nowrap; }
+.use { font-size: 12px; color: #1a1a1a; }
+.cost { font-size: 10px; color: #999; margin-top: 1px; }
+.tag { display: inline-block; border-radius: 3px; padding: 2px 7px; font-size: 10px; font-weight: 500; white-space: nowrap; }
+.tc { background: #E1F5EE; color: #085041; }
+.ti { background: #E6F1FB; color: #0C447C; }
+.tv { background: #EEEDFE; color: #3C3489; }
+.tn { background: #F1EFE8; color: #888780; }
+
+/* CHART */
+.chart-wrap { position: relative; width: 100%; height: 380px; }
+
+/* PRODUCT STRIP */
+.checkout-banner { background: #fff8ec; border: 1px solid #f5c842; border-radius: 6px 6px 0 0; padding: 7px 14px; display: flex; align-items: center; gap: 10px; border-bottom: none; margin-top: 20px; }
+.checkout-label { font-size: 9px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: #b07800; white-space: nowrap; }
+.checkout-bar { flex: 1; height: 2px; background: repeating-linear-gradient(90deg,#f5c842 0,#f5c842 7px,transparent 7px,transparent 12px); border-radius: 2px; }
+.checkout-note { font-size: 10px; color: #b07800; }
+.product-row { display: flex; border-radius: 0 0 6px 6px; overflow: hidden; border: 1px solid #e8e8e6; }
+.product-step { flex: 1; padding: 9px 12px; border-right: 1px solid #e8e8e6; position: relative; }
+.product-step:last-child { border-right: none; }
+.step-num { font-size: 9px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.5; margin-bottom: 2px; }
+.step-cohort { font-size: 9px; color: #999; margin-bottom: 2px; }
+.step-product { font-size: 12px; font-weight: 700; color: #1a1a1a; margin-bottom: 1px; }
+.step-note { font-size: 9px; color: #aaa; }
+.step-arrow { position: absolute; right: -8px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; background: #fff; border: 1px solid #e8e8e6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #bbb; z-index: 2; }
+.s1 { background: #f0faf6; } .s2 { background: #eef5fd; } .s3 { background: #f3f2fd; } .s4 { background: #fdf3ee; }
+
+/* TREE NODES */
+.tree-node {
+  width: 100%;
+  background: var(--nb, #f5f5f3);
+  border: 1.5px solid transparent;
+  border-left: 3px solid var(--nc, #999);
+  border-radius: 0 5px 5px 0;
+  padding: 7px 10px;
+  cursor: pointer;
+  user-select: none;
+  transition: box-shadow 0.12s;
+  position: relative;
+}
+.tree-node:hover { box-shadow: 0 1px 5px rgba(0,0,0,0.1); }
+.tn-header { font-size: 11px; font-weight: 600; color: #1a1a1a; display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+.tn-badge { font-size: 9px; font-weight: 600; border-radius: 3px; padding: 1px 5px; white-space: nowrap; }
+.tree-tip {
+  display: none;
+  background: #fff;
+  border: 0.5px solid #e4e4e2;
+  border-left: 3px solid var(--nc, #999);
+  border-radius: 0 6px 6px 0;
+  padding: 10px 12px;
+  font-size: 11px;
+  line-height: 1.65;
+  color: #444;
+  width: 100%;
+  animation: fadeIn 0.12s ease;
+  margin-bottom: 2px;
+}
+.tree-tip.open { display: block; }
+
+/* ── MOBILE NAV TOGGLE ── */
+.nav-toggle { display: none; background: none; border: none; cursor: pointer; padding: 0 4px; }
+.nav-toggle span { display: block; width: 18px; height: 2px; background: #fff; margin: 3px 0; border-radius: 1px; transition: all 0.2s; }
+.mob-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 49; }
+.mob-overlay.open { display: block; }
+
+/* ── MOBILE RESPONSIVE ── */
+@media (max-width: 768px) {
+  html, body { overflow: auto; height: auto; }
+  .app { height: auto; min-height: 100vh; overflow: visible; }
+  .body { overflow: visible; }
+
+  /* Header compact */
+  .hdr { padding: 0 14px; gap: 10px; }
+  .hdr-badge { display: none; }
+  .hdr-div { display: none; }
+  .nav-toggle { display: block; }
+
+  /* Nav as slide-in drawer */
+  .nav {
+    position: fixed; left: -220px; top: 44px; bottom: 0;
+    width: 220px; z-index: 50;
+    transition: left 0.22s ease;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+    overflow-y: auto;
+  }
+  .nav.open { left: 0; }
+
+  /* Main fills full width */
+  .main { padding: 12px; overflow: visible; min-height: calc(100vh - 44px); }
+  .slide { padding: 16px; border-radius: 6px; }
+  .slide-title { font-size: 15px; }
+
+  /* Grids collapse to single column */
+  .slide [style*="grid-template-columns:1fr 1fr 1fr"],
+  .slide [style*="grid-template-columns: 1fr 1fr 1fr"] { display: flex !important; flex-direction: column !important; }
+  .slide [style*="grid-template-columns:1fr 1fr"],
+  .slide [style*="grid-template-columns: 1fr 1fr"] { display: flex !important; flex-direction: column !important; }
+
+  /* Tables scroll horizontally */
+  .tbl-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .nt { min-width: 600px; }
+
+  /* Product strip stacks */
+  .product-row { flex-direction: column; }
+  .product-step { border-right: none; border-bottom: 0.5px solid #e8e8e6; }
+  .product-step:last-child { border-bottom: none; }
+  .step-arrow { display: none; }
+
+  /* Chart shorter on mobile */
+  .chart-wrap { height: 260px; }
+
+  /* Checkout banner wraps */
+  .checkout-banner { flex-wrap: wrap; }
+  .checkout-bar { display: none; }
+
+  /* Callout smaller */
+  .callout { font-size: 11px; padding: 8px 10px; }
+}
+
+@media (min-width: 769px) {
+  .nav-toggle { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="hdr">
+  <button class="nav-toggle" onclick="toggleNav()" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="hdr-logo">Platform <span>Pay</span></div>
+  <div class="hdr-div"></div>
+  <div class="hdr-sub">Finance Strategy</div>
+  <div class="hdr-space"></div>
+  <div class="hdr-badge" onclick="location.href='/consulting/'" style="cursor:pointer">← creditintuition</div>
+</div>
+<div class="mob-overlay" id="mob-overlay" onclick="toggleNav()"></div>
+
+<div class="body">
+  <nav class="nav">
+    <div class="nav-sec">Platform Pay</div>
+    <div class="nav-item active" data-idx="0" onclick="show(0)"><span class="nav-num">01</span><span class="nav-lbl">Customer needs &amp; financial products</span></div>
+    <div class="nav-item" data-idx="1" onclick="show(1)"><span class="nav-num">02</span><span class="nav-lbl">Product universe — Fintech tree</span></div>
+    <div class="nav-item" data-idx="2" onclick="show(2)"><span class="nav-num">03</span><span class="nav-lbl">Customer distribution &amp; engagement</span></div>
+    <div class="nav-div"></div>
+    <div class="nav-sec">Strategy</div>
+    <div class="nav-item" data-idx="3" onclick="show(3)"><span class="nav-num">04</span><span class="nav-lbl">Insurance fails standalone — childbirth</span></div>
+    <div class="nav-item" data-idx="4" onclick="show(4)"><span class="nav-num">05</span><span class="nav-lbl">Insurance fails standalone — IVF</span></div>
+    <div class="nav-item" data-idx="5" onclick="show(5)"><span class="nav-num">06</span><span class="nav-lbl">Insurance works — as a bundle</span></div>
+    <div class="nav-item" data-idx="6" onclick="show(6)"><span class="nav-num">07</span><span class="nav-lbl">Bundled product — loan + insurance design</span></div>
+    <div class="nav-div"></div>
+    <div class="nav-sec">Commercial</div>
+    <div class="nav-item" data-idx="7" onclick="show(7)"><span class="nav-num">08</span><span class="nav-lbl">Commercial model — revenue build</span></div>
+    <div class="nav-item" onclick="showById('s7b')"><span class="nav-num">09</span><span class="nav-lbl">Product comparison</span></div>
+    <div class="nav-div"></div>
+    <div class="nav-sec">Product Design</div>
+    <div class="nav-item" data-idx="8" onclick="show(8)"><span class="nav-num">09</span><span class="nav-lbl">Childbirth — cash flow &amp; contours</span></div>
+    <div class="nav-item" onclick="showById('s9b')"><span class="nav-num">10</span><span class="nav-lbl">Childbirth — risk framework</span></div>
+    <div class="nav-div"></div>
+    <div class="nav-sec">Financials</div>
+    <div class="nav-item" data-idx="12" onclick="show(12)"><span class="nav-num">11</span><span class="nav-lbl">5-year P&amp;L model</span></div>
+    <div class="nav-div"></div>
+    <div class="nav-sec">Appendix</div>
+    <div class="nav-item" data-idx="11" onclick="show(11)"><span class="nav-num">A1</span><span class="nav-lbl">Hospital P&amp;L benchmarks</span></div>
+    <div class="nav-item" data-idx="13" onclick="show(13)"><span class="nav-num">A2</span><span class="nav-lbl">Insurer P&amp;L benchmarks</span></div>
+  </nav>
+
+  <main class="main">
+
+    <!-- SLIDE 01 — NEEDS TABLE -->
+    <div class="slide active" id="s0">
+      <div class="slide-tag">Platform Pay — Product universe</div>
+      <div class="slide-title">Customer needs across the parenting journey — and how they are financed</div>
+      <div class="callout"><strong>Credit covers almost every stage.</strong> Insurance is limited to genuine tail risks. Investments emerge post-delivery as parents begin planning ahead.</div>
+
+      <div class="tbl-scroll" style="border:0.5px solid #e4e4e2;border-radius:8px;">
+        <table class="nt">
+          <colgroup>
+            <col style="width:48px">
+            <col style="width:98px">
+            <col style="width:210px">
+            <col style="width:155px">
+            <col style="width:155px">
+            <col style="width:155px">
+          </colgroup>
+          <thead>
+            <tr>
+              <th style="color:#fff;">Stage</th>
+              <th style="color:rgba(255,255,255,0.55);">Sub-stage</th>
+              <th style="color:rgba(255,255,255,0.9);">End use / need (cost)</th>
+              <th style="color:#9FE1CB;">Credit</th>
+              <th style="color:#85B7EB;">Insurance</th>
+              <th style="color:#AFA9EC;">Investments</th>
+            </tr>
+          </thead>
+          <tbody id="tbl"></tbody>
+        </table>
+      </div>
+
+      <div style="display:flex;gap:14px;margin-top:12px;align-items:center;flex-wrap:wrap;">
+        <span style="font-size:10px;color:#aaa;">Legend:</span>
+        <span class="tag tc">Credit</span>
+        <span class="tag ti">Insurance</span>
+        <span class="tag tv">Investments</span>
+        <span class="tag tn">— not applicable</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 02 — FINTECH PRODUCT TREE -->
+    <div class="slide" id="s1">
+      <div class="slide-tag">Platform Pay — Product Universe</div>
+      <div class="slide-title">Fintech product tree — what the platform can build</div>
+      <div class="callout"><strong>Click any node to expand rationale and next steps.</strong> <span style="background:#d4edda;color:#155724;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:600;">Live</span> already on platform &nbsp;<span style="background:#E6F1FB;color:#0C447C;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:600;">Near-term</span> priority build &nbsp;<span style="background:#EEEDFE;color:#3C3489;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:600;">Future</span> licensing or scale required</div>
+
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+      <div style="min-width:900px;">
+
+      <!-- ROOT -->
+      <div style="display:flex;justify-content:center;padding-top:8px;">
+        <div style="background:#1B2A4A;color:#fff;border-radius:8px;padding:9px 32px;font-size:13px;font-weight:700;box-shadow:0 2px 8px rgba(27,42,74,0.2);">the platform Fintech</div>
+      </div>
+
+      <!-- ROOT → BRANCH LINES -->
+      <div style="display:flex;justify-content:center;">
+        <svg width="900" height="36" style="display:block;overflow:visible;">
+          <!-- vertical stem -->
+          <line x1="450" y1="0" x2="450" y2="12" stroke="#ccc" stroke-width="1.5"/>
+          <!-- horizontal bar -->
+          <line x1="112" y1="12" x2="788" y2="12" stroke="#ccc" stroke-width="1.5"/>
+          <!-- drops to each branch -->
+          <line x1="112" y1="12" x2="112" y2="36" stroke="#ccc" stroke-width="1.5"/>
+          <line x1="337" y1="12" x2="337" y2="36" stroke="#ccc" stroke-width="1.5"/>
+          <line x1="562" y1="12" x2="562" y2="36" stroke="#ccc" stroke-width="1.5"/>
+          <line x1="788" y1="12" x2="788" y2="36" stroke="#ccc" stroke-width="1.5"/>
+        </svg>
+      </div>
+
+      <!-- FOUR BRANCH COLUMNS -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;align-items:start;">
+
+            <!-- PAYMENTS COLUMN -->
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <div style="background:#E24B4A;color:#fff;border-radius:6px;padding:6px 0;font-size:11px;font-weight:700;width:100%;text-align:center;box-shadow:0 1px 4px rgba(226,75,74,0.3);">Payments</div>
+              <div style="width:1.5px;height:10px;background:#ccc;"></div>
+              <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:0;">
+
+                <div onclick="toggleNode('closedwallet')" class="tree-node" style="--nc:#E24B4A;--nb:#fef2f2;">
+                  <div class="tn-header">Closed Loop Wallet <span class="tn-badge" style="background:#d4edda;color:#155724;">Live</span></div>
+                </div>
+                <div id="tip-closedwallet" class="tree-tip" style="--nc:#E24B4A;">
+                  <strong>What:</strong> the platform Cash wallet — users load cash and spend only on Platform Store. Exempt from RBI PPI licensing as a closed-loop instrument.<br><br>
+                  <strong>Current mechanics:</strong> Load ₹2,000 get ₹2,100 (5% bonus). Earn the platform Cash via surveys, social follows, spin-to-win. Redeem against store purchases.<br><br>
+                  <strong>Strategic value:</strong> Trains financial behaviour on platform. Every load is a micro-transaction. Builds the usage history that makes future credit underwriting possible.<br><br>
+                  <strong>Limitation:</strong> No interchange revenue. No float income at current scale. Pure loyalty mechanic until semi-closed wallet is added.<br><br>
+                  <strong>Next step:</strong> Track load frequency and redemption rate per cohort. Users who load 3+ times are the highest-intent segment for credit and insurance cross-sell.
+                </div>
+
+
+                <div style="width:1.5px;height:8px;background:#ccc;"></div>
+                <div onclick="toggleNode('semiclosed')" class="tree-node" style="--nc:#E24B4A;--nb:#fef2f2;">
+                  <div class="tn-header">Semi-Closed Wallet <span class="tn-badge" style="background:#EEEDFE;color:#3C3489;">Future</span></div>
+                </div>
+                <div id="tip-semiclosed" class="tree-tip" style="--nc:#E24B4A;">
+                  <strong>What:</strong> Wallet spendable at third-party hospital and pharmacy POS — not just Platform Store. Load ₹5,000, get ₹250 bonus (5% discount) redeemable at network providers.<br><br>
+                  <strong>Why compelling:</strong> Maternity and infant healthcare spend is ₹60K–2L over the first year. If the platform can capture even 20% of that as wallet load, float income and interchange become meaningful.<br><br>
+                  <strong>Regulatory reality:</strong> Semi-closed PPI requires RBI PPI licence — or a licensed partner (Paytm, PhonePe, slice). the platform should partner, not apply. Licence takes 2–3 years and ₹5Cr net worth minimum.<br><br>
+                  <strong>Partner model:</strong> White-label a licensed PPI issuer. the platform controls the UX, partner holds the licence. Revenue share on interchange (1–1.5% of spends) + float income on loaded balances.<br><br>
+                  <strong>Prerequisite:</strong> Build hospital network first (needed for packages anyway). Semi-closed wallet extends the same network to payment acceptance.
+                </div>
+
+              </div>
+            </div>
+
+            <!-- CREDIT COLUMN -->
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <div style="background:#1D9E75;color:#fff;border-radius:6px;padding:6px 0;font-size:11px;font-weight:700;width:100%;text-align:center;box-shadow:0 1px 4px rgba(29,158,117,0.3);">Credit</div>
+              <div style="width:1.5px;height:10px;background:#ccc;"></div>
+              <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:0;">
+
+                <div onclick="toggleNode('childloan')" class="tree-node" style="--nc:#1D9E75;--nb:#E1F5EE;">
+                  <div class="tn-header">Childbirth Loan <span class="tn-badge" style="background:#E6F1FB;color:#0C447C;">Near-term</span></div>
+                </div>
+                <div id="tip-childloan" class="tree-tip" style="--nc:#1D9E75;">
+                  <strong>What:</strong> ₹1–3L loan disbursed at week 27. 3 pre-EMIs before delivery, then 18–24 month repayment. Highest revenue product.<br><br>
+                  <strong>Why the platform wins:</strong> Due date is known. Originate at week 24 before hospital booking. No bank has this signal.<br><br>
+                  <strong>Model:</strong> CLM2 — NBFC funds 100%, the platform provides 8–10% FLDG, earns 5–6% spread.<br><br>
+                  <strong>Revenue/customer:</strong> ₹18,000–22,000 (spread + insurance commission + processing fee).<br><br>
+                  <strong>Next step:</strong> Identify NBFC partner. Draft CLM2 term sheet. Build credit policy with CIBIL 680+ floor.
+                </div>
+
+                <div style="width:1.5px;height:8px;background:#ccc;"></div>
+                <div onclick="toggleNode('bnpl')" class="tree-node" style="--nc:#1D9E75;--nb:#E1F5EE;">
+                  <div class="tn-header">BNPL / Checkout <span class="tn-badge" style="background:#d4edda;color:#155724;">Live</span></div>
+                </div>
+                <div id="tip-bnpl" class="tree-tip" style="--nc:#1D9E75;">
+                  <strong>What:</strong> ₹500–5,000 BNPL on Platform Store. Diapers, formula, baby gear. Repeat category, 2–3x/month frequency.<br><br>
+                  <strong>Model:</strong> LSP — NBFC pre-approves limit at onboarding. Zero marginal underwriting per transaction.<br><br>
+                  <strong>IRR:</strong> 24–36% on small ticket. Low default severity. Good unit economics at scale.<br><br>
+                  <strong>Extensions:</strong> Pharmacy credit; doctor consultation credit; lab test credit — all on the same revolving limit.<br><br>
+                  <strong>Next step:</strong> Pilot on top 20 Platform Store SKUs. Measure D30 default. Scale if &lt;3%.
+                </div>
+
+                <div style="width:1.5px;height:8px;background:#ccc;"></div>
+                <div onclick="toggleNode('ivfloan')" class="tree-node" style="--nc:#1D9E75;--nb:#E1F5EE;">
+                  <div class="tn-header">IVF / Fertility Loan <span class="tn-badge" style="background:#E6F1FB;color:#0C447C;">Near-term</span></div>
+                </div>
+                <div id="tip-ivfloan" class="tree-tip" style="--nc:#1D9E75;">
+                  <strong>What:</strong> ₹1.5–3L per cycle, structured for 2 cycles. Direct disbursement to clinic.<br><br>
+                  <strong>Why the platform wins:</strong> TTC &gt;6 month users search IVF content explicitly. No insurance exists. Loan is the only product.<br><br>
+                  <strong>Risk:</strong> 30–40% success rate. Mitigate via direct clinic disbursal + 15% down payment.<br><br>
+                  <strong>Extensions:</strong> Egg freezing loan; fertility medication credit disbursed to pharmacy.<br><br>
+                  <strong>Next step:</strong> Partner with Indira IVF, Nova IVF, Cloudnine. Direct settlement API.
+                </div>
+
+                <div style="width:1.5px;height:8px;background:#ccc;"></div>
+                <div onclick="toggleNode('schoolloan')" class="tree-node" style="--nc:#1D9E75;--nb:#E1F5EE;">
+                  <div class="tn-header">School Fee Loan <span class="tn-badge" style="background:#E6F1FB;color:#0C447C;">Near-term</span></div>
+                </div>
+                <div id="tip-schoolloan" class="tree-tip" style="--nc:#1D9E75;">
+                  <strong>What:</strong> ₹50K–3L/yr upfront to school, parent repays in EMIs. Zero-interest via school subvention (2–3%).<br><br>
+                  <strong>Why the platform wins:</strong> Tracks child age — prompts school fee loan 6 months before admission season. Structural timing edge.<br><br>
+                  <strong>Model:</strong> B2B2C. School pays subvention. NBFC funds. the platform earns distribution fee.<br><br>
+                  <strong>Extensions:</strong> Preschool loan; coaching loan; back-to-school device loan.<br><br>
+                  <strong>Next step:</strong> Shortlist 50 CBSE schools in top 10 cities for pilot.
+                </div>
+
+                <div style="width:1.5px;height:8px;background:#ccc;"></div>
+                <div onclick="toggleNode('carcredit')" class="tree-node" style="--nc:#1D9E75;--nb:#E1F5EE;">
+                  <div class="tn-header">Car Loan Referral <span class="tn-badge" style="background:#EEEDFE;color:#3C3489;">Future</span></div>
+                </div>
+                <div id="tip-carcredit" class="tree-tip" style="--nc:#1D9E75;">
+                  <strong>What:</strong> Lead-gen for car loans at the "new family car" moment — parents with 0–12 month newborns upgrade vehicles at high rates.<br><br>
+                  <strong>Model:</strong> Pure DSA referral. HDFC Bank, ICICI Bank, Mahindra Finance pay ₹3,000–8,000 per disbursed loan. Zero capital from the platform.<br><br>
+                  <strong>Next step:</strong> Push notification campaign to 0–6 month cohort. Measure conversion before formalising DSA agreement.
+                </div>
+
+              </div>
+            </div>
+
+            <!-- INSURANCE COLUMN -->
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <div style="background:#378ADD;color:#fff;border-radius:6px;padding:6px 0;font-size:11px;font-weight:700;width:100%;text-align:center;box-shadow:0 1px 4px rgba(55,138,221,0.3);">Insurance</div>
+              <div style="width:1.5px;height:10px;background:#ccc;"></div>
+              <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:0;">
+
+                <div onclick="toggleNode('bundledins')" class="tree-node" style="--nc:#378ADD;--nb:#E6F1FB;">
+                  <div class="tn-header">Complication Cover <span class="tn-badge" style="background:#E6F1FB;color:#0C447C;">Near-term</span></div>
+                </div>
+                <div id="tip-bundledins" class="tree-tip" style="--nc:#378ADD;">
+                  <strong>What:</strong> NICU, maternal ICU, emergency C-section complications — bundled on top of the childbirth loan. Not sold standalone.<br><br>
+                  <strong>Why it works:</strong> Genuinely uncertain, high severity. Claim rate 8–12%. Real insurance economics unlike maternity.<br><br>
+                  <strong>Pricing:</strong> ₹1,500–2,500 premium in EMI. the platform earns 15–18% commission as corporate agent.<br><br>
+                  <strong>Next step:</strong> Approach Niva Bupa / Star Health for group "obstetric complication" product — sidesteps maternity waiting period entirely.
+                </div>
+
+                <div style="width:1.5px;height:8px;background:#ccc;"></div>
+                <div onclick="toggleNode('termlife')" class="tree-node" style="--nc:#378ADD;--nb:#E6F1FB;">
+                  <div class="tn-header">Parent Term Life <span class="tn-badge" style="background:#E6F1FB;color:#0C447C;">Near-term</span></div>
+                </div>
+                <div id="tip-termlife" class="tree-tip" style="--nc:#378ADD;">
+                  <strong>What:</strong> Credit-linked term life. Outstanding loan repaid by insurer if primary earner dies during tenure.<br><br>
+                  <strong>Why now:</strong> New parent moment = highest life insurance intent. No waiting period on term life.<br><br>
+                  <strong>Economics:</strong> ₹500–2,000/yr premium. 25–35% first-year commission. 5–7.5% renewal from year 2.<br><br>
+                  <strong>Next step:</strong> HDFC Life / ICICI Pru have pre-built credit-life APIs. One-tap add-on at loan checkout.
+                </div>
+
+                <div style="width:1.5px;height:8px;background:#ccc;"></div>
+                <div onclick="toggleNode('childhealth')" class="tree-node" style="--nc:#378ADD;--nb:#E6F1FB;">
+                  <div class="tn-header">Child Health Floater <span class="tn-badge" style="background:#d4edda;color:#155724;">Live (pilot)</span></div>
+                </div>
+                <div id="tip-childhealth" class="tree-tip" style="--nc:#378ADD;">
+                  <strong>What:</strong> Family floater adding newborn from Day 1. Offered to 0–6 month cohort.<br><br>
+                  <strong>Economics:</strong> ₹8,000–15,000/yr. 17–20% first-year commission. 80%+ renewal rate.<br><br>
+                  <strong>Extensions:</strong> OPD-only paediatric plan; vaccination package insurance.<br><br>
+                  <strong>Regulatory path:</strong> IRDAI Corporate Agent — ₹50L net worth, up to 9 insurer tie-ups.
+                </div>
+
+                <div style="width:1.5px;height:8px;background:#ccc;"></div>
+                <div onclick="toggleNode('accidental')" class="tree-node" style="--nc:#378ADD;--nb:#E6F1FB;">
+                  <div class="tn-header">Personal Accident <span class="tn-badge" style="background:#EEEDFE;color:#3C3489;">Future</span></div>
+                </div>
+                <div id="tip-accidental" class="tree-tip" style="--nc:#378ADD;">
+                  <strong>What:</strong> PA cover for primary earner. ₹2,000–5,000/yr, ₹10–50L sum assured.<br><br>
+                  <strong>Model:</strong> Bundle into the platform Family Plan subscription. Adds value, marginal claim risk, 15–20% commission.<br><br>
+                  <strong>Extensions:</strong> Two-wheeler accident cover (Tier 2 commuters); hospitalisation daily cash.
+                </div>
+
+                <div style="width:1.5px;height:8px;background:#ccc;"></div>
+                <div onclick="toggleNode('familyplan')" class="tree-node" style="--nc:#378ADD;--nb:#E6F1FB;">
+                  <div class="tn-header">the platform Family Plan <span class="tn-badge" style="background:#EEEDFE;color:#3C3489;">Future</span></div>
+                </div>
+                <div id="tip-familyplan" class="tree-tip" style="--nc:#378ADD;">
+                  <strong>What:</strong> ₹199–499/month subscription bundling wallet bonus, child health insurance, discounts, emergency credit line.<br><br>
+                  <strong>Revenue stack:</strong> ₹2,400–6,000/yr fee + insurance commission + incremental credit origination.<br><br>
+                  <strong>Risk:</strong> Churn kills the model. Start at ₹199/month, prove retention before scaling price.<br><br>
+                  <strong>Extensions:</strong> Telemedicine access; discount pharmacy network; priority SLA.
+                </div>
+
+              </div>
+            </div>
+
+            <!-- INVESTMENT COLUMN -->
+            <div style="display:flex;flex-direction:column;align-items:center;">
+              <div style="background:#7F77DD;color:#fff;border-radius:6px;padding:6px 0;font-size:11px;font-weight:700;width:100%;text-align:center;box-shadow:0 1px 4px rgba(127,119,221,0.3);">Investments</div>
+              <div style="width:1.5px;height:10px;background:#ccc;"></div>
+              <div style="display:flex;flex-direction:column;align-items:center;width:100%;gap:0;">
+
+                <div onclick="toggleNode('savingsscheme')" class="tree-node" style="--nc:#7F77DD;--nb:#EEEDFE;">
+                  <div class="tn-header">Delivery Savings SIP <span class="tn-badge" style="background:#E6F1FB;color:#0C447C;">Near-term</span></div>
+                </div>
+                <div id="tip-savingsscheme" class="tree-tip" style="--nc:#7F77DD;">
+                  <strong>What:</strong> Goal-based SIP — "₹50,000 delivery fund ready by Week 38." 3–6 month horizon. Target: TTC and 1st trimester.<br><br>
+                  <strong>Model:</strong> MFD — NISM Series V-A + ARN. Zero capital. Trail commission 0.5–1% AUM.<br><br>
+                  <strong>Timing to launch:</strong> 4 months from starting NISM process.<br><br>
+                  <strong>Extensions:</strong> Emergency fund SIP; vaccination corpus SIP (₹300/month, ₹25K over 3 years).
+                </div>
+
+                <div style="width:1.5px;height:8px;background:#ccc;"></div>
+                <div onclick="toggleNode('edufund')" class="tree-node" style="--nc:#7F77DD;--nb:#EEEDFE;">
+                  <div class="tn-header">Child Education Corpus <span class="tn-badge" style="background:#E6F1FB;color:#0C447C;">Near-term</span></div>
+                </div>
+                <div id="tip-edufund" class="tree-tip" style="--nc:#7F77DD;">
+                  <strong>What:</strong> Long-horizon SIP — "IIT Fund / IIM Fund." ₹2,000–10,000/month, 10–18 year horizon. Target: 0–6 month motherhood cohort.<br><br>
+                  <strong>Economics:</strong> ₹5K SIP × 1% trail × 10yr = ₹600 cumulative/user. 100K SIP users = ₹60Cr AUM at year 5.<br><br>
+                  <strong>Extensions:</strong> Sukanya Samriddhi Yojana facilitation (girl child, 8.2% govt-backed); PPF-linked education plan.<br><br>
+                  <strong>Next step:</strong> NISM V-A first. AMC partner: Mirae, Axis, or DSP.
+                </div>
+
+                <div style="width:1.5px;height:8px;background:#ccc;"></div>
+                <div onclick="toggleNode('goldscheme')" class="tree-node" style="--nc:#7F77DD;--nb:#EEEDFE;">
+                  <div class="tn-header">Digital Gold <span class="tn-badge" style="background:#EEEDFE;color:#3C3489;">Future</span></div>
+                </div>
+                <div id="tip-goldscheme" class="tree-tip" style="--nc:#7F77DD;">
+                  <strong>What:</strong> "Buy ₹100 gold for baby's first month." Milestone-linked accumulation with physical redemption at 5 years.<br><br>
+                  <strong>Model:</strong> Partner SafeGold / Augmont / MMTC-PAMP. 0.5–1% spread or ₹29/month platform fee.<br><br>
+                  <strong>Cultural fit:</strong> Gold gifting at birth (mundan, naming ceremony) is deeply Indian. Digital wrapper on an existing behaviour.<br><br>
+                  <strong>Extensions:</strong> Sovereign Gold Bond distribution (1% commission, tax-efficient).
+                </div>
+
+                <div style="width:1.5px;height:8px;background:#ccc;"></div>
+                <div onclick="toggleNode('wealthmgmt')" class="tree-node" style="--nc:#7F77DD;--nb:#EEEDFE;">
+                  <div class="tn-header">Wealth Mgmt Referral <span class="tn-badge" style="background:#EEEDFE;color:#3C3489;">Future</span></div>
+                </div>
+                <div id="tip-wealthmgmt" class="tree-tip" style="--nc:#7F77DD;">
+                  <strong>What:</strong> HNI users (HHI ₹30L+) referred to SEBI-registered RIA or wealth platform. ₹3,000–10,000 per opened account.<br><br>
+                  <strong>Partners:</strong> Scripbox, Fisdom, INDmoney, 1Finance.<br><br>
+                  <strong>Risk:</strong> Cannot give investment advice without RIA licence. Keep it referral-only, not advisory.
+                </div>
+
+              </div>
+            </div>
+
+          </div><!-- end 4-column grid -->
+      </div><!-- end min-width -->
+      </div><!-- end overflow -->
+
+      <!-- LEGEND -->
+      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center;">
+        <span style="font-size:10px;color:#aaa;font-weight:600;">Status:</span>
+        <span style="background:#d4edda;color:#155724;border-radius:3px;padding:2px 8px;font-size:10px;font-weight:600;">Live</span>
+        <span style="background:#E6F1FB;color:#0C447C;border-radius:3px;padding:2px 8px;font-size:10px;font-weight:600;">Near-term &lt;12mo</span>
+        <span style="background:#EEEDFE;color:#3C3489;border-radius:3px;padding:2px 8px;font-size:10px;font-weight:600;">Future 12–36mo</span>
+        <span style="font-size:10px;color:#bbb;margin-left:4px;">· Click any node to expand</span>
+      </div>
+    </div>
+
+    <!-- SLIDE 02 — HISTOGRAM -->
+    <div class="slide" id="s2">
+      <div class="slide-tag">Platform Pay — Customer base</div>
+      <div class="slide-title">Customer distribution &amp; engagement by stage</div>
+      <div class="callout"><strong>Pregnancy (44%) and Motherhood (46%) are the two largest segments</strong> — together 90% of the platform. Engagement peaks at <strong>14 mins/user/month</strong> during pregnancy — the optimal window to originate financial products.</div>
+
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+        <div style="background:#f5f5f3;border-radius:6px;padding:7px 14px;"><div style="font-size:9px;color:#999;margin-bottom:2px;">Trying to conceive</div><div style="font-size:18px;font-weight:700;color:#1D9E75;">10.2%</div></div>
+        <div style="background:#f5f5f3;border-radius:6px;padding:7px 14px;"><div style="font-size:9px;color:#999;margin-bottom:2px;">Pregnancy</div><div style="font-size:18px;font-weight:700;color:#378ADD;">44.0%</div></div>
+        <div style="background:#f5f5f3;border-radius:6px;padding:7px 14px;"><div style="font-size:9px;color:#999;margin-bottom:2px;">Motherhood</div><div style="font-size:18px;font-weight:700;color:#7F77DD;">45.8%</div></div>
+      </div>
+
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:10px;color:#666;">
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:2px;background:#1D9E75;display:inline-block;"></span>Trying to conceive</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:2px;background:#378ADD;display:inline-block;"></span>Pregnancy</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:9px;height:9px;border-radius:2px;background:#7F77DD;display:inline-block;"></span>Motherhood</span>
+        <span style="display:flex;align-items:center;gap:4px;"><span style="width:13px;height:2px;background:#E24B4A;display:inline-block;"></span><span style="width:5px;height:5px;border-radius:50%;background:#E24B4A;display:inline-block;margin-left:-2px;"></span>&nbsp;Engagement mins/user/month</span>
+      </div>
+
+      <div class="chart-wrap"><canvas id="platformChart" role="img" aria-label="the platform customer distribution and engagement chart"></canvas></div>
+      <div style="font-size:9px;color:#bbb;margin-top:6px;">* Engagement minutes: confirmed for TTC, 1st Trimester and 0–3mo; other sub-stages interpolated from group averages</div>
+
+      <div class="checkout-banner">
+        <span class="checkout-label">⚡ Checkout Finance</span>
+        <div class="checkout-bar"></div>
+        <span class="checkout-note">Present at every stage · ₹500–5,000 · Platform Store BNPL · 24–36% IRR · zero FLDG on small ticket</span>
+      </div>
+      <div class="product-row">
+        <div class="product-step s1"><div class="step-num">Step 1</div><div class="step-cohort">2nd → 3rd Trimester</div><div class="step-product">Childbirth Loan</div><div class="step-note">₹3L · week 27 · 3 pre-EMIs</div><div class="step-arrow">→</div></div>
+        <div class="product-step s2"><div class="step-num">Step 2</div><div class="step-cohort">0–6 months Motherhood</div><div class="step-product">Newborn CI + Term Life</div><div class="step-note">Credit protection · genuine insurance</div><div class="step-arrow">→</div></div>
+        <div class="product-step s3"><div class="step-num">Step 3</div><div class="step-cohort">1–3 years Motherhood</div><div class="step-product">School Fee Loan</div><div class="step-note">Recurring annual · higher ticket</div><div class="step-arrow">→</div></div>
+        <div class="product-step s4"><div class="step-num">Step 4</div><div class="step-cohort">TTC &gt;6 months</div><div class="step-product">IVF / Fertility Loan</div><div class="step-note">₹1.5–3L · separate funnel</div></div>
+      </div>
+    </div>
+
+    <!-- SLIDES 03–07 -->
+    <div class="slide" id="s3">
+      <div class="slide-tag">Platform Pay — Insurance strategy</div>
+      <div class="slide-title">Why insurance does not work standalone — childbirth</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+
+        <div style="background:#fdf3ee;border-left:3px solid #D85A30;border-radius:0 6px 6px 0;padding:14px 16px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#D85A30;margin-bottom:8px;">What insurance is designed for</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:flex-start;gap:10px;">
+              <div style="min-width:36px;height:36px;background:#D85A3018;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;">low</div>
+              <div><div style="font-size:12px;font-weight:600;color:#712B13;">Low frequency</div><div style="font-size:11px;color:#993C1D;margin-top:2px;">Event happens rarely — death, critical illness, accident. Pooling across millions makes pricing work.</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;">
+              <div style="min-width:36px;height:36px;background:#D85A3018;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;">high</div>
+              <div><div style="font-size:12px;font-weight:600;color:#712B13;">High severity</div><div style="font-size:11px;color:#993C1D;margin-top:2px;">When it does happen, the cost is catastrophic. Insurance transfers that tail risk to the pool.</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;">
+              <div style="min-width:36px;height:36px;background:#D85A3018;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;">?</div>
+              <div><div style="font-size:12px;font-weight:600;color:#712B13;">Uncertain timing</div><div style="font-size:11px;color:#993C1D;margin-top:2px;">Neither insurer nor customer knows when the event will occur. That uncertainty is the product.</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#eef4fd;border-left:3px solid #378ADD;border-radius:0 6px 6px 0;padding:14px 16px;">
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#378ADD;margin-bottom:8px;">Why maternity fails all three tests</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:flex-start;gap:10px;">
+              <div style="min-width:36px;height:36px;background:#378ADD18;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;">95%</div>
+              <div><div style="font-size:12px;font-weight:600;color:#0C447C;">Near-certain event</div><div style="font-size:11px;color:#185FA5;margin-top:2px;">If a woman is pregnant, delivery will happen. Claim probability is ~95%. No pooling benefit.</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;">
+              <div style="min-width:36px;height:36px;background:#378ADD18;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;">low</div>
+              <div><div style="font-size:12px;font-weight:600;color:#0C447C;">Moderate severity</div><div style="font-size:11px;color:#185FA5;margin-top:2px;">Normal delivery ₹60K–1.5L. Painful but not catastrophic. Insurance sub-limits reflect this.</div></div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px;">
+              <div style="min-width:36px;height:36px;background:#378ADD18;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;">9mo</div>
+              <div><div style="font-size:12px;font-weight:600;color:#0C447C;">Timing is known</div><div style="font-size:11px;color:#185FA5;margin-top:2px;">Due date is predictable to within 2 weeks. No uncertainty. Insurer cannot price this as risk.</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#aaa;margin-bottom:8px;">How insurers respond — mandatory waiting periods</div>
+      <div style="border:0.5px solid #e4e4e2;border-radius:8px;overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;">
+          <colgroup>
+            <col style="width:130px">
+            <col style="width:130px">
+            <col style="width:120px">
+            <col style="width:120px">
+            <col style="width:120px">
+            <col style="width:200px">
+          </colgroup>
+          <thead>
+            <tr>
+              <th style="background:#1B2A4A;color:#fff;padding:7px 10px;font-size:10px;font-weight:500;text-align:left;letter-spacing:0.04em;">Insurer</th>
+              <th style="background:#1B2A4A;color:#fff;padding:7px 10px;font-size:10px;font-weight:500;text-align:left;">Plan</th>
+              <th style="background:#1B2A4A;color:#E24B4A;padding:7px 10px;font-size:10px;font-weight:500;text-align:left;">Waiting period</th>
+              <th style="background:#1B2A4A;color:#9FE1CB;padding:7px 10px;font-size:10px;font-weight:500;text-align:left;">Normal delivery</th>
+              <th style="background:#1B2A4A;color:#9FE1CB;padding:7px 10px;font-size:10px;font-weight:500;text-align:left;">C-section</th>
+              <th style="background:#1B2A4A;color:rgba(255,255,255,0.55);padding:7px 10px;font-size:10px;font-weight:500;text-align:left;">Annual premium (₹10L SI, age 30)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:0.5px solid #efefed;">
+              <td style="padding:7px 10px;font-weight:500;">Star Health</td>
+              <td style="padding:7px 10px;color:#555;">Family Health Optima</td>
+              <td style="padding:7px 10px;"><span style="background:#FCEBEB;color:#A32D2D;border-radius:3px;padding:2px 7px;font-size:10px;font-weight:600;">2–3 years</span></td>
+              <td style="padding:7px 10px;color:#1a1a1a;">₹25,000</td>
+              <td style="padding:7px 10px;color:#1a1a1a;">₹50,000</td>
+              <td style="padding:7px 10px;color:#555;">₹14,000–18,000</td>
+            </tr>
+            <tr style="border-bottom:0.5px solid #efefed;background:#fafaf9;">
+              <td style="padding:7px 10px;font-weight:500;">Niva Bupa</td>
+              <td style="padding:7px 10px;color:#555;">Aspire (M-iracle add-on)</td>
+              <td style="padding:7px 10px;"><span style="background:#FEF3C7;color:#854F0B;border-radius:3px;padding:2px 7px;font-size:10px;font-weight:600;">9 months</span></td>
+              <td style="padding:7px 10px;color:#1a1a1a;">₹25,000–50,000</td>
+              <td style="padding:7px 10px;color:#1a1a1a;">₹50,000–1,00,000</td>
+              <td style="padding:7px 10px;color:#555;">₹18,000–25,000</td>
+            </tr>
+            <tr style="border-bottom:0.5px solid #efefed;">
+              <td style="padding:7px 10px;font-weight:500;">Care Health</td>
+              <td style="padding:7px 10px;color:#555;">Care Joy</td>
+              <td style="padding:7px 10px;"><span style="background:#FCEBEB;color:#A32D2D;border-radius:3px;padding:2px 7px;font-size:10px;font-weight:600;">2 years</span></td>
+              <td style="padding:7px 10px;color:#1a1a1a;">₹35,000</td>
+              <td style="padding:7px 10px;color:#1a1a1a;">₹50,000</td>
+              <td style="padding:7px 10px;color:#555;">₹12,000–16,000</td>
+            </tr>
+            <tr style="border-bottom:0.5px solid #efefed;background:#fafaf9;">
+              <td style="padding:7px 10px;font-weight:500;">HDFC ERGO</td>
+              <td style="padding:7px 10px;color:#555;">Parenthood add-on</td>
+              <td style="padding:7px 10px;"><span style="background:#FCEBEB;color:#A32D2D;border-radius:3px;padding:2px 7px;font-size:10px;font-weight:600;">2–6 years</span></td>
+              <td style="padding:7px 10px;color:#1a1a1a;">₹50,000</td>
+              <td style="padding:7px 10px;color:#1a1a1a;">₹1,00,000</td>
+              <td style="padding:7px 10px;color:#555;">₹15,000–22,000</td>
+            </tr>
+            <tr style="border-bottom:0.5px solid #efefed;">
+              <td style="padding:7px 10px;font-weight:500;">Star Health</td>
+              <td style="padding:7px 10px;color:#555;">Star Women Care</td>
+              <td style="padding:7px 10px;"><span style="background:#E1F5EE;color:#085041;border-radius:3px;padding:2px 7px;font-size:10px;font-weight:600;">Week 12–20 only</span></td>
+              <td style="padding:7px 10px;color:#1a1a1a;">₹25,000</td>
+              <td style="padding:7px 10px;color:#1a1a1a;">₹50,000</td>
+              <td style="padding:7px 10px;color:#555;">₹10,000–15,000</td>
+            </tr>
+            <tr style="background:#fafaf9;">
+              <td style="padding:7px 10px;font-weight:500;">Aditya Birla</td>
+              <td style="padding:7px 10px;color:#555;">Activ One MAX</td>
+              <td style="padding:7px 10px;"><span style="background:#FEF3C7;color:#854F0B;border-radius:3px;padding:2px 7px;font-size:10px;font-weight:600;">3 months (3yr policy)</span></td>
+              <td style="padding:7px 10px;color:#1a1a1a;">₹25,000–1,00,000</td>
+              <td style="padding:7px 10px;color:#1a1a1a;">₹25,000–1,00,000</td>
+              <td style="padding:7px 10px;color:#555;">₹15,000–20,000</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-top:14px;background:#f5f5f3;border-radius:6px;padding:10px 14px;font-size:11px;line-height:1.7;color:#444;">
+        <strong style="color:#1B2A4A;">The insurer's dilemma:</strong> If no waiting period exists, every pregnant woman buys the policy, claims immediately, and cancels. The insurer loses money on every policy. Waiting periods are the only structural defence — which means maternity insurance is <strong style="color:#1B2A4A;">useless for the customer who needs it most: the woman who is already pregnant.</strong>
+        The only exception is complication cover — NICU, maternal ICU, emergency C-section complications. These are genuinely uncertain, genuinely severe, and genuinely insurable. That is the only insurance product that makes sense bundled with the platform's childbirth loan.
+      </div>
+    </div>
+    <div class="slide" id="s4">
+      <div class="slide-tag">Platform Pay — Insurance strategy</div>
+      <div class="slide-title">Why insurance does not work standalone — IVF &amp; pregnancy</div>
+
+      <div class="callout"><strong>the platform's data advantage is also its insurance problem.</strong> The platform knows about pregnancy and IVF precisely because users are already in those journeys. That certainty — which makes the platform valuable for lending — makes insurance structurally impossible for the same events.</div>
+
+      <!-- Two parallel cases -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">
+
+        <!-- PREGNANCY -->
+        <div style="border:0.5px solid #e4e4e2;border-radius:8px;overflow:hidden;">
+          <div style="background:#378ADD;padding:10px 14px;">
+            <div style="font-size:11px;font-weight:700;color:#fff;letter-spacing:0.02em;">Pregnancy — 44% of the platform's base</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.7);margin-top:2px;">Largest single segment on the platform</div>
+          </div>
+          <div style="padding:14px;">
+            <div style="display:flex;flex-direction:column;gap:10px;">
+
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <div style="min-width:28px;height:28px;background:#E6F1FB;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#0C447C;">1</div>
+                <div>
+                  <div style="font-size:11px;font-weight:600;color:#1a1a1a;">User arrives already pregnant</div>
+                  <div style="font-size:10px;color:#666;margin-top:2px;">the platform's peak engagement is weeks 8–36. By the time she downloads the app and tracks her due date — she is pregnant. The event is not in the future. It is happening now.</div>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <div style="min-width:28px;height:28px;background:#E6F1FB;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#0C447C;">2</div>
+                <div>
+                  <div style="font-size:11px;font-weight:600;color:#1a1a1a;">Every insurer excludes existing pregnancy</div>
+                  <div style="font-size:10px;color:#666;margin-top:2px;">HDFC ERGO explicitly states: "Pregnant women cannot buy maternity insurance." Niva Bupa, Care Health, Star Health all enforce the same. IRDAI permits this exclusion.</div>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <div style="min-width:28px;height:28px;background:#E6F1FB;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#0C447C;">3</div>
+                <div>
+                  <div style="font-size:11px;font-weight:600;color:#1a1a1a;">Waiting period outlasts the pregnancy</div>
+                  <div style="font-size:10px;color:#666;margin-top:2px;">Minimum waiting period is 9 months (Niva Bupa Aspire). A woman in her 1st trimester who buys today cannot claim for this delivery. The policy covers her next pregnancy — if she has one.</div>
+                </div>
+              </div>
+
+              <div style="background:#FCEBEB;border-radius:5px;padding:8px 10px;margin-top:4px;">
+                <div style="font-size:10px;font-weight:700;color:#A32D2D;">Verdict for the platform's core user</div>
+                <div style="font-size:10px;color:#791F1F;margin-top:2px;">Maternity insurance is <strong>not available</strong> to 44% of the platform. The product does not exist for them at the moment of highest intent.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- IVF -->
+        <div style="border:0.5px solid #e4e4e2;border-radius:8px;overflow:hidden;">
+          <div style="background:#1D9E75;padding:10px 14px;">
+            <div style="font-size:11px;font-weight:700;color:#fff;letter-spacing:0.02em;">IVF / Fertility — TTC &gt;6 months segment</div>
+            <div style="font-size:10px;color:rgba(255,255,255,0.7);margin-top:2px;">High ticket, high intent, deeply underserved</div>
+          </div>
+          <div style="padding:14px;">
+            <div style="display:flex;flex-direction:column;gap:10px;">
+
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <div style="min-width:28px;height:28px;background:#E1F5EE;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#085041;">1</div>
+                <div>
+                  <div style="font-size:11px;font-weight:600;color:#1a1a1a;">User signals IVF intent explicitly on platform</div>
+                  <div style="font-size:10px;color:#666;margin-top:2px;">the platform tracks TTC users who have been trying for 6+ months. Searches for IVF clinics, hormone protocols, and fertility specialists are explicit intent signals. IVF is planned — not uncertain.</div>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <div style="min-width:28px;height:28px;background:#E1F5EE;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#085041;">2</div>
+                <div>
+                  <div style="font-size:11px;font-weight:600;color:#1a1a1a;">IVF insurance does not exist in India</div>
+                  <div style="font-size:10px;color:#666;margin-top:2px;">No standalone IVF insurance product exists from any Indian insurer. A handful of premium group plans mention IVF as a sub-benefit — at sub-limits of ₹50,000–1,00,000 on a ₹2–3L procedure. Effectively uninsured.</div>
+                </div>
+              </div>
+
+              <div style="display:flex;gap:10px;align-items:flex-start;">
+                <div style="min-width:28px;height:28px;background:#E1F5EE;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#085041;">3</div>
+                <div>
+                  <div style="font-size:11px;font-weight:600;color:#1a1a1a;">Why — same actuarial problem as maternity</div>
+                  <div style="font-size:10px;color:#666;margin-top:2px;">Once a couple decides on IVF the procedure will happen. Cost is certain (₹1.5–3L/cycle). Outcome is uncertain (30–40% success rate) — but the <em>expense</em> is not. You cannot insure a planned expenditure.</div>
+                </div>
+              </div>
+
+              <div style="background:#E1F5EE;border-radius:5px;padding:8px 10px;margin-top:4px;">
+                <div style="font-size:10px;font-weight:700;color:#085041;">Verdict for the platform's TTC user</div>
+                <div style="font-size:10px;color:#0F6E56;margin-top:2px;">IVF insurance is <strong>structurally non-existent</strong>. The need is ₹3–8L per patient. The only product that works is a <strong>loan</strong>.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- The only insurance that works -->
+      <div style="background:#f5f5f3;border-radius:8px;padding:14px 16px;">
+      <div style="font-size:11px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#aaa;margin-bottom:8px;margin-top:20px;">IVF insurance in India — what actually exists</div>
+      <div style="border:0.5px solid #e4e4e2;border-radius:8px;overflow:hidden;margin-bottom:20px;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;">
+          <colgroup>
+            <col style="width:120px">
+            <col style="width:130px">
+            <col style="width:110px">
+            <col style="width:130px">
+            <col style="width:110px">
+            <col style="width:100px">
+            <col style="width:80px">
+          </colgroup>
+          <thead>
+            <tr>
+              <th style="background:#1B2A4A;color:#fff;padding:7px 10px;font-size:10px;font-weight:500;text-align:left;letter-spacing:0.04em;">Insurer</th>
+              <th style="background:#1B2A4A;color:#fff;padding:7px 10px;font-size:10px;font-weight:500;text-align:left;">Plan / rider</th>
+              <th style="background:#1B2A4A;color:#E24B4A;padding:7px 10px;font-size:10px;font-weight:500;text-align:left;">Waiting period</th>
+              <th style="background:#1B2A4A;color:#9FE1CB;padding:7px 10px;font-size:10px;font-weight:500;text-align:left;">IVF cover (sub-limit)</th>
+              <th style="background:#1B2A4A;color:#9FE1CB;padding:7px 10px;font-size:10px;font-weight:500;text-align:left;">Meds covered?</th>
+              <th style="background:#1B2A4A;color:rgba(255,255,255,0.55);padding:7px 10px;font-size:10px;font-weight:500;text-align:left;">Annual premium</th>
+              <th style="background:#1B2A4A;color:#FAC775;padding:7px 10px;font-size:10px;font-weight:500;text-align:left;">Confidence</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:0.5px solid #efefed;">
+              <td style="padding:7px 10px;font-weight:500;">Niva Bupa</td>
+              <td style="padding:7px 10px;color:#555;">Aspire / ReAssure add-on</td>
+              <td style="padding:7px 10px;"><span style="background:#FEF3C7;color:#854F0B;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">2 years</span></td>
+              <td style="padding:7px 10px;color:#1a1a1a;">₹50,000–1,00,000</td>
+              <td style="padding:7px 10px;"><span style="background:#FCEBEB;color:#A32D2D;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">Partial / excluded</span></td>
+              <td style="padding:7px 10px;color:#555;">₹20,000–28,000</td>
+              <td style="padding:7px 10px;"><span style="background:#E1F5EE;color:#085041;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">High</span></td>
+            </tr>
+            <tr style="border-bottom:0.5px solid #efefed;background:#fafaf9;">
+              <td style="padding:7px 10px;font-weight:500;">Star Health</td>
+              <td style="padding:7px 10px;color:#555;">Women Care (select variants)</td>
+              <td style="padding:7px 10px;"><span style="background:#FCEBEB;color:#A32D2D;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">3 years</span></td>
+              <td style="padding:7px 10px;color:#1a1a1a;">₹50,000</td>
+              <td style="padding:7px 10px;"><span style="background:#FCEBEB;color:#A32D2D;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">No</span></td>
+              <td style="padding:7px 10px;color:#555;">₹12,000–18,000</td>
+              <td style="padding:7px 10px;"><span style="background:#E1F5EE;color:#085041;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">High</span></td>
+            </tr>
+            <tr style="border-bottom:0.5px solid #efefed;">
+              <td style="padding:7px 10px;font-weight:500;">Aditya Birla</td>
+              <td style="padding:7px 10px;color:#555;">Activ One MAX</td>
+              <td style="padding:7px 10px;"><span style="background:#FEF3C7;color:#854F0B;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">2 years</span></td>
+              <td style="padding:7px 10px;color:#1a1a1a;">₹50,000–2,00,000</td>
+              <td style="padding:7px 10px;"><span style="background:#FEF3C7;color:#854F0B;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">Partial</span></td>
+              <td style="padding:7px 10px;color:#555;">₹18,000–28,000</td>
+              <td style="padding:7px 10px;"><span style="background:#E1F5EE;color:#085041;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">High</span></td>
+            </tr>
+            <tr style="border-bottom:0.5px solid #efefed;background:#fafaf9;">
+              <td style="padding:7px 10px;font-weight:500;">ICICI Lombard</td>
+              <td style="padding:7px 10px;color:#555;">Elevate (select variants)</td>
+              <td style="padding:7px 10px;"><span style="background:#FCEBEB;color:#A32D2D;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">3–4 years</span></td>
+              <td style="padding:7px 10px;color:#555;font-style:italic;">Not confirmed</td>
+              <td style="padding:7px 10px;"><span style="background:#FCEBEB;color:#A32D2D;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">No</span></td>
+              <td style="padding:7px 10px;color:#555;">₹16,000–24,000</td>
+              <td style="padding:7px 10px;"><span style="background:#FEF3C7;color:#854F0B;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">Medium</span></td>
+            </tr>
+            <tr style="border-bottom:0.5px solid #efefed;">
+              <td style="padding:7px 10px;font-weight:500;">Care Health</td>
+              <td style="padding:7px 10px;color:#555;">Care Supreme (select)</td>
+              <td style="padding:7px 10px;"><span style="background:#FCEBEB;color:#A32D2D;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">2–3 years</span></td>
+              <td style="padding:7px 10px;color:#555;font-style:italic;">Limited / on request</td>
+              <td style="padding:7px 10px;"><span style="background:#FCEBEB;color:#A32D2D;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">No</span></td>
+              <td style="padding:7px 10px;color:#555;">₹14,000–20,000</td>
+              <td style="padding:7px 10px;"><span style="background:#FEF3C7;color:#854F0B;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">Medium</span></td>
+            </tr>
+            <tr style="background:#fafaf9;">
+              <td style="padding:7px 10px;font-weight:500;">Most standard plans</td>
+              <td style="padding:7px 10px;color:#555;">All retail individual plans</td>
+              <td style="padding:7px 10px;"><span style="background:#FCEBEB;color:#A32D2D;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">2–6 years</span></td>
+              <td style="padding:7px 10px;"><span style="background:#FCEBEB;color:#A32D2D;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">Excluded entirely</span></td>
+              <td style="padding:7px 10px;"><span style="background:#FCEBEB;color:#A32D2D;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">No</span></td>
+              <td style="padding:7px 10px;color:#555;">—</td>
+              <td style="padding:7px 10px;"><span style="background:#E1F5EE;color:#085041;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">High</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="background:#f5f5f3;border-radius:6px;padding:10px 14px;margin-bottom:16px;font-size:11px;line-height:1.7;color:#444;">
+        <strong style="color:#1B2A4A;">The IVF coverage gap is structural, not accidental.</strong> A typical IVF cycle costs ₹1.5–3L. The best insurance sub-limit available is ₹2L — but only after a 2-year waiting period, only for the procedure (not medications which cost ₹60–80K/cycle), and only at approved clinics. Medications alone — which form 30–40% of total IVF cost — are excluded by almost every plan. <strong style="color:#1B2A4A;">A user who arrives on the platform actively planning IVF cannot use insurance for this cycle under any retail plan.</strong> The loan is the only product.
+      </div>
+
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#888780;margin-bottom:10px;">The only insurance that genuinely works for the platform's user base</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+          <div style="background:#fff;border:0.5px solid #e4e4e2;border-radius:6px;padding:10px 12px;">
+            <div style="font-size:11px;font-weight:700;color:#1B2A4A;margin-bottom:4px;">Complication cover</div>
+            <div style="font-size:10px;color:#555;line-height:1.5;">NICU, maternal ICU, emergency C-section complications. Genuinely uncertain, genuinely severe. Bundled on top of the childbirth loan — not sold standalone.</div>
+            <div style="margin-top:6px;"><span style="background:#E1F5EE;color:#085041;border-radius:3px;padding:2px 7px;font-size:10px;font-weight:600;">Bundle with loan</span></div>
+          </div>
+          <div style="background:#fff;border:0.5px solid #e4e4e2;border-radius:6px;padding:10px 12px;">
+            <div style="font-size:11px;font-weight:700;color:#1B2A4A;margin-bottom:4px;">Term life for parent</div>
+            <div style="font-size:10px;color:#555;line-height:1.5;">Death is uncertain, high severity, and the outstanding loan creates a direct need for cover. Credit life insurance is standard practice globally. No waiting period on term life.</div>
+            <div style="margin-top:6px;"><span style="background:#E1F5EE;color:#085041;border-radius:3px;padding:2px 7px;font-size:10px;font-weight:600;">Bundle with loan</span></div>
+          </div>
+          <div style="background:#fff;border:0.5px solid #e4e4e2;border-radius:6px;padding:10px 12px;">
+            <div style="font-size:11px;font-weight:700;color:#1B2A4A;margin-bottom:4px;">Child health floater</div>
+            <div style="font-size:10px;color:#555;line-height:1.5;">Post-birth, child illness is uncertain. Offered to 0–6 month motherhood users as a standalone cross-sell. Genuine insurance economics. Recurring annual premium.</div>
+            <div style="margin-top:6px;"><span style="background:#E6F1FB;color:#0C447C;border-radius:3px;padding:2px 7px;font-size:10px;font-weight:600;">Cross-sell post-loan</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- THE CORE ARGUMENT -->
+      <div style="margin-top:20px;border:0.5px solid #e4e4e2;border-radius:8px;overflow:hidden;">
+        <div style="background:#1B2A4A;padding:10px 16px;">
+          <div style="font-size:11px;font-weight:700;color:#fff;letter-spacing:0.02em;">By the time a user is on the platform — the insurance decision has already been made</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;">
+
+          <!-- Scenario A -->
+          <div style="padding:14px 16px;border-right:0.5px solid #efefed;">
+            <div style="font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#888780;margin-bottom:8px;">Scenario A — has employer cover</div>
+            <div style="font-size:11px;color:#555;line-height:1.6;margin-bottom:10px;">She has group health insurance from her employer. Maternity cover likely included with zero waiting period. OPD visits, scans, and delivery are partially covered.</div>
+            <div style="background:#f5f5f3;border-radius:5px;padding:8px 10px;">
+              <div style="font-size:10px;font-weight:700;color:#1B2A4A;margin-bottom:3px;">the platform insurance value-add</div>
+              <div style="font-size:10px;color:#666;">Zero. She is already covered. Selling her another maternity policy is mis-selling.</div>
+              <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;">
+                <span style="background:#FCEBEB;color:#A32D2D;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">Insurance — no opportunity</span>
+                <span style="background:#E1F5EE;color:#085041;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">Credit — fills the gap above sub-limits</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scenario B -->
+          <div style="padding:14px 16px;border-right:0.5px solid #efefed;">
+            <div style="font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#888780;margin-bottom:8px;">Scenario B — no insurance, already pregnant</div>
+            <div style="font-size:11px;color:#555;line-height:1.6;margin-bottom:10px;">She has no health cover. She is already in her 1st or 2nd trimester. Every insurer will reject her maternity application or impose a waiting period that outlasts her current pregnancy.</div>
+            <div style="background:#f5f5f3;border-radius:5px;padding:8px 10px;">
+              <div style="font-size:10px;font-weight:700;color:#1B2A4A;margin-bottom:3px;">the platform insurance value-add</div>
+              <div style="font-size:10px;color:#666;">Zero for this pregnancy. She cannot procure meaningful cover. The product simply does not exist for her current need.</div>
+              <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;">
+                <span style="background:#FCEBEB;color:#A32D2D;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">Insurance — structurally unavailable</span>
+                <span style="background:#E1F5EE;color:#085041;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">Credit — only viable product</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scenario C — OPD -->
+          <div style="padding:14px 16px;">
+            <div style="font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#888780;margin-bottom:8px;">Scenario C — OPD &amp; doctor visits</div>
+            <div style="font-size:11px;color:#555;line-height:1.6;margin-bottom:10px;">OB consultations and scans are already happening. Standard health plans either cover OPD (employer group) or don't (most individual retail plans). the platform cannot retroactively insure visits that have already occurred or are in progress.</div>
+            <div style="background:#f5f5f3;border-radius:5px;padding:8px 10px;">
+              <div style="font-size:10px;font-weight:700;color:#1B2A4A;margin-bottom:3px;">the platform insurance value-add</div>
+              <div style="font-size:10px;color:#666;">Zero for ongoing OPD. Insurance is either already covering it or will never cover it. A healthcare credit line fills the gap for visits not covered.</div>
+              <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;">
+                <span style="background:#FCEBEB;color:#A32D2D;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">Insurance — already decided</span>
+                <span style="background:#E1F5EE;color:#085041;border-radius:3px;padding:2px 6px;font-size:10px;font-weight:600;">Credit — fills uncovered OPD costs</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Punchline row -->
+        <div style="background:#1B2A4A18;border-top:0.5px solid #e4e4e2;padding:12px 16px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:center;">
+            <div>
+              <div style="font-size:11px;font-weight:700;color:#1B2A4A;margin-bottom:4px;">The conclusion across all three scenarios</div>
+              <div style="font-size:11px;color:#555;line-height:1.6;">the platform's data advantage — knowing the due date, tracking the pregnancy week — arrives too late to originate insurance. The window to sell maternity insurance closed before the user downloaded the app. <strong style="color:#1B2A4A;">Credit is the only product the platform can originate at the moment of highest intent.</strong></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:120px;font-size:10px;color:#666;text-align:right;">Has employer cover</div>
+                <div style="flex:1;height:6px;background:#efefed;border-radius:3px;overflow:hidden;"><div style="width:100%;height:100%;background:#1D9E75;border-radius:3px;"></div></div>
+                <div style="font-size:10px;font-weight:600;color:#1D9E75;width:70px;">Credit ✓</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:120px;font-size:10px;color:#666;text-align:right;">No cover, pregnant</div>
+                <div style="flex:1;height:6px;background:#efefed;border-radius:3px;overflow:hidden;"><div style="width:100%;height:100%;background:#1D9E75;border-radius:3px;"></div></div>
+                <div style="font-size:10px;font-weight:600;color:#1D9E75;width:70px;">Credit ✓</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:120px;font-size:10px;color:#666;text-align:right;">OPD in progress</div>
+                <div style="flex:1;height:6px;background:#efefed;border-radius:3px;overflow:hidden;"><div style="width:100%;height:100%;background:#1D9E75;border-radius:3px;"></div></div>
+                <div style="font-size:10px;font-weight:600;color:#1D9E75;width:70px;">Credit ✓</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px;">
+                <div style="width:120px;font-size:10px;color:#666;text-align:right;">Any insurance</div>
+                <div style="flex:1;height:6px;background:#efefed;border-radius:3px;overflow:hidden;"><div style="width:15%;height:100%;background:#E24B4A;border-radius:3px;"></div></div>
+                <div style="font-size:10px;font-weight:600;color:#E24B4A;width:70px;">Bundled only</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- SLIDE 05 — INSURANCE WORKS AS BUNDLE -->
+    <div class="slide" id="s5">
+      <div class="slide-tag">Platform Pay — Insurance strategy</div>
+      <div class="slide-title">Insurance works — but only as a bundled product</div>
+      <div class="callout"><strong>Two insurance layers make the loan complete.</strong> Neither is standalone — both are bundled onto the childbirth loan. One protects the borrower from catastrophic cost overrun. The other protects the family (and the platform's book) if either parent dies or is disabled.</div>
+
+      <style>
+        .tl-wrap { font-family: inherit; }
+        .loan-bar { display: flex; height: 34px; border-radius: 6px; overflow: hidden; width: 100%; }
+        .lb-pre  { background: #E1F5EE; flex: 3; display: flex; align-items: center; justify-content: center; border-right: 1.5px solid #fff; }
+        .lb-zero { background: #EF9F27; flex: 1; display: flex; align-items: center; justify-content: center; border-right: 1.5px solid #fff; }
+        .lb-mora { background: #F1EFE8; flex: 3; display: flex; align-items: center; justify-content: center; border-right: 1.5px solid #fff; }
+        .lb-rep  { background: #B5D4F4; flex: 12; display: flex; align-items: center; justify-content: center; }
+        .lb-text { font-size: 10px; font-weight: 500; white-space: nowrap; text-align:center; line-height:1.3; }
+        .lb-pre .lb-text { color: #085041; }
+        .lb-zero .lb-text { color: #412402; }
+        .lb-mora .lb-text { color: #5F5E5A; }
+        .lb-rep .lb-text { color: #0C447C; }
+        .tl-line { width: 100%; height: 2px; background: #e4e4e2; margin: 4px 0 0; }
+        .tl-dots { display: flex; justify-content: space-between; margin-top: -5px; padding: 0 2px; }
+        .tl-dot-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+        .tl-dot { width: 10px; height: 10px; border-radius: 50%; border: 2px solid #fff; flex-shrink: 0; }
+        .tl-dot-label { font-size: 9px; color: #888780; white-space: nowrap; }
+        .trigger-bar { margin: 12px 0; padding: 10px 12px; border-radius: 6px; background: #f5f5f3; display: flex; gap: 10px; align-items: stretch; }
+        .trigger-seg { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+        .trigger-seg-label { font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+        .trigger-seg-val { font-size: 15px; font-weight: 700; }
+        .trigger-seg-sub { font-size: 9px; color: #888780; line-height: 1.3; }
+        .trigger-div { width: 1px; background: #e4e4e2; flex-shrink: 0; }
+        .trigger-mid { display: flex; align-items: center; padding: 0 6px; font-size: 14px; color: #bbb; }
+        .ins-layers { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+        .ins-card { border-radius: 6px; border: 0.5px solid #e4e4e2; overflow: hidden; }
+        .ins-card-head { padding: 8px 10px; display: flex; align-items: center; gap: 8px; }
+        .ins-card-head-icon { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+        .ins-card-head-title { font-size: 11px; font-weight: 700; }
+        .ins-card-head-sub { font-size: 9px; margin-top: 1px; }
+        .ins-card-body { padding: 8px 10px; display: flex; flex-direction: column; gap: 5px; }
+        .ins-row { display: flex; gap: 6px; align-items: flex-start; }
+        .ins-row-icon { font-size: 10px; flex-shrink: 0; margin-top: 1px; }
+        .ins-row-text { font-size: 10px; color: #555; line-height: 1.35; }
+        .ins-row-text strong { color: #1a1a1a; font-weight: 600; }
+        .ins-footer { padding: 6px 10px; font-size: 9px; font-weight: 600; }
+        .hardship { margin-top: 10px; padding: 8px 12px; border-radius: 6px; border-left: 3px solid #EF9F27; background: #FAEEDA; }
+        .hardship-title { font-size: 9px; font-weight: 700; color: #633806; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 2px; }
+        .hardship-text { font-size: 10px; color: #854F0B; line-height: 1.45; }
+        .ins-legend { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
+        .ins-legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #666; }
+        .ins-legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+        @media (max-width:600px) { .ins-layers { grid-template-columns: 1fr; } .trigger-bar { flex-direction: column; } }
+      </style>
+
+      <div class="tl-wrap">
+
+        <div style="font-size:9px;color:#aaa;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:5px;">Loan lifecycle — ₹3L disbursed to hospital 3–6 months before delivery</div>
+        <div class="loan-bar">
+          <div class="lb-pre"><span class="lb-text">Pre-delivery<br><span style="font-weight:400;font-size:8px;">EMIs begin</span></span></div>
+          <div class="lb-zero"><span class="lb-text" style="font-size:9px;">Delivery</span></div>
+          <div class="lb-mora"><span class="lb-text">Moratorium<br><span style="font-weight:400;font-size:8px;">3 months</span></span></div>
+          <div class="lb-rep"><span class="lb-text">Repayment — 12 months</span></div>
+        </div>
+        <div class="tl-line"></div>
+        <div class="tl-dots">
+          <div class="tl-dot-wrap"><div class="tl-dot" style="background:#1D9E75;"></div><div class="tl-dot-label">Disbursal</div></div>
+          <div class="tl-dot-wrap"><div class="tl-dot" style="background:#EF9F27;"></div><div class="tl-dot-label">Delivery</div></div>
+          <div class="tl-dot-wrap"><div class="tl-dot" style="background:#888780;"></div><div class="tl-dot-label">EMI restart</div></div>
+          <div class="tl-dot-wrap"><div class="tl-dot" style="background:#378ADD;"></div><div class="tl-dot-label">Loan closed</div></div>
+        </div>
+
+        <div class="trigger-bar">
+          <div class="trigger-seg">
+            <div class="trigger-seg-label" style="color:#085041;">Loan covers</div>
+            <div class="trigger-seg-val" style="color:#1D9E75;">₹3L</div>
+            <div class="trigger-seg-sub">Normal / C-section cost. Paid directly to hospital.</div>
+          </div>
+          <div class="trigger-div"></div>
+          <div class="trigger-mid">+</div>
+          <div class="trigger-div"></div>
+          <div class="trigger-seg">
+            <div class="trigger-seg-label" style="color:#854F0B;">Insurance trigger</div>
+            <div class="trigger-seg-val" style="color:#EF9F27;">&gt;₹50K overrun</div>
+            <div class="trigger-seg-sub">Claim repays loan balance first, then patient.</div>
+          </div>
+          <div class="trigger-div"></div>
+          <div class="trigger-mid">=</div>
+          <div class="trigger-div"></div>
+          <div class="trigger-seg">
+            <div class="trigger-seg-label" style="color:#0C447C;">Total cover</div>
+            <div class="trigger-seg-val" style="color:#378ADD;">₹6L</div>
+            <div class="trigger-seg-sub">2× loan. NICU, maternal ICU, emergency complications only.</div>
+          </div>
+        </div>
+
+        <div class="ins-layers">
+          <div class="ins-card">
+            <div class="ins-card-head" style="background:#E6F1FB;">
+              <div class="ins-card-head-icon" style="background:#378ADD;color:#fff;">A</div>
+              <div>
+                <div class="ins-card-head-title" style="color:#0C447C;">Complication overrun cover</div>
+                <div class="ins-card-head-sub" style="color:#185FA5;">Triggers at delivery · protects loan book</div>
+              </div>
+            </div>
+            <div class="ins-card-body">
+              <div class="ins-row"><div class="ins-row-icon" style="color:#1D9E75;">✓</div><div class="ins-row-text"><strong>NICU stays</strong> — newborn critical care above expected cost</div></div>
+              <div class="ins-row"><div class="ins-row-icon" style="color:#1D9E75;">✓</div><div class="ins-row-text"><strong>Maternal ICU</strong> — post-surgical complications, haemorrhage</div></div>
+              <div class="ins-row"><div class="ins-row-icon" style="color:#1D9E75;">✓</div><div class="ins-row-text"><strong>Emergency overrun</strong> — planned normal delivery turns complex</div></div>
+              <div class="ins-row"><div class="ins-row-icon" style="color:#E24B4A;">✗</div><div class="ins-row-text"><strong>Normal delivery cost</strong> — covered by loan, not this insurance</div></div>
+            </div>
+            <div class="ins-footer" style="background:#E6F1FB;color:#0C447C;">Genuine insurance — low frequency · high severity · uncertain</div>
+          </div>
+
+          <div class="ins-card">
+            <div class="ins-card-head" style="background:#EEEDFE;">
+              <div class="ins-card-head-icon" style="background:#7F77DD;color:#fff;">B</div>
+              <div>
+                <div class="ins-card-head-title" style="color:#3C3489;">Credit life + personal accident</div>
+                <div class="ins-card-head-sub" style="color:#534AB7;">Active from disbursal · either parent</div>
+              </div>
+            </div>
+            <div class="ins-card-body">
+              <div class="ins-row"><div class="ins-row-icon" style="color:#1D9E75;">✓</div><div class="ins-row-text"><strong>Death of either parent</strong> — outstanding loan cleared immediately</div></div>
+              <div class="ins-row"><div class="ins-row-icon" style="color:#1D9E75;">✓</div><div class="ins-row-text"><strong>Permanent disability</strong> — income stops, loan cleared. Either parent.</div></div>
+              <div class="ins-row"><div class="ins-row-icon" style="color:#1D9E75;">✓</div><div class="ins-row-text"><strong>No waiting period</strong> — active from day of disbursal</div></div>
+              <div class="ins-row"><div class="ins-row-icon" style="color:#888780;">≈</div><div class="ins-row-text"><strong>Same as business loan bundling</strong> — standard global practice</div></div>
+            </div>
+            <div class="ins-footer" style="background:#EEEDFE;color:#3C3489;">Premium ~₹1,300–2,300 · 18-month tenor · bundled into processing</div>
+          </div>
+        </div>
+
+        <div class="hardship">
+          <div class="hardship-title">Pregnancy loss after disbursal — hardship protocol (not insurance)</div>
+          <div class="hardship-text">Miscarriage post week-27 does not trigger life/PA cover — mother survives. the platform's hardship protocol applies: automatic 6-month moratorium extension, zero collection activity. A policy commitment, not an insurance product. Frequency &lt;2% of disbursals. Cost manageable; brand cost of aggressive collections is not.</div>
+        </div>
+
+        <div class="ins-legend">
+          <div class="ins-legend-item"><div class="ins-legend-dot" style="background:#1D9E75;"></div>Loan (certain cost)</div>
+          <div class="ins-legend-item"><div class="ins-legend-dot" style="background:#378ADD;"></div>Complication cover (uncertain, high severity)</div>
+          <div class="ins-legend-item"><div class="ins-legend-dot" style="background:#7F77DD;"></div>Credit life / PA (uncertain, any time)</div>
+          <div class="ins-legend-item"><div class="ins-legend-dot" style="background:#EF9F27;"></div>Hardship protocol (pregnancy loss)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 06 — BUNDLED PRODUCT DESIGN -->
+    <div class="slide" id="s6">
+      <div class="slide-tag">Platform Pay — Product design</div>
+      <div class="slide-title">The bundled product — loan + insurance across the lifecycle</div>
+      <div class="callout"><strong>One product. Four protections.</strong> The childbirth loan bundles cost overrun cover, credit life, personal accident, and a pregnancy loss rider. Each covers a genuinely uncertain, high-severity event. Nothing like this exists from any bank or NBFC in India today.</div>
+
+      <style>
+        .tl-table { width:100%; border-collapse:separate; border-spacing:4px 0; }
+        .tl-ph { font-size:11px; font-weight:600; text-align:center; padding:3px 4px 2px; }
+        .tl-sub { font-size:9px; text-align:center; padding:0 4px 4px; }
+        .tl-bar { border-radius:4px; padding:7px 6px; text-align:center; }
+        .tl-bar-title { font-size:10px; font-weight:600; }
+        .tl-bar-sub { font-size:9px; margin-top:1px; }
+        .tl-event { border-radius:4px; padding:6px 5px; text-align:center; margin-top:4px; }
+        .tl-ev-title { font-size:10px; font-weight:600; }
+        .tl-ev-sub { font-size:9px; margin-top:1px; line-height:1.3; }
+        .tl-ins { border-radius:4px; padding:6px 5px; text-align:center; margin-top:4px; }
+        .tl-ins-title { font-size:10px; font-weight:600; }
+        .tl-ins-sub { font-size:9px; margin-top:2px; line-height:1.35; }
+        .tl-arrow { text-align:center; font-size:11px; padding:2px 0; }
+        .tl-divider { text-align:center; font-size:9px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#888780; padding:8px 0 4px; border-top:0.5px solid #e4e4e2; margin-top:4px; }
+        .tl-legend { display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; padding:8px 10px; background:#f5f5f3; border-radius:5px; }
+        .tl-legend-item { display:flex; align-items:center; gap:5px; font-size:9px; }
+        .tl-legend-dot { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
+      </style>
+
+      <table class="tl-table">
+        <colgroup>
+          <col style="width:26%">
+          <col style="width:14%">
+          <col style="width:14%">
+          <col style="width:46%">
+        </colgroup>
+        <thead>
+          <tr>
+            <td class="tl-ph" style="color:#085041;">Pre-delivery<div class="tl-sub" style="color:#888780;">−9m to −3m</div></td>
+            <td class="tl-ph" style="color:#854F0B;">Delivery<div class="tl-sub" style="color:#888780;">event</div></td>
+            <td class="tl-ph" style="color:#444441;">Moratorium<div class="tl-sub" style="color:#888780;">3 months</div></td>
+            <td class="tl-ph" style="color:#0C447C;">Repayment<div class="tl-sub" style="color:#888780;">12 months</div></td>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Timeline bars -->
+          <tr>
+            <td><div class="tl-bar" style="background:#E1F5EE;border:0.5px solid #1D9E75;"><div class="tl-bar-title" style="color:#085041;">3–6 months before delivery</div></div></td>
+            <td><div class="tl-bar" style="background:#FAEEDA;border:0.5px solid #BA7517;"><div class="tl-bar-title" style="color:#633806;">Delivery</div></div></td>
+            <td><div class="tl-bar" style="background:#F1EFE8;border:0.5px solid #888780;"><div class="tl-bar-title" style="color:#444441;">No EMI</div></div></td>
+            <td><div class="tl-bar" style="background:#E6F1FB;border:0.5px solid #378ADD;"><div class="tl-bar-title" style="color:#0C447C;">Monthly EMIs · loan closes month 18</div></div></td>
+          </tr>
+          <!-- Event row -->
+          <tr>
+            <td>
+              <div class="tl-arrow" style="color:#1D9E75;">↓</div>
+              <div class="tl-event" style="background:#E1F5EE;border:0.5px solid #1D9E75;">
+                <div class="tl-ev-title" style="color:#085041;">Loan disbursed to hospital</div>
+                <div class="tl-ev-sub" style="color:#0F6E56;">80% the platform · 20% customer upfront</div>
+                <div class="tl-ev-sub" style="color:#0F6E56;">Lock-in · serious borrower filter</div>
+              </div>
+            </td>
+            <td>
+              <div class="tl-arrow" style="color:#BA7517;">↓</div>
+              <div class="tl-event" style="background:#FAEEDA;border:0.5px solid #BA7517;">
+                <div class="tl-ev-title" style="color:#633806;">Baby born</div>
+                <div class="tl-ev-sub" style="color:#854F0B;">Hospital bill settled from loan</div>
+              </div>
+            </td>
+            <td>
+              <div class="tl-arrow" style="color:#888780;">↓</div>
+              <div class="tl-event" style="background:#F1EFE8;border:0.5px solid #888780;">
+                <div class="tl-ev-title" style="color:#444441;">Family recovers</div>
+                <div class="tl-ev-sub" style="color:#5F5E5A;">No payment due</div>
+              </div>
+            </td>
+            <td>
+              <div class="tl-arrow" style="color:#378ADD;">↓</div>
+              <div class="tl-event" style="background:#E6F1FB;border:0.5px solid #378ADD;">
+                <div class="tl-ev-title" style="color:#0C447C;">EMIs begin · NACH auto-debit</div>
+                <div class="tl-ev-sub" style="color:#185FA5;">Income stabilised · child settled at home</div>
+              </div>
+            </td>
+          </tr>
+          <!-- Divider row -->
+          <tr>
+            <td colspan="4"><div class="tl-divider">Insurance covers — at each phase</div></td>
+          </tr>
+          <!-- Insurance row -->
+          <tr>
+            <td>
+              <div class="tl-arrow" style="color:#7F77DD;">↓</div>
+              <div class="tl-ins" style="background:#EEEDFE;border:0.5px solid #7F77DD;">
+                <div class="tl-ins-title" style="color:#3C3489;">Credit life + PA · either parent</div>
+                <div class="tl-ins-sub" style="color:#534AB7;">Death or disability → loan cleared immediately</div>
+                <div class="tl-ins-sub" style="color:#534AB7;">Active from disbursal · no waiting period</div>
+              </div>
+              <div class="tl-arrow" style="color:#D4537E; margin-top:2px;">↓</div>
+              <div class="tl-ins" style="background:#FBEAF0;border:1px solid #D4537E;">
+                <div class="tl-ins-title" style="color:#72243E;">Pregnancy loss rider</div>
+                <div class="tl-ins-sub" style="color:#993556;">Medical costs covered</div>
+                <div class="tl-ins-sub" style="color:#993556;">+ loan balance cleared</div>
+                <div class="tl-ins-sub" style="color:#D4537E;font-weight:600;margin-top:2px;">the platform value add · no bank offers this</div>
+              </div>
+            </td>
+            <td>
+              <div class="tl-arrow" style="color:#378ADD;">↓</div>
+              <div class="tl-ins" style="background:#E6F1FB;border:1px solid #378ADD;">
+                <div class="tl-ins-title" style="color:#0C447C;">Cost overrun cover</div>
+                <div class="tl-ins-sub" style="color:#185FA5;">Triggers if cost</div>
+                <div class="tl-ins-sub" style="color:#185FA5;">&gt; loan + ₹50K</div>
+                <div class="tl-ins-sub" style="color:#185FA5;">NICU · maternal ICU</div>
+                <div class="tl-ins-sub" style="color:#185FA5;">Claim → loan first</div>
+                <div class="tl-ins-sub" style="color:#185FA5;font-weight:600;">Max cover ₹6L</div>
+              </div>
+            </td>
+            <td>
+              <div class="tl-arrow" style="color:#7F77DD;">↓</div>
+              <div class="tl-ins" style="background:#EEEDFE;border:0.5px solid #7F77DD;">
+                <div class="tl-ins-title" style="color:#3C3489;">Life + PA active</div>
+                <div class="tl-ins-sub" style="color:#534AB7;">Either parent</div>
+                <div class="tl-ins-sub" style="color:#534AB7;">Loan cleared if</div>
+                <div class="tl-ins-sub" style="color:#534AB7;">death / disability</div>
+              </div>
+            </td>
+            <td>
+              <div class="tl-arrow" style="color:#7F77DD;">↓</div>
+              <div class="tl-ins" style="background:#EEEDFE;border:0.5px solid #7F77DD;">
+                <div class="tl-ins-title" style="color:#3C3489;">Life + PA · full remaining tenure</div>
+                <div class="tl-ins-sub" style="color:#534AB7;">Either parent · death or disability</div>
+                <div class="tl-ins-sub" style="color:#534AB7;">→ outstanding balance cleared</div>
+                <div class="tl-ins-sub" style="color:#534AB7;">Family not left with debt</div>
+                <div class="tl-ins-sub" style="color:#534AB7;">Same as home / business loan structure</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="tl-legend">
+        <div class="tl-legend-item"><div class="tl-legend-dot" style="background:#1D9E75;"></div><span style="color:#085041;">Loan — 80% the platform to hospital · 20% customer upfront</span></div>
+        <div class="tl-legend-item"><div class="tl-legend-dot" style="background:#7F77DD;"></div><span style="color:#3C3489;">Credit life + PA — either parent · full 18-month tenure · no waiting period</span></div>
+        <div class="tl-legend-item"><div class="tl-legend-dot" style="background:#378ADD;"></div><span style="color:#0C447C;">Overrun cover — triggers &gt;₹50K above loan · max ₹6L · claim repays loan first</span></div>
+        <div class="tl-legend-item"><div class="tl-legend-dot" style="background:#D4537E;"></div><span style="color:#72243E;">Pregnancy loss rider — medical costs + loan balance · the platform value add · unique product</span></div>
+      </div>
+    </div>
+
+    <!-- SLIDE 07 — PRIORITISATION -->
+    <div class="slide" id="s7">
+      <div class="slide-tag">Platform Pay — Commercial</div>
+      <div class="slide-title">Revenue model — steady state</div>
+      <div class="callout"><strong>Click any row to expand methodology.</strong> Steady-state at full platform capture. Credit dominates at ₹41.5Cr of ₹52Cr total profit.</div>
+
+      <!-- TABLE STYLE -->
+      <style>
+        .ctbl { width:100%; border-collapse:collapse; font-size:10.5px; margin-bottom:20px; }
+        .ctbl th { background:#1B2A4A; color:#fff; padding:8px 10px; text-align:right; font-weight:700; font-size:9.5px; }
+        .ctbl th:first-child { text-align:left; border-radius:6px 0 0 0; }
+        .ctbl th:last-child { border-radius:0 6px 0 0; }
+        .ctbl td { padding:7px 10px; text-align:right; border-bottom:0.5px solid #efefed; }
+        .ctbl td:first-child { text-align:left; }
+        .ctbl tr.note-row td { padding:6px 14px 10px; font-size:10px; color:#666; line-height:1.65; text-align:left; }
+        .ctbl tr.sub-hdr td { font-size:9px; font-weight:700; letter-spacing:0.07em; text-transform:uppercase; padding:5px 10px; }
+        .ctbl tr.total-row td { font-weight:700; padding:9px 10px; }
+        .ctbl tr.data-row { cursor:pointer; }
+        .ctbl tr.data-row:hover td { background:#fafaf9; }
+        .tbl-sec { font-size:11px; font-weight:700; color:#1B2A4A; margin:0 0 6px; letter-spacing:0.01em; }
+      </style>
+
+      <!-- ① LENDING TABLE -->
+      <div class="tbl-sec">① Credit — Loan products</div>
+      <table class="ctbl">
+        <thead>
+          <tr>
+            <th style="width:18%;">Product</th>
+            <th>Cohort</th>
+            <th>Volume</th>
+            <th>ATS</th>
+            <th>Tenor</th>
+            <th>Yield</th>
+            <th>AUM (₹Cr)</th>
+            <th>Revenue (₹Cr)</th>
+            <th>Margin</th>
+            <th>Profit (₹Cr)</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="data-row" onclick="toggleCRow('cb')" style="background:#fff;">
+            <td style="font-weight:600;">Childbirth Loan <span style="font-size:8px;color:#aaa;">▸</span></td>
+            <td style="color:#666;">All tri app ÷ 9 + web</td>
+            <td style="font-weight:600;">13,228/mo</td>
+            <td style="font-weight:600;">₹2L</td>
+            <td>12mo</td>
+            <td>20%</td>
+            <td style="font-weight:600;">1,587</td>
+            <td style="font-weight:600;">317</td>
+            <td style="color:#666;">20%</td>
+            <td style="font-weight:700;color:#085041;">63.5</td>
+          </tr>
+          <tr id="crow-cb" style="display:none;background:#f0faf6;">
+            <td colspan="10" class="note-row">
+              <strong>Cohort:</strong> All 3 trimesters app (432,918) ÷ 9 = 48,102/mo. Web-only (1.5×) ÷ 9 = 72,153/mo. Capture: 20% app + 5% web = 13,228 loans/mo.<br>
+              <strong>AUM:</strong> 13,228 × ₹2L × 12mo ÷ 2 = ₹1,587Cr. Revenue = AUM × 20% IRR. Profit = 20% of revenue after FLDG cost and ops.<br>
+              <strong style="color:#085041;">Subvention (₹4,000–5,000/loan) and processing fee (3% = ₹6,000/loan) not included above — additive upside of ~₹166Cr/yr at steady state.</strong>
+            </td>
+          </tr>
+
+          <tr class="data-row" onclick="toggleCRow('ivf')" style="background:#f9fffe;">
+            <td style="font-weight:600;">IVF Loan <span style="font-size:8px;color:#aaa;">▸</span></td>
+            <td style="color:#666;">TTC >6m app ÷ 12 + web</td>
+            <td style="font-weight:600;">817/mo</td>
+            <td style="font-weight:600;">₹5L</td>
+            <td>12mo</td>
+            <td>20%</td>
+            <td style="font-weight:600;">245</td>
+            <td style="font-weight:600;">49</td>
+            <td style="color:#666;">20%</td>
+            <td style="font-weight:700;color:#085041;">9.8</td>
+          </tr>
+          <tr id="crow-ivf" style="display:none;background:#f0faf6;">
+            <td colspan="10" class="note-row">
+              <strong>Cohort:</strong> TTC >6m app (35,653) ÷ 12 = 2,971/mo. Web-only ÷ 12 = 4,457/mo. Capture: 20% + 5% = 817 loans/mo.<br>
+              <strong>AUM:</strong> 817 × ₹5L × 12mo ÷ 2 = ₹245Cr. <strong style="color:#c0392b;">Note: IVF lending has a difficult track record — 60–70% of cycles fail, creating moral hazard for repayment. Lender skepticism likely.</strong>
+            </td>
+          </tr>
+
+          <tr class="data-row" onclick="toggleCRow('sch')" style="background:#fff;">
+            <td style="font-weight:600;">School Fee Loan <span style="font-size:8px;color:#aaa;">▸</span></td>
+            <td style="color:#666;">5yr+ stock (recurring)</td>
+            <td style="font-weight:600;">2,353 users</td>
+            <td style="font-weight:600;">₹1.5L</td>
+            <td>12mo</td>
+            <td>20%</td>
+            <td style="font-weight:600;">18</td>
+            <td style="font-weight:600;">3.5</td>
+            <td style="color:#666;">20%</td>
+            <td style="font-weight:700;color:#085041;">0.7</td>
+          </tr>
+          <tr id="crow-sch" style="display:none;background:#f0faf6;">
+            <td colspan="10" class="note-row">
+              <strong>Cohort:</strong> 5yr+ app users (8,557). Stock model — recurring annual. Capture: 2,353 users. Small today — grows as pregnancy cohort ages 5yr through platform.<br>
+              <strong>AUM:</strong> 2,353 × ₹1.5L ÷ 2 = ₹18Cr.
+            </td>
+          </tr>
+
+          <tr class="data-row" onclick="toggleCRow('bnpl')" style="background:#f9fffe;">
+            <td style="font-weight:600;">BNPL <span style="font-size:8px;color:#aaa;">▸</span></td>
+            <td style="color:#666;">₹7.8Cr GMV/mo (on+off)</td>
+            <td style="font-weight:600;">~6,240/mo</td>
+            <td style="font-weight:600;">₹2,500</td>
+            <td>6mo</td>
+            <td>40%</td>
+            <td style="font-weight:600;">4.7</td>
+            <td style="font-weight:600;">1.9</td>
+            <td style="color:#666;">20%</td>
+            <td style="font-weight:700;color:#085041;">0.4</td>
+          </tr>
+          <tr id="crow-bnpl" style="display:none;background:#f0faf6;">
+            <td colspan="10" class="note-row">
+              <strong>Online:</strong> ₹5Cr GMV/mo × 20% financed = ₹1Cr/mo. <strong>Offline:</strong> ₹2.8Cr × 20% = ₹0.56Cr/mo. AUM = ₹1.56Cr × 6mo ÷ 2 = ₹4.7Cr. Grows 5–10× as GMV scales.
+            </td>
+          </tr>
+
+          <tr class="total-row" style="background:#1B2A4A;color:#fff;">
+            <td style="border-radius:0 0 0 6px;">Credit Total</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td style="color:#fff;">₹1,855Cr</td>
+            <td style="color:#fff;">371.4</td>
+            <td style="color:rgba(255,255,255,0.5);">20%</td>
+            <td style="color:#1D9E75;font-size:13px;border-radius:0 0 6px 0;">74.4</td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <!-- ② INSURANCE TABLE -->
+      <div class="tbl-sec">② Insurance — Commission products</div>
+      <table class="ctbl">
+        <thead>
+          <tr>
+            <th style="width:18%;">Product</th>
+            <th>Cohort</th>
+            <th>Policies/yr</th>
+            <th>Cover</th>
+            <th>Premium %</th>
+            <th>Premium/policy</th>
+            <th>Commission</th>
+            <th>Revenue (₹Cr)</th>
+            <th>Margin</th>
+            <th>Profit (₹Cr)</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="data-row" onclick="toggleCRow('life')" style="background:#fff;">
+            <td style="font-weight:600;">Term Life <span style="font-size:8px;color:#aaa;">▸</span></td>
+            <td style="color:#666;">Annual preg. captured</td>
+            <td style="font-weight:600;">158,737</td>
+            <td style="font-weight:600;">₹1Cr</td>
+            <td>0.4%</td>
+            <td style="font-weight:600;">₹40,000</td>
+            <td>20%</td>
+            <td style="font-weight:600;">127</td>
+            <td style="color:#666;">30%</td>
+            <td style="font-weight:700;color:#0C447C;">38.1</td>
+          </tr>
+          <tr id="crow-life" style="display:none;background:#EEF5FC;">
+            <td colspan="10" class="note-row">
+              <strong>Cohort:</strong> Full annual pregnancy captured = 158,737. Conversion funnel assumed same as childbirth loan — likely weaker in practice given insurance requires separate intent and mortality salience.<br>
+              <strong>Revenue:</strong> 158,737 × ₹40,000 premium × 20% commission = ₹127Cr. This is the best case ceiling. Renewal commission (5–7.5%) adds recurring revenue from year 2.
+            </td>
+          </tr>
+
+          <tr class="data-row" onclick="toggleCRow('health')" style="background:#f5f9fe;">
+            <td style="font-weight:600;">Health Floater <span style="font-size:8px;color:#aaa;">▸</span></td>
+            <td style="color:#666;">Annual preg. captured</td>
+            <td style="font-weight:600;">158,737</td>
+            <td style="font-weight:600;">₹20L</td>
+            <td>0.75%</td>
+            <td style="font-weight:600;">₹15,000</td>
+            <td>20%</td>
+            <td style="font-weight:600;">47.6</td>
+            <td style="color:#666;">30%</td>
+            <td style="font-weight:700;color:#0C447C;">14.3</td>
+          </tr>
+          <tr id="crow-health" style="display:none;background:#EEF5FC;">
+            <td colspan="10" class="note-row">
+              <strong>Cohort:</strong> Same 158,737 base. Conversion funnel assumed same as childbirth loan — likely weaker in practice. Works better bundled with loan than as a standalone product.<br>
+              <strong>Revenue:</strong> 158,737 × ₹15,000 premium × 20% commission = ₹47.6Cr. Best case ceiling — actual conversion likely 5–15% of base.
+            </td>
+          </tr>
+
+          <tr class="total-row" style="background:#1B2A4A;color:#fff;">
+            <td style="border-radius:0 0 0 6px;">Insurance Total</td>
+            <td></td>
+            <td style="color:#fff;">317,474</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td style="color:#fff;">174.6</td>
+            <td style="color:rgba(255,255,255,0.5);">30%</td>
+            <td style="color:#378ADD;font-size:13px;border-radius:0 0 6px 0;">52.4</td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <!-- ③ PAYMENTS TABLE -->
+      <div class="tbl-sec">③ Payments — Float income</div>
+      <table class="ctbl">
+        <thead>
+          <tr>
+            <th style="width:18%;">Product</th>
+            <th>GMV base</th>
+            <th>% via wallet</th>
+            <th>Monthly txn</th>
+            <th>Balance 3×</th>
+            <th>Float rate</th>
+            <th>Float AUM</th>
+            <th>Revenue (₹Cr)</th>
+            <th>Margin</th>
+            <th>Profit (₹Cr)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="data-row" onclick="toggleCRow('cl')" style="background:#fff;">
+            <td style="font-weight:600;">Closed Loop <span style="font-size:8px;color:#aaa;">▸</span></td>
+            <td style="color:#666;">₹5Cr online/mo</td>
+            <td>20%</td>
+            <td style="font-weight:600;">₹1Cr</td>
+            <td>₹3Cr</td>
+            <td>6.5%</td>
+            <td style="font-weight:600;">₹3Cr</td>
+            <td style="font-weight:600;">0.20</td>
+            <td style="color:#666;">30%</td>
+            <td style="font-weight:700;color:#E24B4A;">0.06</td>
+          </tr>
+          <tr id="crow-cl" style="display:none;background:#fef9f9;">
+            <td colspan="10" class="note-row">Monthly online GMV ₹5Cr × 20% via wallet = ₹1Cr/mo transacted. Float = 3× = ₹3Cr. Revenue = ₹3Cr × 6.5% = ₹20L/yr. Strategic value is behavioural, not financial.</td>
+          </tr>
+          <tr class="data-row" onclick="toggleCRow('sc')" style="background:#fef9f9;">
+            <td style="font-weight:600;">Semi-Closed (Y2) <span style="font-size:8px;color:#aaa;">▸</span></td>
+            <td style="color:#666;">₹2.8Cr offline/mo</td>
+            <td>20%</td>
+            <td style="font-weight:600;">₹0.56Cr</td>
+            <td>₹1.7Cr</td>
+            <td>6.5%</td>
+            <td style="font-weight:600;">₹1.7Cr</td>
+            <td style="font-weight:600;">0.11</td>
+            <td style="color:#666;">30%</td>
+            <td style="font-weight:700;color:#E24B4A;">0.03</td>
+          </tr>
+          <tr id="crow-sc" style="display:none;background:#fef9f9;">
+            <td colspan="10" class="note-row">Offline GMV ₹2.8Cr × 20% = ₹0.56Cr/mo. Float = 3× = ₹1.7Cr. Revenue = ₹11L/yr. PPI partner required — live Y2.</td>
+          </tr>
+          <tr class="total-row" style="background:#1B2A4A;color:#fff;">
+            <td style="border-radius:0 0 0 6px;">Payments Total</td>
+            <td></td><td></td><td></td><td></td>
+            <td style="color:#fff;">₹4.7Cr</td>
+            <td></td>
+            <td style="color:#fff;">0.31</td>
+            <td style="color:rgba(255,255,255,0.5);">30%</td>
+            <td style="color:#E24B4A;font-size:13px;border-radius:0 0 6px 0;">0.09</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- GRAND TOTAL -->
+      <div style="background:#1B2A4A;border-radius:8px;padding:12px 18px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;">
+        <div style="text-align:center;">
+          <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:4px;">Credit profit</div>
+          <div style="font-size:20px;font-weight:700;color:#1D9E75;">₹74.4Cr</div>
+        </div>
+        <div style="text-align:center;border-left:1px solid rgba(255,255,255,0.1);">
+          <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:4px;">Insurance profit</div>
+          <div style="font-size:20px;font-weight:700;color:#378ADD;">₹52.4Cr</div>
+        </div>
+        <div style="text-align:center;border-left:1px solid rgba(255,255,255,0.1);">
+          <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:4px;">Payments profit</div>
+          <div style="font-size:20px;font-weight:700;color:#E24B4A;">₹0.1Cr</div>
+        </div>
+        <div style="text-align:center;border-left:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);border-radius:6px;padding:4px 0;">
+          <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:4px;">Total profit</div>
+          <div style="font-size:24px;font-weight:700;color:#fff;">₹127Cr</div>
+          <div style="font-size:9px;color:rgba(255,255,255,0.3);">on ₹547Cr revenue</div>
+        </div>
+      </div>
+      <div style="margin-top:8px;font-size:9px;color:#aaa;">* Steady-state at full capture. Insurance conversion assumed same as childbirth — likely weaker. Payments float is negligible at current GMV. Next slide filters to key products and shows operational requirements.</div>
+
+    </div><!-- end commercial slide -->
+
+    <!-- SLIDE: PRODUCT COMPARISON -->
+    <div class="slide" id="s7b">
+      <div class="slide-tag">Platform Pay — Commercial</div>
+      <div class="slide-title">Product comparison — what it takes to build each</div>
+      <div class="callout">Best case revenue at steady state, full capture. Capital is the binding constraint for credit. Insurance is zero capital but conversion risk is high. Childbirth loan dominates on every revenue metric.</div>
+
+      <style>
+        .pc{width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed}
+        .pc th{padding:7px 10px;font-weight:700;font-size:9.5px;color:#fff;background:#1B2A4A;text-align:left;white-space:nowrap}
+        .pc th:first-child{border-radius:6px 0 0 0}
+        .pc th:last-child{border-radius:0 6px 0 0}
+        .pc td{padding:8px 10px;vertical-align:top;border-bottom:0.5px solid #efefed;font-size:10.5px;line-height:1.5;color:#333}
+        .pc tr:last-child td{border-bottom:none}
+        .pc td:first-child{font-weight:600;font-size:11px}
+        .pnum{font-size:16px;font-weight:700;color:#1a1a1a}
+        .psub{font-size:9px;color:#aaa;margin-top:2px}
+        .pcat{background:#f5f5f3}
+        .pcat td{padding:4px 10px;font-size:9px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#888}
+        .bl{border-left:2px solid #1D9E75}
+        .blb{border-left:2px solid #378ADD}
+        .badge-lo{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:#E1F5EE;color:#085041}
+        .badge-hi{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:#fef2f2;color:#c0392b}
+        .badge-md{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:#fff8ec;color:#b07800}
+        .fnotes{margin-top:10px;display:flex;flex-direction:column;gap:4px}
+        .fn{font-size:10px;color:#666;line-height:1.5}
+        .fn b{color:#378ADD}
+      </style>
+
+      <div style="overflow-x:auto;">
+      <table class="pc">
+        <colgroup>
+          <col style="width:13%"><col style="width:9%"><col style="width:9%"><col style="width:11%"><col style="width:13%"><col style="width:11%"><col style="width:17%"><col style="width:17%">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Revenue ₹Cr</th>
+            <th>Profit ₹Cr</th>
+            <th>AUM</th>
+            <th>Capital required</th>
+            <th>Regulatory gate</th>
+            <th>Tech investment</th>
+            <th>People investment</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="pcat"><td colspan="8">Credit</td></tr>
+
+          <tr>
+            <td class="bl">Childbirth loan <sup style="color:#378ADD;font-size:9px;">a</sup></td>
+            <td><span class="pnum">317</span></td>
+            <td><span class="pnum">63.5</span><div class="psub">20% margin</div></td>
+            <td><span class="pnum" style="font-size:13px;">₹1,587Cr</span><div class="psub">13,228/mo × ₹2L</div></td>
+            <td><span style="font-weight:700;color:#b07800;">FLDG 7%</span><div class="psub">₹1.4Cr launch → ₹400Cr at scale</div></td>
+            <td>LSP only<div class="psub">4–8 weeks</div></td>
+            <td><span class="badge-hi">High</span><div class="psub">Origination, bureau, credit engine, NACH, collections, hospital API, RCU</div></td>
+            <td><span class="badge-hi">High</span><div class="psub">Credit underwriter, RCU, collections ops, hospital managers</div></td>
+          </tr>
+
+          <tr style="background:#fafaf9;">
+            <td class="bl">IVF loan <sup style="color:#378ADD;font-size:9px;">b</sup></td>
+            <td><span class="pnum">49</span></td>
+            <td><span class="pnum">9.8</span><div class="psub">20% margin</div></td>
+            <td><span class="pnum" style="font-size:13px;">₹245Cr</span><div class="psub">817/mo × ₹5L</div></td>
+            <td><span style="font-weight:700;color:#b07800;">FLDG 7%</span><div class="psub">~₹60Cr equity at full AUM</div></td>
+            <td>LSP + clinic agreement<div class="psub">6–10 weeks</div></td>
+            <td><span class="badge-md">Medium</span><div class="psub">Shared stack + clinic settlement API</div></td>
+            <td><span class="badge-md">Medium</span><div class="psub">Overlaps childbirth team. IVF clinic managers.</div></td>
+          </tr>
+
+          <tr class="pcat"><td colspan="8">Insurance — corporate agent</td></tr>
+
+          <tr>
+            <td class="blb">Term life <sup style="color:#378ADD;font-size:9px;">c</sup></td>
+            <td><span class="pnum">127</span></td>
+            <td><span class="pnum">38.1</span><div class="psub">30% margin</div></td>
+            <td style="color:#aaa;">—</td>
+            <td style="color:#085041;font-weight:700;">Zero<div class="psub" style="color:#aaa;">Insurer holds risk</div></td>
+            <td>IRDAI CA licence<div class="psub">4–6 months · ₹50L net worth</div></td>
+            <td><span class="badge-lo">Low</span><div class="psub">Insurer API, health declaration, KYC. Shared with health floater.</div></td>
+            <td><span class="badge-lo">Low</span><div class="psub">1 compliance officer, 1 ops, 1 partnership manager</div></td>
+          </tr>
+
+          <tr style="background:#fafaf9;">
+            <td class="blb">Health floater <sup style="color:#378ADD;font-size:9px;">c</sup></td>
+            <td><span class="pnum">47.6</span></td>
+            <td><span class="pnum">14.3</span><div class="psub">30% margin</div></td>
+            <td style="color:#aaa;">—</td>
+            <td style="color:#085041;font-weight:700;">Zero<div class="psub" style="color:#aaa;">Insurer holds risk</div></td>
+            <td>Same IRDAI CA<div class="psub">Launch with term life</div></td>
+            <td><span class="badge-lo">Low</span><div class="psub">Same stack as term life</div></td>
+            <td><span class="badge-lo">Low</span><div class="psub">Same team. No incremental hire.</div></td>
+          </tr>
+
+          <tr style="background:#1B2A4A;">
+            <td style="color:#fff;font-weight:700;border-radius:0 0 0 6px;">Total</td>
+            <td style="color:#fff;"><span style="font-size:16px;font-weight:700;">541</span></td>
+            <td style="color:#1D9E75;"><span style="font-size:16px;font-weight:700;">126</span></td>
+            <td colspan="5" style="color:rgba(255,255,255,0.5);font-size:10px;border-radius:0 0 6px 0;">Best case. Insurance conversion assumed same as credit — likely weaker in practice.</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <div class="fnotes">
+        <div class="fn"><b>a</b> Subvention (₹4–5K/loan) and processing fee (3% = ₹6K/loan) not included — additive upside of ~₹166Cr/yr.</div>
+        <div class="fn"><b>b</b> IVF lending has a difficult track record — 60–70% of cycles fail, moral hazard for repayment. Several NBFCs have pulled back. Expect lender skepticism and higher FLDG demands.</div>
+        <div class="fn"><b>c</b> Conversion funnel assumed same as childbirth loan — likely weaker. Works better bundled with loan than standalone.</div>
+      </div>
+    </div>
+
+    <!-- SLIDE: CASH FLOW + PRODUCT CONTOURS -->
+    <div class="slide" id="s8">
+      <div class="slide-tag">Platform Pay — Product Design</div>
+      <div class="slide-title">Childbirth loan — cash flow &amp; product contours</div>
+
+      <div style="display:grid;grid-template-columns:1.1fr 0.9fr;gap:24px;align-items:start;">
+
+        <!-- LEFT: CASH FLOW DIAGRAM -->
+        <div>
+          <div style="font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#1B2A4A;margin-bottom:10px;">Cash flow</div>
+          <svg viewBox="0 0 440 360" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;">
+            <defs>
+              <marker id="a1" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#1B2A4A"/></marker>
+              <marker id="a2" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#1D9E75"/></marker>
+              <marker id="a3" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#378ADD"/></marker>
+              <marker id="a4" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0,0 8,3 0,6" fill="#7F77DD"/></marker>
+            </defs>
+
+            <!-- CUSTOMER box — top left -->
+            <rect x="20" y="20" width="130" height="50" rx="7" fill="#1B2A4A"/>
+            <text x="85" y="42" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Customer</text>
+            <text x="85" y="58" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.55)">Borrower</text>
+
+            <!-- HOSPITAL box — top right -->
+            <rect x="290" y="20" width="130" height="50" rx="7" fill="#378ADD"/>
+            <text x="355" y="42" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Hospital</text>
+            <text x="355" y="58" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.65)">Anchor</text>
+
+            <!-- PLATFORM box — centre -->
+            <rect x="155" y="165" width="130" height="50" rx="7" fill="#1D9E75"/>
+            <text x="220" y="187" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">the platform</text>
+            <text x="220" y="203" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.65)">LSP + FLDG</text>
+
+            <!-- NBFC box — bottom right -->
+            <rect x="290" y="285" width="130" height="50" rx="7" fill="#7F77DD"/>
+            <text x="355" y="313" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">NBFC</text>
+            <text x="355" y="328" text-anchor="middle" font-size="9" fill="rgba(255,255,255,0.65)">Lender</text>
+
+            <!-- ── DISBURSEMENT FLOWS ── -->
+
+            <!-- 1. Customer → Hospital: 20% down payment -->
+            <line x1="150" y1="45" x2="288" y2="45" stroke="#1B2A4A" stroke-width="1.8" marker-end="url(#a1)"/>
+            <rect x="162" y="28" width="116" height="18" rx="3" fill="#f0f0ee"/>
+            <text x="220" y="40" text-anchor="middle" font-size="8.5" font-weight="700" fill="#1B2A4A">20% down payment</text>
+
+            <!-- 2. NBFC → Hospital: 80% loan value -->
+            <line x1="355" y1="285" x2="355" y2="72" stroke="#7F77DD" stroke-width="2" marker-end="url(#a4)"/>
+            <rect x="362" y="160" width="68" height="32" rx="3" fill="#EEEDFE"/>
+            <text x="396" y="173" text-anchor="middle" font-size="8.5" font-weight="700" fill="#3C3489">NBFC →</text>
+            <text x="396" y="185" text-anchor="middle" font-size="8.5" font-weight="700" fill="#3C3489">Hospital</text>
+
+            <!-- Label on NBFC→Hospital arrow -->
+            <rect x="358" y="106" width="76" height="30" rx="3" fill="#EEEDFE"/>
+            <text x="396" y="119" text-anchor="middle" font-size="8" fill="#3C3489" font-weight="700">80% of loan</text>
+            <text x="396" y="130" text-anchor="middle" font-size="8" fill="#3C3489">value</text>
+
+            <!-- 3. Hospital → the platform: Subvention -->
+            <line x1="316" y1="70" x2="252" y2="165" stroke="#378ADD" stroke-width="1.8" marker-end="url(#a3)"/>
+            <rect x="252" y="108" width="100" height="30" rx="3" fill="#E6F1FB"/>
+            <text x="302" y="121" text-anchor="middle" font-size="8.5" font-weight="700" fill="#0C447C">Subvention</text>
+            <text x="302" y="133" text-anchor="middle" font-size="8" fill="#0C447C">₹4–5K per loan</text>
+
+            <!-- ── ONGOING FLOWS ── -->
+
+            <!-- 4. Customer → the platform: EMI monthly -->
+            <line x1="95" y1="70" x2="190" y2="165" stroke="#1D9E75" stroke-width="2.2" stroke-dasharray="6,3" marker-end="url(#a2)"/>
+            <rect x="58" y="108" width="86" height="30" rx="3" fill="#E1F5EE" stroke="#1D9E75" stroke-width="1"/>
+            <text x="101" y="121" text-anchor="middle" font-size="8.5" font-weight="700" fill="#085041">Customer →</text>
+            <text x="101" y="133" text-anchor="middle" font-size="8" fill="#085041">EMI monthly</text>
+
+            <!-- 5. the platform → NBFC: Hurdle + loss cover (dashed) -->
+            <line x1="250" y1="210" x2="318" y2="285" stroke="#7F77DD" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#a4)"/>
+            <rect x="218" y="240" width="116" height="30" rx="3" fill="#EEEDFE"/>
+            <text x="276" y="253" text-anchor="middle" font-size="8.5" font-weight="700" fill="#3C3489">Hurdle rate</text>
+            <text x="276" y="265" text-anchor="middle" font-size="8" fill="#3C3489">+ Loss cover</text>
+
+            <!-- LEGEND -->
+            <line x1="20" y1="350" x2="48" y2="350" stroke="#1B2A4A" stroke-width="1.8" marker-end="url(#a1)"/>
+            <text x="55" y="354" font-size="8" fill="#888">At disbursement</text>
+            <line x1="200" y1="350" x2="228" y2="350" stroke="#7F77DD" stroke-width="1.8" stroke-dasharray="5,3" marker-end="url(#a4)"/>
+            <text x="235" y="354" font-size="8" fill="#888">Ongoing / monthly</text>
+          </svg>
+        </div>
+
+        <!-- RIGHT: PRODUCT CONTOURS + SCHEDULE -->
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div>
+            <div style="font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#1B2A4A;margin-bottom:8px;">Product contours</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+              <div style="background:#E1F5EE;border-radius:7px;padding:10px 12px;border-left:3px solid #1D9E75;">
+                <div style="font-size:9px;color:#666;margin-bottom:2px;">LTV</div>
+                <div style="font-size:22px;font-weight:700;color:#085041;">80%</div>
+                <div style="font-size:9px;color:#aaa;">20% paid by customer</div>
+              </div>
+              <div style="background:#E1F5EE;border-radius:7px;padding:10px 12px;border-left:3px solid #1D9E75;">
+                <div style="font-size:9px;color:#666;margin-bottom:2px;">Avg ticket</div>
+                <div style="font-size:22px;font-weight:700;color:#085041;">₹2L</div>
+                <div style="font-size:9px;color:#aaa;">80% of ₹2.5L bill</div>
+              </div>
+              <div style="background:#E1F5EE;border-radius:7px;padding:10px 12px;border-left:3px solid #1D9E75;">
+                <div style="font-size:9px;color:#666;margin-bottom:2px;">Total tenure</div>
+                <div style="font-size:22px;font-weight:700;color:#085041;">15mo</div>
+                <div style="font-size:9px;color:#aaa;">12mo principal + 3mo buffer</div>
+              </div>
+              <div style="background:#E1F5EE;border-radius:7px;padding:10px 12px;border-left:3px solid #1D9E75;">
+                <div style="font-size:9px;color:#666;margin-bottom:2px;">Interest rate</div>
+                <div style="font-size:22px;font-weight:700;color:#085041;">16–17%</div>
+                <div style="font-size:9px;color:#aaa;">+ 3% PF + 3% subvention</div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div style="font-size:9px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:#1B2A4A;margin-bottom:8px;">Repayment schedule</div>
+            <table style="width:100%;border-collapse:collapse;font-size:10px;">
+              <thead>
+                <tr style="background:#1B2A4A;color:#fff;">
+                  <th style="padding:6px 8px;text-align:left;border-radius:5px 0 0 0;font-size:9px;">Disbursement</th>
+                  <th style="padding:6px 8px;text-align:center;font-size:9px;color:#6ee7b7;">Full EMI</th>
+                  <th style="padding:6px 8px;text-align:center;font-size:9px;color:#93c5fd;">Int. only</th>
+                  <th style="padding:6px 8px;text-align:center;font-size:9px;color:#6ee7b7;">Full EMI</th>
+                  <th style="padding:6px 8px;text-align:center;border-radius:0 5px 0 0;font-size:9px;">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:0.5px solid #efefed;">
+                  <td style="padding:6px 8px;font-weight:600;">1st trimester</td>
+                  <td style="padding:6px 8px;text-align:center;background:#f0faf6;font-weight:600;">9mo</td>
+                  <td style="padding:6px 8px;text-align:center;background:#EEF5FC;font-weight:600;">3mo</td>
+                  <td style="padding:6px 8px;text-align:center;background:#f0faf6;font-weight:600;">3mo</td>
+                  <td style="padding:6px 8px;text-align:center;font-weight:700;">15mo</td>
+                </tr>
+                <tr style="border-bottom:0.5px solid #efefed;background:#fafaf9;">
+                  <td style="padding:6px 8px;font-weight:600;">2nd trimester</td>
+                  <td style="padding:6px 8px;text-align:center;background:#f0faf6;font-weight:600;">6mo</td>
+                  <td style="padding:6px 8px;text-align:center;background:#EEF5FC;font-weight:600;">3mo</td>
+                  <td style="padding:6px 8px;text-align:center;background:#f0faf6;font-weight:600;">6mo</td>
+                  <td style="padding:6px 8px;text-align:center;font-weight:700;">15mo</td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 8px;font-weight:600;">3rd trimester</td>
+                  <td style="padding:6px 8px;text-align:center;background:#f0faf6;font-weight:600;">3mo</td>
+                  <td style="padding:6px 8px;text-align:center;background:#EEF5FC;font-weight:600;">3mo</td>
+                  <td style="padding:6px 8px;text-align:center;background:#f0faf6;font-weight:600;">9mo</td>
+                  <td style="padding:6px 8px;text-align:center;font-weight:700;">15mo</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE B: RISK FRAMEWORK -->
+    <div class="slide" id="s9b">
+      <div class="slide-tag">Platform Pay — Product Design</div>
+      <div class="slide-title">Childbirth loan — risk framework</div>
+      <div class="callout">Three risk layers — Customer, Hospital, Transaction. Hospital payment holdback is a <em>proposal</em> for founder discussion.</div>
+
+      <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <thead>
+          <tr style="background:#1B2A4A;color:#fff;">
+            <th style="padding:9px 12px;text-align:left;border-radius:6px 0 0 0;width:13%;">Category</th>
+            <th style="padding:9px 12px;text-align:left;width:17%;">Sub-category</th>
+            <th style="padding:9px 12px;text-align:left;width:32%;">Risk</th>
+            <th style="padding:9px 12px;text-align:left;border-radius:0 6px 0 0;">Mitigation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:#fff8ec;">
+            <td rowspan="2" style="padding:10px 12px;font-weight:700;color:#b07800;border-bottom:0.5px solid #efefed;vertical-align:top;border-left:3px solid #f5c842;">Customer</td>
+            <td style="padding:10px 12px;font-weight:600;border-bottom:0.5px solid #efefed;">Credit risk</td>
+            <td style="padding:10px 12px;color:#555;border-bottom:0.5px solid #efefed;">Borrower defaults — income disruption, over-leverage, willingness-to-pay drop post-birth</td>
+            <td style="padding:10px 12px;border-bottom:0.5px solid #efefed;">ML credit scoring. CIBIL 680+ floor. FOIR check. NACH mandate. Soft in-app collections before hard recovery</td>
+          </tr>
+          <tr style="background:#fff8ec;">
+            <td style="padding:10px 12px;font-weight:600;border-bottom:1px solid #e4e4e2;">Fraud risk</td>
+            <td style="padding:10px 12px;color:#555;border-bottom:1px solid #e4e4e2;">Synthetic identity, income inflation, straw borrower</td>
+            <td style="padding:10px 12px;border-bottom:1px solid #e4e4e2;">Aadhaar OTP auth. Video KYC above ₹1.5L. Welcome call post-disbursal. Dedupe across applications</td>
+          </tr>
+          <tr style="background:#EEF5FC;">
+            <td rowspan="3" style="padding:10px 12px;font-weight:700;color:#0C447C;border-bottom:0.5px solid #efefed;vertical-align:top;border-left:3px solid #378ADD;">Hospital</td>
+            <td style="padding:10px 12px;font-weight:600;border-bottom:0.5px solid #efefed;">Overbilling</td>
+            <td style="padding:10px 12px;color:#555;border-bottom:0.5px solid #efefed;">Hospital inflates bill to extract higher loan disbursement</td>
+            <td style="padding:10px 12px;border-bottom:0.5px solid #efefed;">Empanelled hospitals only with published tariffs. RCU cross-checks every invoice. Variance triggers escalation</td>
+          </tr>
+          <tr style="background:#EEF5FC;">
+            <td style="padding:10px 12px;font-weight:600;border-bottom:0.5px solid #efefed;">Zero DP risk</td>
+            <td style="padding:10px 12px;color:#555;border-bottom:0.5px solid #efefed;">Hospital waives 20% customer contribution to boost conversion</td>
+            <td style="padding:10px 12px;border-bottom:0.5px solid #efefed;">DP collected by the platform directly. Hospital receives only 80% regardless. Contractually prohibited</td>
+          </tr>
+          <tr style="background:#EEF5FC;">
+            <td style="padding:10px 12px;font-weight:600;border-bottom:1px solid #e4e4e2;">Service quality</td>
+            <td style="padding:10px 12px;color:#555;border-bottom:1px solid #e4e4e2;">Substandard care — borrower stops repaying citing deficiency</td>
+            <td style="padding:10px 12px;border-bottom:1px solid #e4e4e2;">NABH accreditation + 4.0+ Google rating at onboarding. Quarterly monitoring. <em style="color:#b07800;">Proposal: 5–10% holdback released on loan completion</em></td>
+          </tr>
+          <tr style="background:#f0faf6;">
+            <td rowspan="2" style="padding:10px 12px;font-weight:700;color:#085041;border-bottom:0.5px solid #efefed;vertical-align:top;border-left:3px solid #1D9E75;">Transaction</td>
+            <td style="padding:10px 12px;font-weight:600;border-bottom:0.5px solid #efefed;">Complication</td>
+            <td style="padding:10px 12px;color:#555;border-bottom:0.5px solid #efefed;">C-section, NICU, maternal ICU — cost overrun increases default probability</td>
+            <td style="padding:10px 12px;border-bottom:0.5px solid #efefed;">Bundled NICU + maternal ICU cover rolled into EMI. Insurer pays overrun directly to hospital</td>
+          </tr>
+          <tr style="background:#f0faf6;">
+            <td style="padding:10px 12px;font-weight:600;">Service level</td>
+            <td style="padding:10px 12px;color:#555;">Poor experience creates collections friction even without genuine default intent</td>
+            <td style="padding:10px 12px;">SLA in hospital agreement. Dedicated the platform ops support. Dispute ≠ EMI suspension</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="slide" id="s11">
+      <div class="slide-tag">Platform Pay — Appendix</div>
+      <div class="slide-title">Hospital P&amp;L — Apollo Hospitals &amp; Narayana Hrudayalaya (FY2025)</div>
+
+      <style>
+        .hp{width:100%;border-collapse:collapse;font-size:11px}
+        .hp th{background:#1B2A4A;color:#fff;padding:8px 12px;font-weight:700;font-size:10px}
+        .hp th:first-child{text-align:left;border-radius:6px 0 0 0}
+        .hp th:not(:first-child){text-align:right}
+        .hp th:last-child{border-radius:0 6px 0 0}
+        .hp td{padding:7px 12px;border-bottom:0.5px solid #efefed}
+        .hp td:first-child{text-align:left;color:#333}
+        .hp td.ind{padding-left:22px;color:#666}
+        .hp td:not(:first-child){text-align:right}
+        .hp td.pct{color:#999;font-size:10px}
+        .hp tr.eb td{background:#E1F5EE;font-weight:700;color:#085041}
+        .hp tr.pt td{background:#f5f5f3;font-weight:600}
+        .hp tr.pa td{background:#1B2A4A;color:#fff;font-weight:700}
+        .hp tr.pa td.pct{color:rgba(255,255,255,0.5)}
+      </style>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:20px;">
+
+        <!-- APOLLO -->
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#1B2A4A;margin-bottom:8px;border-bottom:2px solid #378ADD;padding-bottom:5px;">Apollo Hospitals — Consolidated FY2025</div>
+          <table class="hp">
+            <thead>
+              <tr>
+                <th>Line Item</th>
+                <th>₹ Cr</th>
+                <th>% Rev</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Revenue</td><td>25,228</td><td class="pct">100.0%</td></tr>
+              <tr><td class="ind">Materials consumed</td><td>(2,454)</td><td class="pct">9.7%</td></tr>
+              <tr><td class="ind">Stock-in-trade (pharmacy)</td><td>(10,622)</td><td class="pct">42.1%</td></tr>
+              <tr><td class="ind">Employee benefits</td><td>(3,301)</td><td class="pct">13.1%</td></tr>
+              <tr><td class="ind">Finance costs</td><td>(232)</td><td class="pct">0.9%</td></tr>
+              <tr><td class="ind">Depreciation &amp; amortisation</td><td>(909)</td><td class="pct">3.6%</td></tr>
+              <tr><td class="ind">Other expenses</td><td>(5,050)</td><td class="pct">20.0%</td></tr>
+              <tr class="eb"><td>EBITDA</td><td>3,802</td><td class="pct" style="color:#085041">15.1%</td></tr>
+              <tr class="pt"><td>PBT</td><td>2,661</td><td class="pct">10.5%</td></tr>
+              <tr><td class="ind">Tax</td><td>(719)</td><td class="pct">2.9%</td></tr>
+              <tr class="pa"><td>PAT</td><td>1,942</td><td class="pct">7.7%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- NARAYANA -->
+        <div>
+          <div style="font-size:12px;font-weight:700;color:#1B2A4A;margin-bottom:8px;border-bottom:2px solid #1D9E75;padding-bottom:5px;">Narayana Hrudayalaya — Consolidated FY2025</div>
+          <table class="hp">
+            <thead>
+              <tr>
+                <th>Line Item</th>
+                <th>₹ Cr</th>
+                <th>% Rev</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Revenue</td><td>5,483</td><td class="pct">100.0%</td></tr>
+              <tr><td class="ind">Consumables &amp; drugs</td><td>(1,069)</td><td class="pct">19.5%</td></tr>
+              <tr><td class="ind">Employee benefits</td><td>(1,617)</td><td class="pct">29.5%</td></tr>
+              <tr><td class="ind">Finance costs</td><td>(164)</td><td class="pct">3.0%</td></tr>
+              <tr><td class="ind">Depreciation &amp; amortisation</td><td>(280)</td><td class="pct">5.1%</td></tr>
+              <tr><td class="ind">Other expenses</td><td>(1,498)</td><td class="pct">27.3%</td></tr>
+              <tr class="eb"><td>EBITDA</td><td>1,298</td><td class="pct" style="color:#085041">23.7%</td></tr>
+              <tr class="pt"><td>PBT</td><td>854</td><td class="pct">15.6%</td></tr>
+              <tr><td class="ind">Tax</td><td>(75)</td><td class="pct">1.4%</td></tr>
+              <tr class="pa"><td>PAT</td><td>779</td><td class="pct">14.2%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- SUBVENTION SUMMARY -->
+      <div style="background:#1B2A4A;border-radius:8px;padding:14px 18px;">
+        <div style="font-size:10px;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:12px;">Subvention basis</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;">
+          <div style="text-align:center;">
+            <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:4px;">Apollo marketing % rev</div>
+            <div style="font-size:18px;font-weight:700;color:#fff;">2–3%</div>
+          </div>
+          <div style="text-align:center;border-left:1px solid rgba(255,255,255,0.1);">
+            <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:4px;">Cloudnine/Motherhood est.</div>
+            <div style="font-size:18px;font-weight:700;color:#fff;">4–5%</div>
+          </div>
+          <div style="text-align:center;border-left:1px solid rgba(255,255,255,0.1);">
+            <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:4px;">Implied PAC per delivery</div>
+            <div style="font-size:18px;font-weight:700;color:#fff;">₹5–8K</div>
+          </div>
+          <div style="text-align:center;border-left:1px solid rgba(255,255,255,0.1);background:rgba(29,158,117,0.15);border-radius:6px;">
+            <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:4px;">the platform subvention per loan</div>
+            <div style="font-size:22px;font-weight:700;color:#1D9E75;">₹4–5K</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="slide" id="s12"><div class="slide-tag">Platform Pay</div><div class="slide-title">5-year P&amp;L model</div><div class="placeholder"><div class="placeholder-icon">📈</div><div>Coming next</div></div></div>
+
+    <!-- APPENDIX A1: Insurer P&L Benchmarks -->
+    <div class="slide" id="s13">
+      <div class="slide-tag">Appendix A1</div>
+      <div class="slide-title">Insurer P&L benchmarks — Life &amp; General/Health (FY2024)</div>
+      <div class="callout" style="font-size:11px;margin-bottom:12px;">
+        <strong>Why this matters for the platform:</strong> Insurance economics look attractive on headline PAT — but PAT in life insurance is distorted by policyholder vs. shareholder account separation, reserve releases, and investment income. The normalized view (% of premium) reveals the true operating engine. For a corporate agent earning 15–25% commission, the question is: how much of that premium dollar actually flows through to profit for the underwriter — and thus how stable is the commission pool?
+      </div>
+
+      <!-- SECTION LABEL: LIFE -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#1B2A4A;background:#eef4fd;padding:6px 10px;border-radius:4px 4px 0 0;border-left:3px solid #378ADD;margin-bottom:0;">LIFE INSURERS — ABSOLUTE P&L (₹ Crore, FY2024)</div>
+      <div style="overflow-x:auto;margin-bottom:4px;">
+      <table class="nt" style="margin-bottom:0;border-radius:0 0 4px 4px;">
+        <colgroup>
+          <col style="width:140px">
+          <col style="width:90px">
+          <col style="width:90px">
+          <col style="width:90px">
+          <col style="width:95px">
+          <col style="width:85px">
+          <col style="width:85px">
+          <col style="width:85px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th style="color:#fff;text-align:left;">Company</th>
+            <th style="color:#fff;text-align:right;">GWP (₹Cr)</th>
+            <th style="color:#fff;text-align:right;">Benefits Paid</th>
+            <th style="color:#fff;text-align:right;">Commission</th>
+            <th style="color:#fff;text-align:right;">Opex (excl. comm.)</th>
+            <th style="color:#fff;text-align:right;">Investment Inc.</th>
+            <th style="color:#fff;text-align:right;">PAT</th>
+            <th style="color:#fff;text-align:right;">VNB Margin</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600;">HDFC Life</td>
+            <td style="text-align:right;">57,500</td>
+            <td style="text-align:right;">42,800</td>
+            <td style="text-align:right;">4,800</td>
+            <td style="text-align:right;">6,200</td>
+            <td style="text-align:right;">~10,200</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">1,569</td>
+            <td style="text-align:right;">26.3%</td>
+          </tr>
+          <tr style="background:#fafaf9;">
+            <td style="font-weight:600;">SBI Life</td>
+            <td style="text-align:right;">75,000</td>
+            <td style="text-align:right;">58,000</td>
+            <td style="text-align:right;">5,100</td>
+            <td style="text-align:right;">5,800</td>
+            <td style="text-align:right;">~12,400</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">1,894</td>
+            <td style="text-align:right;">28.1%</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">ICICI Prudential Life</td>
+            <td style="text-align:right;">48,900</td>
+            <td style="text-align:right;">37,500</td>
+            <td style="text-align:right;">3,900</td>
+            <td style="text-align:right;">5,100</td>
+            <td style="text-align:right;">~9,800</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">852</td>
+            <td style="text-align:right;">24.1%</td>
+          </tr>
+          <tr style="background:#fafaf9;">
+            <td style="font-weight:600;">Max Life</td>
+            <td style="text-align:right;">29,500</td>
+            <td style="text-align:right;">22,400</td>
+            <td style="text-align:right;">3,100</td>
+            <td style="text-align:right;">3,800</td>
+            <td style="text-align:right;">~5,200</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">648</td>
+            <td style="text-align:right;">25.2%</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">LIC</td>
+            <td style="text-align:right;">4,74,005</td>
+            <td style="text-align:right;">3,92,000</td>
+            <td style="text-align:right;">26,500</td>
+            <td style="text-align:right;">22,000</td>
+            <td style="text-align:right;">~82,000</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">40,676</td>
+            <td style="text-align:right;">14.6%</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <!-- SECTION LABEL: LIFE NORMALIZED -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#1B2A4A;background:#f0faf6;padding:6px 10px;border-radius:4px 4px 0 0;border-left:3px solid #1D9E75;margin-bottom:0;margin-top:10px;">LIFE INSURERS — NORMALIZED BY GWP (% of Gross Written Premium, FY2024)</div>
+      <div style="overflow-x:auto;margin-bottom:14px;">
+      <table class="nt" style="margin-bottom:0;border-radius:0 0 4px 4px;">
+        <colgroup>
+          <col style="width:140px">
+          <col style="width:90px">
+          <col style="width:90px">
+          <col style="width:90px">
+          <col style="width:95px">
+          <col style="width:85px">
+          <col style="width:85px">
+          <col style="width:85px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th style="color:#fff;background:#285E48;text-align:left;">Company</th>
+            <th style="color:#fff;background:#285E48;text-align:right;">GWP = 100%</th>
+            <th style="color:#fff;background:#285E48;text-align:right;">Benefits %</th>
+            <th style="color:#fff;background:#285E48;text-align:right;">Commission %</th>
+            <th style="color:#fff;background:#285E48;text-align:right;">Opex %</th>
+            <th style="color:#fff;background:#285E48;text-align:right;">Inv. Inc. %</th>
+            <th style="color:#fff;background:#285E48;text-align:right;">PAT %</th>
+            <th style="color:#fff;background:#285E48;text-align:right;">VNB Margin</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600;">HDFC Life</td>
+            <td style="text-align:right;color:#888;">100%</td>
+            <td style="text-align:right;">74.4%</td>
+            <td style="text-align:right;">8.3%</td>
+            <td style="text-align:right;">10.8%</td>
+            <td style="text-align:right;color:#1D9E75;">17.7%</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">2.7%</td>
+            <td style="text-align:right;">26.3%</td>
+          </tr>
+          <tr style="background:#fafaf9;">
+            <td style="font-weight:600;">SBI Life</td>
+            <td style="text-align:right;color:#888;">100%</td>
+            <td style="text-align:right;">77.3%</td>
+            <td style="text-align:right;">6.8%</td>
+            <td style="text-align:right;">7.7%</td>
+            <td style="text-align:right;color:#1D9E75;">16.5%</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">2.5%</td>
+            <td style="text-align:right;">28.1%</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">ICICI Prudential Life</td>
+            <td style="text-align:right;color:#888;">100%</td>
+            <td style="text-align:right;">76.7%</td>
+            <td style="text-align:right;">8.0%</td>
+            <td style="text-align:right;">10.4%</td>
+            <td style="text-align:right;color:#1D9E75;">20.0%</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">1.7%</td>
+            <td style="text-align:right;">24.1%</td>
+          </tr>
+          <tr style="background:#fafaf9;">
+            <td style="font-weight:600;">Max Life</td>
+            <td style="text-align:right;color:#888;">100%</td>
+            <td style="text-align:right;">75.9%</td>
+            <td style="text-align:right;">10.5%</td>
+            <td style="text-align:right;">12.9%</td>
+            <td style="text-align:right;color:#1D9E75;">17.6%</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">2.2%</td>
+            <td style="text-align:right;">25.2%</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">LIC</td>
+            <td style="text-align:right;color:#888;">100%</td>
+            <td style="text-align:right;">82.7%</td>
+            <td style="text-align:right;">5.6%</td>
+            <td style="text-align:right;">4.6%</td>
+            <td style="text-align:right;color:#1D9E75;">17.3%</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">8.6%</td>
+            <td style="text-align:right;">14.6%</td>
+          </tr>
+          <tr style="background:#eef4fd;font-style:italic;">
+            <td style="font-weight:700;color:#1B2A4A;">Private avg (ex-LIC)</td>
+            <td style="text-align:right;color:#888;">100%</td>
+            <td style="text-align:right;font-weight:600;">76.1%</td>
+            <td style="text-align:right;font-weight:600;">8.4%</td>
+            <td style="text-align:right;font-weight:600;">10.5%</td>
+            <td style="text-align:right;font-weight:600;color:#1D9E75;">17.9%</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">2.3%</td>
+            <td style="text-align:right;font-weight:600;">25.9%</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <!-- DIVIDER -->
+      <div style="height:1px;background:#e8e8e6;margin:4px 0 14px;"></div>
+
+      <!-- SECTION LABEL: GENERAL/HEALTH -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#1B2A4A;background:#fff3ee;padding:6px 10px;border-radius:4px 4px 0 0;border-left:3px solid #E24B4A;margin-bottom:0;">GENERAL / HEALTH INSURERS — ABSOLUTE P&L (₹ Crore, FY2024)</div>
+      <div style="overflow-x:auto;margin-bottom:4px;">
+      <table class="nt" style="margin-bottom:0;border-radius:0 0 4px 4px;">
+        <colgroup>
+          <col style="width:150px">
+          <col style="width:85px">
+          <col style="width:85px">
+          <col style="width:85px">
+          <col style="width:85px">
+          <col style="width:85px">
+          <col style="width:85px">
+          <col style="width:90px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th style="color:#fff;text-align:left;">Company</th>
+            <th style="color:#fff;text-align:right;">GWP (₹Cr)</th>
+            <th style="color:#fff;text-align:right;">Net Premium</th>
+            <th style="color:#fff;text-align:right;">Claims Incurred</th>
+            <th style="color:#fff;text-align:right;">Commission</th>
+            <th style="color:#fff;text-align:right;">Opex</th>
+            <th style="color:#fff;text-align:right;">PAT</th>
+            <th style="color:#fff;text-align:right;">Combined Ratio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600;">Star Health <span style="font-size:9px;color:#999;">(SAHI)</span></td>
+            <td style="text-align:right;">15,254</td>
+            <td style="text-align:right;">13,600</td>
+            <td style="text-align:right;">9,300</td>
+            <td style="text-align:right;">2,400</td>
+            <td style="text-align:right;">2,800</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">845</td>
+            <td style="text-align:right;">102.1%</td>
+          </tr>
+          <tr style="background:#fafaf9;">
+            <td style="font-weight:600;">ICICI Lombard <span style="font-size:9px;color:#999;">(General)</span></td>
+            <td style="text-align:right;">23,000</td>
+            <td style="text-align:right;">16,400</td>
+            <td style="text-align:right;">11,800</td>
+            <td style="text-align:right;">2,900</td>
+            <td style="text-align:right;">3,100</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">1,919</td>
+            <td style="text-align:right;">104.5%</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Niva Bupa <span style="font-size:9px;color:#999;">(SAHI)</span></td>
+            <td style="text-align:right;">5,480</td>
+            <td style="text-align:right;">4,900</td>
+            <td style="text-align:right;">2,850</td>
+            <td style="text-align:right;">1,100</td>
+            <td style="text-align:right;">1,200</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">82</td>
+            <td style="text-align:right;">108.0%</td>
+          </tr>
+          <tr style="background:#fafaf9;">
+            <td style="font-weight:600;">New India Assurance <span style="font-size:9px;color:#999;">(PSU General)</span></td>
+            <td style="text-align:right;">40,592</td>
+            <td style="text-align:right;">28,000</td>
+            <td style="text-align:right;">21,500</td>
+            <td style="text-align:right;">3,500</td>
+            <td style="text-align:right;">5,200</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">1,091</td>
+            <td style="text-align:right;">103.6%</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Care Health <span style="font-size:9px;color:#999;">(SAHI)</span></td>
+            <td style="text-align:right;">6,200</td>
+            <td style="text-align:right;">5,400</td>
+            <td style="text-align:right;">3,510</td>
+            <td style="text-align:right;">930</td>
+            <td style="text-align:right;">1,100</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">261</td>
+            <td style="text-align:right;">99.3%</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <!-- SECTION LABEL: GENERAL/HEALTH NORMALIZED -->
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#1B2A4A;background:#fff0f0;padding:6px 10px;border-radius:4px 4px 0 0;border-left:3px solid #E24B4A;margin-bottom:0;margin-top:10px;">GENERAL / HEALTH INSURERS — NORMALIZED BY NET PREMIUM (% of Net Premium Earned, FY2024)</div>
+      <div style="overflow-x:auto;margin-bottom:14px;">
+      <table class="nt" style="margin-bottom:0;border-radius:0 0 4px 4px;">
+        <colgroup>
+          <col style="width:150px">
+          <col style="width:85px">
+          <col style="width:85px">
+          <col style="width:85px">
+          <col style="width:85px">
+          <col style="width:85px">
+          <col style="width:85px">
+          <col style="width:90px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th style="color:#fff;background:#7A2020;text-align:left;">Company</th>
+            <th style="color:#fff;background:#7A2020;text-align:right;">Net Prem = 100%</th>
+            <th style="color:#fff;background:#7A2020;text-align:right;">Claims %</th>
+            <th style="color:#fff;background:#7A2020;text-align:right;">Commission %</th>
+            <th style="color:#fff;background:#7A2020;text-align:right;">Opex %</th>
+            <th style="color:#fff;background:#7A2020;text-align:right;">Inv. Inc. %</th>
+            <th style="color:#fff;background:#7A2020;text-align:right;">PAT %</th>
+            <th style="color:#fff;background:#7A2020;text-align:right;">Combined Ratio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:600;">Star Health</td>
+            <td style="text-align:right;color:#888;">100%</td>
+            <td style="text-align:right;">68.4%</td>
+            <td style="text-align:right;">17.6%</td>
+            <td style="text-align:right;">20.6%</td>
+            <td style="text-align:right;color:#1D9E75;">~8.0%</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">6.2%</td>
+            <td style="text-align:right;color:#c0392b;">102.1%</td>
+          </tr>
+          <tr style="background:#fafaf9;">
+            <td style="font-weight:600;">ICICI Lombard</td>
+            <td style="text-align:right;color:#888;">100%</td>
+            <td style="text-align:right;">71.9%</td>
+            <td style="text-align:right;">17.7%</td>
+            <td style="text-align:right;">18.9%</td>
+            <td style="text-align:right;color:#1D9E75;">~9.0%</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">11.7%</td>
+            <td style="text-align:right;color:#c0392b;">104.5%</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Niva Bupa</td>
+            <td style="text-align:right;color:#888;">100%</td>
+            <td style="text-align:right;">58.2%</td>
+            <td style="text-align:right;">22.4%</td>
+            <td style="text-align:right;">24.5%</td>
+            <td style="text-align:right;color:#1D9E75;">~6.0%</td>
+            <td style="text-align:right;font-weight:700;color:#E24B4A;">1.7%</td>
+            <td style="text-align:right;color:#c0392b;">108.0%</td>
+          </tr>
+          <tr style="background:#fafaf9;">
+            <td style="font-weight:600;">New India Assurance</td>
+            <td style="text-align:right;color:#888;">100%</td>
+            <td style="text-align:right;">76.8%</td>
+            <td style="text-align:right;">12.5%</td>
+            <td style="text-align:right;">18.6%</td>
+            <td style="text-align:right;color:#1D9E75;">~7.0%</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">3.9%</td>
+            <td style="text-align:right;color:#c0392b;">103.6%</td>
+          </tr>
+          <tr>
+            <td style="font-weight:600;">Care Health</td>
+            <td style="text-align:right;color:#888;">100%</td>
+            <td style="text-align:right;">65.0%</td>
+            <td style="text-align:right;">17.2%</td>
+            <td style="text-align:right;">20.4%</td>
+            <td style="text-align:right;color:#1D9E75;">~8.0%</td>
+            <td style="text-align:right;font-weight:700;color:#1B56A0;">4.8%</td>
+            <td style="text-align:right;color:#27ae60;">99.3%</td>
+          </tr>
+          <tr style="background:#fff0f0;font-style:italic;">
+            <td style="font-weight:700;color:#1B2A4A;">Sector avg (ex-PSU)</td>
+            <td style="text-align:right;color:#888;">100%</td>
+            <td style="text-align:right;font-weight:600;">65.9%</td>
+            <td style="text-align:right;font-weight:600;">18.7%</td>
+            <td style="text-align:right;font-weight:600;">21.1%</td>
+            <td style="text-align:right;font-weight:600;color:#1D9E75;">7.8%</td>
+            <td style="text-align:right;font-weight:700;color:#E24B4A;">6.1%</td>
+            <td style="text-align:right;font-weight:600;color:#c0392b;">103.5%</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+
+      <!-- KEY READS -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px;">
+        <div style="background:#f8f8f7;border-radius:6px;padding:12px 14px;border-top:3px solid #378ADD;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#1B2A4A;margin-bottom:6px;">Life insurance reads</div>
+          <div style="font-size:11px;line-height:1.7;color:#444;">
+            • PAT of 2–3% on GWP looks modest but VNB margins of 24–28% capture the true new-business economics — driven by long-duration product spreads, not underwriting<br>
+            • Investment income (~17–20% of GWP) is the silent engine — life insurer profitability is structurally investment-dependent<br>
+            • Commission at 8–10% of GWP is the corporate agent's addressable income pool — stable and contractual<br>
+            • LIC's 8.6% PAT/GWP is an outlier driven by back-book reserve releases, not replicable economics
+          </div>
+        </div>
+        <div style="background:#f8f8f7;border-radius:6px;padding:12px 14px;border-top:3px solid #E24B4A;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#1B2A4A;margin-bottom:6px;">General / health insurance reads</div>
+          <div style="font-size:11px;line-height:1.7;color:#444;">
+            • Combined ratios above 100% (Star, ICICI Lombard, Niva Bupa, New India) mean underwriting loses money — profit is entirely investment income<br>
+            • Commission at 17–22% of net premium is <strong>higher</strong> than life — but the underwriter margin is razor thin or negative<br>
+            • Niva Bupa's 1.7% PAT/net premium at 108% combined ratio signals a growth-phase company subsidising CAC — not a stable P&L<br>
+            • Implication for the platform: health commission economics look better, but the underwriters the platform partners with are under structural margin pressure — commission pools can be cut if claims spike
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:10px;font-size:10px;color:#aaa;line-height:1.6;">
+        <strong>Data sources &amp; confidence:</strong> HDFC Life, SBI Life, ICICI Pru press releases FY24 (high confidence on GWP, PAT, VNB margin). Benefits paid and opex splits estimated from IRDAI public disclosures and annual report segmentals (medium confidence — life P&amp;L is not structured as a single income statement due to policyholder/shareholder account separation). General/health: Star Health, ICICI Lombard, Niva Bupa, Care Health investor presentations FY24 (high confidence on GWP, combined ratio, PAT). Commission and opex splits from IRDAI annual report schedule data (medium confidence). LIC numbers from audited FY24 annual report (high confidence on PAT ₹40,676Cr and GWP).
+      </div>
+    </div>
+
+
+  </main>
+</div>
+</div>
+
+<script>
+function showById(id) {
+  document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function toggleCRow(id) {
+  const row = document.getElementById('crow-' + id);
+  if (!row) return;
+  row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+}
+
+function showCTab(tab) {
+  ['pay','cred','ins','inv'].forEach(t => {
+    const panel = document.getElementById('cpanel-' + t);
+    const tabEl = document.getElementById('ctab-' + t);
+    const colors = {pay:'#E24B4A', cred:'#1D9E75', ins:'#378ADD', inv:'#7F77DD'};
+    if (panel) panel.style.display = t === tab ? 'block' : 'none';
+    if (tabEl) {
+      tabEl.style.borderBottomColor = t === tab ? colors[t] : 'transparent';
+      tabEl.style.color = t === tab ? colors[t] : '#aaa';
+      tabEl.style.fontWeight = t === tab ? '700' : '600';
+    }
+  });
+}
+
+function toggleNode(id) {
+  const tip = document.getElementById('tip-' + id);
+  if (!tip) return;
+  const isOpen = tip.classList.contains('open');
+  tip.classList.toggle('open', !isOpen);
+}
+
+function showTip(el) {
+  const tip = el.querySelector('.tip');
+  if (tip) {
+    tip.style.display = 'block';
+    const rect = el.getBoundingClientRect();
+    const tipRect = tip.getBoundingClientRect();
+    if (rect.left + 180 > window.innerWidth) {
+      tip.style.left = 'auto';
+      tip.style.right = '0';
+    } else {
+      tip.style.left = '0';
+      tip.style.right = 'auto';
+    }
+  }
+}
+
+function hideTip(el) {
+  const tip = el.querySelector('.tip');
+  if (tip) tip.style.display = 'none';
+}
+
+function show(idx) {
+  // Show slide by ID
+  document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById('s' + idx);
+  if (target) target.classList.add('active');
+  // Update nav active state by data-idx attribute
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', parseInt(n.dataset.idx) === idx);
+  });
+  if (idx===2 && !window._chart) buildChart();
+  if (document.querySelector('.nav-toggle').offsetParent !== null) closeNav();
+  window.scrollTo(0, 0);
+}
+
+function toggleNav() {
+  const nav = document.querySelector('.nav');
+  const overlay = document.getElementById('mob-overlay');
+  const open = nav.classList.toggle('open');
+  overlay.classList.toggle('open', open);
+}
+
+function closeNav() {
+  document.querySelector('.nav').classList.remove('open');
+  document.getElementById('mob-overlay').classList.remove('open');
+}
+
+/* TABLE DATA */
+const rows = [
+  { stage:'Pre',       sc:'#1D9E75', sub:'TTC',           use:'Fertility diagnostics',                   cost:'₹5–20K',          cr:'Healthcare credit',         ins:'—',                         inv:'IVF fund SIP' },
+  { stage:'',          sc:'',        sub:'',              use:'IUI / IVF treatment',                     cost:'₹15K–8L/cycle',   cr:'IVF loan',                  ins:'Group cover (partial)',      inv:'IVF corpus SIP' },
+  { stage:'',          sc:'',        sub:'',              use:'Fertility medications',                    cost:'₹10–80K/cycle',   cr:'Checkout / healthcare cr.', ins:'—',                         inv:'—' },
+  { stage:'',          sc:'',        sub:'TTC health',    use:'Pre-conception health check',              cost:'₹3–10K',          cr:'Healthcare credit',         ins:'OPD cover (partial)',        inv:'—' },
+  { stage:'Pregnancy', sc:'#378ADD', sub:'1st trimester', use:'OB consult + registration',               cost:'₹2–5K',           cr:'Healthcare credit',         ins:'OPD cover (partial)',        inv:'—' },
+  { stage:'',          sc:'',        sub:'',              use:'Blood panel + early scans',               cost:'₹5–15K',          cr:'Healthcare credit',         ins:'OPD cover (partial)',        inv:'—' },
+  { stage:'',          sc:'',        sub:'',              use:'Prenatal vitamins + maternity wear',      cost:'₹3–20K',          cr:'Checkout loan',             ins:'—',                         inv:'Delivery fund SIP' },
+  { stage:'',          sc:'',        sub:'2nd trimester', use:'Anomaly scan + glucose test',             cost:'₹5–15K',          cr:'Healthcare credit',         ins:'OPD cover (partial)',        inv:'—' },
+  { stage:'',          sc:'',        sub:'',              use:'Antenatal package + nursery setup',       cost:'₹50K–2L',         cr:'Childbirth loan',           ins:'Maternity (2–4yr wait)',     inv:'—' },
+  { stage:'',          sc:'',        sub:'3rd trimester', use:'Normal / C-section delivery',             cost:'₹60K–2.5L',       cr:'Childbirth loan',           ins:'Maternity (2–4yr wait)',     inv:'—' },
+  { stage:'',          sc:'',        sub:'',              use:'NICU / complication overrun',             cost:'₹50K–3L extra',   cr:'Overrun top-up loan',       ins:'Hospicash + complication',   inv:'—' },
+  { stage:'',          sc:'',        sub:'All trimesters',use:'Term life for parent',                    cost:'₹8–20K/yr',       cr:'—',                         ins:'Term life',                  inv:'—' },
+  { stage:'Post',      sc:'#7F77DD', sub:'0–3 months',   use:'Breast pump + mother recovery',           cost:'₹5–20K',          cr:'Checkout loan',             ins:'—',                         inv:'—' },
+  { stage:'',          sc:'',        sub:'',              use:'Newborn vaccinations + paed consults',    cost:'₹8–30K',          cr:'Healthcare credit',         ins:'Child health floater',       inv:'—' },
+  { stage:'',          sc:'',        sub:'',              use:'Diapers + baby hygiene (ongoing)',        cost:'₹4–8K/mo',        cr:'Checkout loan',             ins:'—',                         inv:'—' },
+  { stage:'',          sc:'',        sub:'3–12 months',   use:'Baby food + formula + skincare',          cost:'₹5–15K/mo',       cr:'Checkout loan',             ins:'—',                         inv:'—' },
+  { stage:'',          sc:'',        sub:'',              use:'Baby gear (stroller, cot, monitor)',      cost:'₹15–60K',         cr:'Checkout / personal loan',  ins:'—',                         inv:'—' },
+  { stage:'',          sc:'',        sub:'',              use:'Pediatric illness + hospitalisation',     cost:'₹10–40K/yr',      cr:'Healthcare credit',         ins:'Child health floater',       inv:'School corpus SIP' },
+  { stage:'',          sc:'',        sub:'1–3 years',     use:'Creche / daycare fees',                   cost:'₹96K–4.2L/yr',    cr:'Creche loan',               ins:'—',                         inv:'School corpus SIP' },
+  { stage:'',          sc:'',        sub:'',              use:'Preschool fees + toddler classes',        cost:'₹20K–2.2L/yr',    cr:'Preschool loan',            ins:'—',                         inv:'School corpus SIP' },
+  { stage:'',          sc:'',        sub:'3–5 years',     use:'School admission (CBSE / ICSE / IB)',     cost:'₹1.1–13L Yr1',    cr:'School fee loan',           ins:'—',                         inv:'Higher edu SIP' },
+  { stage:'',          sc:'',        sub:'',              use:'Annual school fees (ongoing)',             cost:'₹1–5L/yr',        cr:'School fee loan',           ins:'Child PA cover',             inv:'Higher edu SIP' },
+  { stage:'',          sc:'',        sub:'5 years+',      use:'Private coaching + tuition',              cost:'₹15–50K/yr',      cr:'Checkout / tuition loan',   ins:'Child health (ongoing)',      inv:'Education corpus SIP' },
+  { stage:'',          sc:'',        sub:'',              use:'University / study abroad corpus',        cost:'Goal ₹20L–2Cr',   cr:'—',                         ins:'Term life — parent',         inv:'Study abroad SIP' },
+];
+
+function tag(v) {
+  if (!v || v==='—') return '<span class="tag tn">—</span>';
+  const lo = v.toLowerCase();
+  const cls = lo.includes('sip')||lo.includes('corpus')||lo.includes('savings') ? 'tv'
+    : lo.includes('insurance')||lo.includes('cover')||lo.includes('hospicash')||lo.includes('term')||lo.includes('floater')||lo.includes('maternity')||lo.includes('partial')||lo.includes('group')||lo.includes('complication')||lo.includes('pa') ? 'ti'
+    : 'tc';
+  return `<span class="tag ${cls}">${v}</span>`;
+}
+
+(function buildTable() {
+  const tbody = document.getElementById('tbl');
+  let prevStage = '', prevSub = '', curSC = '';
+  rows.forEach(r => {
+    const tr = document.createElement('tr');
+    if (r.stage) { prevStage = r.stage; curSC = r.sc; }
+
+    /* Stage cell */
+    const stTd = document.createElement('td');
+    stTd.className = 'st';
+    stTd.style.cssText = `background:${curSC}15;color:${curSC};border-left:3px solid ${curSC};border-right:0.5px solid #efefed;`;
+    stTd.textContent = r.stage || '';
+    tr.appendChild(stTd);
+
+    /* Sub-stage cell */
+    const subTd = document.createElement('td');
+    subTd.className = 'sub';
+    subTd.style.borderRight = '0.5px solid #efefed';
+    const showSub = r.sub && r.sub !== prevSub;
+    subTd.textContent = showSub ? r.sub : '';
+    if (r.sub) prevSub = r.sub;
+    tr.appendChild(subTd);
+
+    /* End use */
+    const useTd = document.createElement('td');
+    useTd.innerHTML = `<div class="use">${r.use}</div><div class="cost">${r.cost}</div>`;
+    tr.appendChild(useTd);
+
+    /* Product columns */
+    [r.cr, r.ins, r.inv].forEach(v => {
+      const td = document.createElement('td');
+      td.innerHTML = tag(v);
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  });
+})();
+
+/* CHART */
+function buildChart() {
+  window._chart = true;
+  Chart.register(ChartDataLabels);
+  const labels = ['TTC <6mo','TTC >6mo','1st Tri','2nd Tri','3rd Tri','0–3mo','3–6mo','6–12mo','1–3yr','3–5yr','5yr+'];
+  const raw = [65134,35653,111154,113789,207975,81503,74877,99642,129601,36717,8557];
+  const total = raw.reduce((a,b)=>a+b,0);
+  const pct = raw.map(v=>Math.round(v/total*1000)/10);
+  const colors = ['#1D9E75','#1D9E75','#378ADD','#378ADD','#378ADD','#7F77DD','#7F77DD','#7F77DD','#7F77DD','#7F77DD','#7F77DD'];
+  const mins = [9,9,14,14,14,7,7,7,7,7,7];
+  new Chart(document.getElementById('platformChart'), {
+    data: {
+      labels,
+      datasets: [
+        { type:'bar', label:'% of users', data:pct, backgroundColor:colors, borderWidth:0, borderRadius:3, yAxisID:'y',
+          datalabels:{ anchor:'end', align:'end', formatter:v=>v.toFixed(1)+'%', font:{size:9,weight:'600'}, color:'#444' } },
+        { type:'line', label:'Engagement', data:mins, borderColor:'#E24B4A', backgroundColor:'#E24B4A',
+          borderWidth:2, pointRadius:4, pointBackgroundColor:'#E24B4A', tension:0.3, yAxisID:'y2',
+          datalabels:{ anchor:'top', align:'top', offset:3, formatter:v=>v+'m', font:{size:9,weight:'600'}, color:'#E24B4A' } }
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false, layout:{ padding:{ top:22 } },
+      plugins:{ legend:{ display:false }, tooltip:{ callbacks:{ label:ctx=>ctx.datasetIndex===0?' '+ctx.parsed.y.toFixed(1)+'% of users':' '+ctx.parsed.y+' mins/user/month' } } },
+      scales:{
+        x:{ grid:{ display:false }, ticks:{ font:{size:9}, color:'#999', autoSkip:false, maxRotation:30 } },
+        y:{ position:'left', grid:{ color:'rgba(0,0,0,0.06)' }, ticks:{ font:{size:9}, color:'#999', callback:v=>v+'%' }, title:{ display:true, text:'% of users', color:'#aaa', font:{size:9} } },
+        y2:{ position:'right', grid:{ display:false }, ticks:{ font:{size:9}, color:'#E24B4A', callback:v=>v+'m' }, title:{ display:true, text:'mins/month', color:'#E24B4A', font:{size:9} }, min:0, max:20 }
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>
