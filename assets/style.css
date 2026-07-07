@@ -118,6 +118,10 @@
   .doc h2{font-family:var(--serif);font-size:21px;margin:28px 0 8px;letter-spacing:-.01em}
   .doc p{font-size:16px;line-height:1.78;color:var(--ink-soft);margin:0 0 15px;max-width:var(--read)}
   .doc p b{color:var(--ink);font-weight:500}
+  .doc ul{margin:6px 0 16px;padding-left:20px;max-width:var(--read);display:flex;flex-direction:column;gap:8px}
+  .doc ul li{font-size:16px;line-height:1.7;color:var(--ink-soft)}
+  .doc ul li::marker{color:var(--accent)}
+  .doc ul li b{color:var(--ink);font-weight:500}
   .doc ul.notes{list-style:none;padding:0;margin:8px 0 0;display:flex;flex-direction:column}
   .doc ul.notes li{padding:14px 0;border-top:1px solid var(--line);cursor:pointer}
   .doc ul.notes li:hover .nt{color:var(--accent-ink)}

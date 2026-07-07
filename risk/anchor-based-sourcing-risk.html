@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anchor-based sourcing risk &mdash; creditintuition</title>
+<meta name="description" content="A dealer-led vehicle loan, a school-led tuition loan and a hospital-led healthcare loan are often variants of the same model. The risks fall into common buckets, and many mitigants can be reused across products.">
+<meta name="author" content="Saket Anand">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#0B6E5F">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Anchor-based sourcing risk &mdash; creditintuition">
+<meta property="og:description" content="A dealer-led vehicle loan, a school-led tuition loan and a hospital-led healthcare loan are often variants of the same model. The risks fall into common buckets, and many mitigants can be reused across products.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2022%2022%27%3E%3Cpath%20d%3D%27M2%2018%20C7%2018%208%206%2020%204%27%20stroke%3D%27%230B6E5F%27%20stroke-width%3D%272%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27/%3E%3Ccircle%20cx%3D%2720%27%20cy%3D%274%27%20r%3D%272%27%20fill%3D%27%230B6E5F%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body data-page="article" data-section="risk">
+<main><div class="wrap"><div class="lib"><article id="content" class="doc"><div class="eyebrow">working note · risk</div><h1>Anchor-based sourcing risk</h1><div class="meta"><span>9 min</span><span>the same risk across every anchor</span></div><p>A dealer-led vehicle loan, a school-led tuition loan, and a hospital-led healthcare loan may look like different products. Risk-wise, they are often variants of the same model: an anchor controls customer access, transaction context, and sometimes collections. Once seen this way, the risks fall into similar buckets and many mitigants can be reused across products.</p>
+
+<h2>The generalisation</h2><p>In many lending businesses, the visible product changes but the underlying structure is similar. A dealer sells a vehicle, a school sells education, a hospital sells treatment, a vocational institute sells a course, and a DSA sells access. In each case, the lender is not dealing with a purely independent borrower journey.</p><p>The customer conversation, the invoice, the product or service description, the urgency of the transaction, and sometimes even repayment behaviour are influenced by the anchor. This creates a common risk architecture.</p><ul><li>The lender underwrites the borrower, but also implicitly underwrites the anchor.</li><li>The lender finances a transaction, but the transaction value may be shaped by the anchor.</li><li>The lender expects borrower equity, but the equity may be manufactured or financed by the anchor.</li><li>The lender assumes end use and delivery, but both may need independent verification.</li><li>The lender tracks repayment, but early performance may be supported or masked by the anchor.</li></ul>
+
+<h2>Why this matters</h2><p>Anchor-led lending can scale faster because acquisition cost is lower and transaction context is richer. But it also weakens lender control over the customer relationship. This is why anchor-led credit should often be tighter than direct-channel credit, not looser.</p><p>The anchor&rsquo;s incentive is usually to complete the sale. The lender&rsquo;s incentive is to originate loans that survive after the sale. <b>That mismatch is the heart of anchor-based lending risk.</b></p>
+
+<div class="tbl-wrap"><table class="ci"><thead><tr><th>Anchor type</th><th>What the anchor controls</th><th>Generic risk created</th></tr></thead><tbody>
+<tr><td><b>Vehicle dealer</b></td><td>Vehicle price, discount, invoice, customer explanation, delivery, RC follow-up</td><td>Overbilling, fake equity, bought customer, delayed transfer, early surrender</td></tr>
+<tr><td><b>School / education provider</b></td><td>Admission, fee schedule, fee receipt, refund process, attendance record</td><td>Inflated fee, fake admission, refund leakage, non-attendance</td></tr>
+<tr><td><b>Hospital / healthcare provider</b></td><td>Treatment estimate, billing, patient journey, cancellation or downgrade information</td><td>Package inflation, proxy patient, treatment cancellation, service dispute</td></tr>
+<tr><td><b>Vocational course provider</b></td><td>Course promise, fee, attendance, completion, placement claims</td><td>Mis-selling, non-delivery, dropout, weak employment outcome</td></tr>
+<tr><td><b>DSA / broker network</b></td><td>Lead quality, customer explanation, documentation flow, urgency</td><td>Ghost customer, bought customer, document tampering, mis-selling</td></tr>
+<tr><td><b>Fleet or operating anchor</b></td><td>Asset usage, driver/operator, collection route, income narrative</td><td>Borrower-user mismatch, syndicate financing, hidden end use</td></tr>
+</tbody></table></div>
+
+<h2>The common risk buckets</h2><p>The most useful way to manage anchor-based lending is not to create a completely separate risk framework for every product. The better approach is to identify common risk buckets and then tune controls by product.</p>
+
+<div class="tbl-wrap"><table class="ci"><thead><tr><th>Risk bucket</th><th>Question the lender should ask</th><th>Typical mitigants</th></tr></thead><tbody>
+<tr><td><b>Anchor quality</b></td><td>Is the anchor stable, genuine, clean, and financially healthy?</td><td>Anchor underwriting beyond KYC: vintage, size, GST/bank activity, promoter checks, political exposure, fraud linkage, references.</td></tr>
+<tr><td><b>Customer authenticity</b></td><td>Is the borrower real, aware, willing, and not merely a proxy?</td><td>Video KYC with liveness, direct lender call, bank account ownership, device/mobile/address/entity dedupe.</td></tr>
+<tr><td><b>Transaction value</b></td><td>Is the financed value directionally sane?</td><td>Independent valuation, market benchmarking, mystery shopping, tax invoice checks, GST/e-invoice validation where available.</td></tr>
+<tr><td><b>Customer equity</b></td><td>Has the customer really paid margin from own funds?</td><td>Borrower-owned digital margin proof, no cash margin recognition, conservative LTVs, source-of-funds checks.</td></tr>
+<tr><td><b>End use</b></td><td>Is the loan being used for the stated borrower and stated purpose?</td><td>Beneficiary verification, patient/student/asset-user checks, random retro audits.</td></tr>
+<tr><td><b>Delivery</b></td><td>Was the vehicle, treatment, admission, course, or service actually delivered?</td><td>Delivery milestone checks, RC/admission/treatment/course record verification, customer confirmation.</td></tr>
+<tr><td><b>Quality and conduct</b></td><td>Was the customer sold what was promised?</td><td>Satisfaction calls, complaint monitoring, stop-disbursal triggers, anchor conduct audits.</td></tr>
+<tr><td><b>Early performance masking</b></td><td>Is repayment coming from borrower cash flows or anchor support?</td><td>EMI source monitoring, 4th&ndash;6th EMI vintage curves, anchor-level roll rates, early surrender/repo tracking.</td></tr>
+<tr><td><b>Cancellation / reversal</b></td><td>Did the underlying transaction reverse while the loan remained?</td><td>Refund-to-lender covenant, cancellation reporting, clawbacks, holdbacks, early surrender and repossession triggers.</td></tr>
+</tbody></table></div>
+
+<h2>The tax invoice is a useful breadcrumb, not final proof</h2><p>One practical control often missed is checking the tax invoice for at least a directional sense of the value of the product or service delivered. The lender should not rely only on a quotation, proforma invoice, fee estimate, or commercial understanding supplied by the anchor.</p><p>A tax invoice is not conclusive proof of value. It can be inflated, cancelled, reversed, or adjusted through credit notes. But it creates a harder trail: who billed, when it was billed, what entity billed it, and whether the financed amount is directionally aligned with a formal billing record.</p><ul><li>Tax invoice amount vs financed amount can reveal unsupported lending value.</li><li>GSTIN and entity match can confirm whether the approved anchor actually billed the transaction.</li><li>Invoice date vs approval/disbursal date can flag backdated or post-facto documentation.</li><li>Credit notes and cancellations can expose refund leakage or transaction reversal.</li><li>Repeated round-number invoices can signal manufactured billing.</li></ul>
+
+<div class="callout"><h4>A few practitioner lines worth keeping</h4><ul><li>The invoice is not always the economic value.</li><li>LTV discipline is not only credit control; in anchor-led lending it is also fraud control.</li><li>Customer equity can be manufactured through cashback, cash adjustment, informal credit, or anchor-funded down payment.</li><li>In-person KYC is weak if it sits inside the same sales chain. Verification must be independent of sales.</li><li>Early EMI performance can lie if the anchor is seasoning the book by paying or managing the first few EMIs.</li><li>Vehicle cancellation risk often appears as early surrender, informal repossession, dealer buyback, or delayed RC transfer.</li></ul></div>
+
+<h2>Conclusion</h2><p>The key shift is to stop thinking of these as isolated product risks. Dealer finance, tuition finance, healthcare finance, vocational finance, and DSA-led lending are all anchor-led structures when the third party controls the customer journey or transaction truth.</p><p>Once generalised this way, the lender&rsquo;s job becomes clearer: build independent controls across anchor quality, customer authenticity, value, equity, end use, delivery, quality, collections, and reversal risk. <b>The product may change; the risk grammar remains surprisingly similar.</b></p>
+
+<div class="author"><div class="avatar">SA</div><div><div style="font-size:15px">Saket Anand</div><div style="font-size:13px;color:var(--muted)">Quantitative-risk practitioner</div></div></div></article><nav id="sidenav" class="libnav" aria-label="Sections"></nav></div></div></main>
+<script src="/assets/app.js" defer></script>
+</body>
+</html>
