@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What needs AI in a lending system &mdash; and what doesn&rsquo;t &mdash; creditintuition</title>
+<meta name="description" content="Most of a lending pipeline is deterministic. AI earns its place in only three kinds of work — reading messy inputs, synthesising non-definitive judgment, and open-ended retrieval. Everything else should be script, and every irreversible credit call keeps a human.">
+<meta name="author" content="Saket Anand">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#0B6E5F">
+<meta property="og:type" content="article">
+<meta property="og:title" content="What needs AI in a lending system &mdash; and what doesn&rsquo;t &mdash; creditintuition">
+<meta property="og:description" content="Most of a lending pipeline is deterministic. AI earns its place in only three kinds of work — reading messy inputs, synthesising non-definitive judgment, and open-ended retrieval. Everything else should be script, and every irreversible credit call keeps a human.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2022%2022%27%3E%3Cpath%20d%3D%27M2%2018%20C7%2018%208%206%2020%204%27%20stroke%3D%27%230B6E5F%27%20stroke-width%3D%272%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27/%3E%3Ccircle%20cx%3D%2720%27%20cy%3D%274%27%20r%3D%272%27%20fill%3D%27%230B6E5F%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body data-page="article" data-section="technology">
+<main><div class="wrap"><div class="lib"><article id="content" class="doc"><div class="eyebrow">working note · technology</div><h1>What needs AI in a lending system &mdash; and what doesn&rsquo;t</h1><div class="meta"><span>8 min</span><span>drawn from a live agentic build</span></div><p>The reflex, right now, is to put a model at every step. But look closely at a lending pipeline and most of it is not a judgment problem at all &mdash; it is a lookup, a rule, or a calculation. Those should stay deterministic. AI earns its place in a narrow set of tasks, and using it anywhere else quietly adds cost, latency, and a hallucination surface for no gain.</p><p>The cleanest way to design the stack is to sort every stage into one of three kinds of work.</p>
+
+<div class="legend"><span><i style="background:#7c5cfc"></i>AI agent — judgment / synthesis / reading messy inputs</span><span><i style="background:#78849a"></i>Script — rules, lookups, deterministic tools</span><span><i style="background:#e08e1d"></i>Human — the irreversible decision gate</span></div>
+
+<h2>Where AI genuinely earns its place</h2><p>Three situations, and only three, actually need a model:</p><ul><li><b>Reading messy, human-shaped inputs.</b> Documents, bank statements, a recorded verification call, a field-investigation photo. The input has no fixed schema, so a deterministic parser breaks on the first unusual layout. OCR and vision-LLM extraction, call transcription, photo-authenticity checks &mdash; this is where models are load-bearing.</li><li><b>Synthesising over non-definitive factors.</b> Preparing a credit memo, or a senior &ldquo;reflection&rdquo; that reads across the score, the call, and the first analyst&rsquo;s note and forms a consolidated view. There is no rule that maps these inputs to an answer; the factors are open-ended and weigh against each other. That is judgment, and it is the real work of a credit agent.</li><li><b>Open-ended retrieval where the knowledge is genuinely non-definitive.</b> A risk-factor knowledge base — where the factors are indicative, not rules — is the one honest use of RAG. If the answer is actually a fixed list, it is a table, not a retrieval problem.</li></ul>
+
+<h2>Where deterministic script wins &mdash; and AI is a mistake</h2><p>Everything with a knowable-in-advance answer should be compiled into a rule or a table. It is auditable, cheap, instant, never hallucinates, and a regulator can read it. A model here adds risk for zero benefit.</p><ul><li><b>Document checklists.</b> &ldquo;What does this entity type need to submit?&rdquo; is a lookup against a document-universe table, not a retrieval query.</li><li><b>Triangulation rules.</b> Cross-checking extracted fields against each other is a compiled ruleset with a defined output tier, not a judgment call.</li><li><b>Policy, scoring, and limits.</b> Loan-type and entity-type policy tables, the rule engine, bureau / bank-statement / GST API calls, the scoring and line-assignment APIs — all deterministic.</li><li><b>Plumbing.</b> NACH verification, affidavit attachment, a 10% random-sample selector for review. Pure mechanics.</li></ul><p>The trap worth naming: work that <i>looks</i> like knowledge is often just a lookup. In an early cut of the system, the checklist and the triangulation rules were built as RAG. They were then corrected to deterministic tables &mdash; same answer, but now testable and cheap. <b>If the answer is knowable in advance, it is a table, not a model.</b></p>
+
+<h2>Where a human stays in the loop</h2><p>Two kinds of steps should never be fully automated, no matter how good the model gets:</p><ul><li><b>The irreversible credit decision.</b> Reject, or proceed. A human owns it — for accountability and because the regulatory expectation is a human decision-maker on credit.</li><li><b>Genuine exceptions.</b> A medium-risk escalation, a policy-cap breach (say a <i>kuchcha</i>-house limit). These are exactly the cases the rules were not built to resolve, so they route to a person.</li></ul>
+
+<h2>A worked example: the eleven-stage pipeline</h2><p>Here is the same logic applied end to end, from sourcing through post-disbursal review. Note how few stages are actually the model doing judgment &mdash; and how the AI that <i>is</i> there is mostly reading inputs, not deciding.</p>
+
+<div class="tbl-wrap"><table class="ci"><thead><tr><th>Stage</th><th>Type</th><th>Role</th><th>Why it is / isn&rsquo;t AI</th></tr></thead><tbody>
+<tr><td><b>1. Sourcing</b></td><td><span class="ttag ai">AI</span></td><td>Extract docs, classify entity, match checklist</td><td>Reads messy documents; the checklist itself is a deterministic table lookup.</td></tr>
+<tr><td><b>2. Document verification</b></td><td><span class="ttag script">Script</span> <span class="ttag ai">+ extraction</span></td><td>OCR/vision extraction, then triangulation rules → risk tier</td><td>Extraction needs a model; the triangulation is compiled rules, not judgment.</td></tr>
+<tr><td><b>3. ML agent</b></td><td><span class="ttag script">Script</span></td><td>Bureau/bank/GST pulls, variable creation, scoring, line</td><td>A tool-caller over deterministic APIs and a rule engine. No model needed.</td></tr>
+<tr><td><b>4. Credit agent I</b></td><td><span class="ttag ai">AI</span></td><td>Prepare the credit memo, raise open queries</td><td>Synthesis over non-definitive risk factors — real judgment. RAG used correctly here.</td></tr>
+<tr><td><b>5. Human credit — gate 1</b></td><td><span class="ttag human">Human</span></td><td>Reject, or send for telephonic verification</td><td>The first irreversible call. Owned by a person.</td></tr>
+<tr><td><b>6. TVR agent</b></td><td><span class="ttag ai">AI</span></td><td>Place and transcribe the verification call</td><td>Reads an open-ended spoken conversation; the question bank is fixed.</td></tr>
+<tr><td><b>7. Credit agent II</b></td><td><span class="ttag ai">AI</span></td><td>Senior reflection across score, call, and memo</td><td>Consolidation across sources — the hardest synthesis in the flow.</td></tr>
+<tr><td><b>8. Human credit — gate 2</b></td><td><span class="ttag human">Human</span></td><td>Proceed to field investigation, or reject</td><td>Senior sign-off on the consolidated read. A person decides.</td></tr>
+<tr><td><b>9. FI agent</b></td><td><span class="ttag ai">AI</span></td><td>Geotag match, photo authenticity, structure and inventory checks</td><td>Reads photos and location data; the caps it checks against are fixed rules.</td></tr>
+<tr><td><b>10. Disbursal</b></td><td><span class="ttag script">Script</span></td><td>Triangulate final docs, verify NACH, attach affidavit</td><td>Document plumbing and verification — deterministic throughout.</td></tr>
+<tr><td><b>11. RCU agent</b></td><td><span class="ttag ai">AI</span> <span class="ttag script">+ sampling</span></td><td>Court/PEP checks, re-verify a random 10% sample</td><td>Reads registries and case files; the sampling selector is pure script.</td></tr>
+</tbody></table></div>
+
+<div class="callout"><h4>The rule of thumb</h4><ul><li>Use AI only to <b>read messy inputs</b>, <b>synthesise non-definitive judgment</b>, or <b>retrieve genuinely open-ended knowledge</b>.</li><li>If the answer is knowable in advance, it is a <b>table or a rule</b> — not a model.</li><li>Every irreversible credit decision keeps a <b>human gate</b>.</li><li>An orchestration layer routes cases between these; it holds state, it does not judge.</li></ul></div>
+
+<h2>Why the discipline matters</h2><p>A model dropped onto a deterministic step doesn&rsquo;t just cost more per call. It makes the step non-reproducible, harder to audit, and slower &mdash; and it introduces a small, permanent chance of a confidently wrong answer on work that had a correct answer all along. The credibility of an AI lending stack comes from being able to say exactly where a model is trusted and where it is not.</p><p>Put the model where judgment lives, keep everything knowable as script, and keep a human on every decision that cannot be taken back. The result is not less AI &mdash; it is AI that a risk committee, and a regulator, can actually stand behind.</p>
+
+<div class="author"><div class="avatar">SA</div><div><div style="font-size:15px">Saket Anand</div><div style="font-size:13px;color:var(--muted)">Quantitative-risk practitioner</div></div></div></article><nav id="sidenav" class="libnav" aria-label="Sections"></nav></div></div></main>
+<script src="/assets/app.js" defer></script>
+</body>
+</html>

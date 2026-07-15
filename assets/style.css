@@ -122,6 +122,13 @@
   .doc ul li{font-size:16px;line-height:1.7;color:var(--ink-soft)}
   .doc ul li::marker{color:var(--accent)}
   .doc ul li b{color:var(--ink);font-weight:500}
+  .doc .legend{display:flex;flex-wrap:wrap;gap:16px;margin:2px 0 20px;font-size:13px;color:var(--muted);max-width:var(--read)}
+  .doc .legend span{display:inline-flex;align-items:center;gap:7px}
+  .doc .legend i{width:11px;height:11px;border-radius:3px;display:inline-block;flex-shrink:0}
+  .ttag{font-family:var(--mono);font-size:10px;letter-spacing:.03em;text-transform:uppercase;padding:2px 7px;border-radius:5px;white-space:nowrap;display:inline-block;font-weight:500}
+  .ttag.ai{background:rgba(124,92,252,.15);color:#7c5cfc}
+  .ttag.script{background:rgba(120,132,148,.2);color:#78849a}
+  .ttag.human{background:rgba(224,142,29,.16);color:#c9820f}
   .doc ul.notes{list-style:none;padding:0;margin:8px 0 0;display:flex;flex-direction:column}
   .doc ul.notes li{padding:14px 0;border-top:1px solid var(--line);cursor:pointer}
   .doc ul.notes li:hover .nt{color:var(--accent-ink)}
