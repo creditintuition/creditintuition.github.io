@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plugseal — Agentic AI for Lending Risk Operations</title>
+<style>
+  :root{
+    --navy:#0F1B3D; --navy2:#16234F; --ink:#232323; --white:#FFFFFF;
+    --slate:#64748B; --slate-lt:#E2E8F0; --border:#E5E7EB;
+    --agent:#7C5CFC; --agent-bg:#F1EDFE; --agent-border:#C7B8FA;
+    --script:#94A3B8; --script-bg:#F1F3F6; --script-border:#CBD5E1;
+    --human:#E08E1D; --human-bg:#FDF1DE; --human-border:#F0CE94;
+    --teal:#00A81C; --green:#00BC1E; --green-dark:#009418; --green-bg:#EAFBEC; --green-border:#B7EEBE;
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; color:var(--ink); background:var(--white); }
+  .app { display:flex; min-height:100vh; }
+
+  /* Sidebar */
+  nav.sidebar { width:260px; flex-shrink:0; background:var(--white); color:var(--ink); padding:28px 20px; position:sticky; top:0; height:100vh; overflow-y:auto; border-right:1px solid var(--border); }
+  .brand-logo { width:100%; max-width:170px; height:auto; display:block; margin-bottom:6px; }
+  .brand-sub { font-size:11px; color:var(--slate); margin-bottom:32px; }
+  .navlist { list-style:none; margin:0; padding:0; }
+  .navlist li { margin-bottom:4px; }
+  .navlist button { all:unset; cursor:pointer; display:block; width:100%; padding:10px 12px; border-radius:8px; font-size:13.5px; color:var(--slate); transition:background .15s, color .15s; }
+  .navlist button:hover { background:var(--green-bg); color:var(--ink); }
+  .navlist button.active { background:var(--green); color:var(--white); font-weight:600; }
+  .navlist .grp { font-size:10.5px; text-transform:uppercase; letter-spacing:0.06em; color:#9AA0A6; margin:20px 0 8px 12px; }
+  .navlist .grp:first-of-type { margin-top:0; }
+
+  /* Main */
+  main { flex:1; min-width:0; }
+  section.page { display:none; padding:56px 64px; max-width:1100px; }
+  section.page.active { display:block; }
+
+  /* Hero (kept detailed, matches original title slide) */
+  section#overview.page { padding:0; max-width:none; }
+  .hero { background:var(--white); color:var(--ink); padding:100px 80px 90px; position:relative; overflow:hidden; }
+  .hero::before { content:""; position:absolute; top:-160px; right:-120px; width:520px; height:520px; border-radius:50%; background:var(--green-bg); }
+  .hero::after { content:""; position:absolute; bottom:-140px; left:-140px; width:380px; height:380px; border-radius:50%; background:var(--green-bg); }
+  .hero-content { position:relative; z-index:1; max-width:760px; }
+  .hero-tag { font-size:18px; font-weight:700; letter-spacing:3px; color:var(--green-dark); margin-bottom:14px; }
+  .hero-logo { width:220px; height:auto; display:block; margin-bottom:24px; }
+  .hero-title { font-size:44px; font-weight:800; line-height:1.15; margin:0 0 20px; color:var(--ink); }
+  .hero-sub { font-size:17px; color:var(--slate); line-height:1.5; margin-bottom:36px; }
+  .hero-foot { font-size:12.5px; color:#9AA0A6; }
+  .hero-cta { display:inline-flex; gap:10px; margin-top:8px; }
+  .hero-cta button { all:unset; cursor:pointer; padding:11px 20px; border-radius:8px; font-size:13.5px; font-weight:600; }
+  .cta-primary { background:var(--green); color:var(--white); }
+  .cta-secondary { background:transparent; border:1px solid var(--green-border) !important; color:var(--green-dark); }
+
+  .below-hero { padding:56px 80px 70px; }
+
+  h1.page-title { font-size:28px; font-weight:800; margin:0 0 6px; }
+  p.page-sub { font-size:14.5px; color:var(--slate); margin:0 0 32px; }
+
+  .grid4 { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
+  .grid3 { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+  .grid2 { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; }
+  .card { border-radius:12px; padding:20px; border:1px solid var(--border); }
+  .card h3 { font-size:15px; margin:0 0 10px; }
+  .card p, .card li { font-size:12.5px; color:var(--slate); line-height:1.55; }
+  .card ul { margin:0; padding-left:18px; }
+  .card li { margin-bottom:7px; }
+  .card-script { background:var(--script-bg); border-color:var(--script-border); }
+  .card-agent { background:var(--agent-bg); border-color:var(--agent-border); }
+  .card-human { background:var(--human-bg); border-color:var(--human-border); }
+  .card-note { font-size:11px; font-style:italic; color:var(--slate); margin-top:8px; display:block; }
+
+  /* Architecture */
+  .lifecycle { display:grid; grid-template-columns:repeat(4,1fr); gap:24px; margin-top:8px; }
+  .stagecol .stagehead { background:var(--green); color:var(--white); border-radius:10px; padding:12px; text-align:center; font-weight:700; font-size:13.5px; margin-bottom:14px; }
+  .stagecol .agentbox { background:var(--agent-bg); border:1px solid var(--agent-border); border-radius:10px; padding:12px 14px; font-size:13px; margin-bottom:10px; }
+  .arrow-note { text-align:center; color:var(--slate); font-size:20px; margin-top:38px; }
+  .demo-note { margin-top:28px; color:var(--green-dark); font-style:italic; font-size:13px; }
+
+  /* Rows (security, POC) */
+  .rowlist { display:flex; flex-direction:column; gap:12px; }
+  .row { display:flex; align-items:center; gap:24px; padding:18px 22px; border-radius:12px; background:var(--script-bg); border:1px solid var(--border); }
+  .row .rt { font-size:14.5px; font-weight:700; min-width:230px; }
+  .row .rd { font-size:12.5px; color:var(--slate); }
+  .row.dark { background:var(--green-bg); border:1px solid var(--green-border); color:var(--ink); }
+  .row.dark .rt { color:var(--ink); }
+  .row.dark .rd { color:var(--slate); }
+  .dot-sm { width:12px; height:12px; border-radius:50%; background:var(--green); flex-shrink:0; }
+
+  /* Team */
+  .avatar { width:52px; height:52px; border-radius:50%; background:var(--ink); margin-bottom:14px; }
+
+  /* Next steps */
+  .steps { list-style:none; margin:0; padding:0; }
+  .steps li { display:flex; gap:14px; padding:16px 0; border-bottom:1px solid var(--border); font-size:15px; }
+  .steps li:last-child { border-bottom:none; }
+  .stepnum { width:26px; height:26px; border-radius:50%; background:var(--green); color:var(--white); font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+
+  .legend { display:flex; gap:22px; font-size:12px; color:var(--slate); margin-bottom:24px; }
+  .legend span { display:inline-flex; align-items:center; gap:6px; }
+  .sw { width:10px; height:10px; border-radius:50%; }
+
+  /* Detailed architecture — stage cards with tools/resources/output */
+  .stage { border-radius:12px; padding:18px 20px; margin-bottom:0; border:1px solid var(--border); }
+  .stage-agent { background:var(--agent-bg); border-color:var(--agent-border); }
+  .stage-script { background:var(--script-bg); border-color:var(--script-border); }
+  .stage-human { background:var(--human-bg); border-color:var(--human-border); }
+  .stage-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+  .stage-title { font-size:16px; font-weight:700; }
+  .badge { font-size:10.5px; padding:3px 10px; border-radius:999px; background:#fff; border:1px solid var(--border); color:var(--slate); white-space:nowrap; }
+  .stage-sub { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+  .sub-box { background:#ffffffa8; border:1px solid var(--border); border-radius:8px; padding:10px 12px; }
+  .sub-box.output { background:#e8f5ec; border-color:#b9dcc4; }
+  .sub-label { font-size:10.5px; color:#8a8a8a; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.04em; }
+  .sub-box.output .sub-label { color:#2f7d46; }
+  .sub-text { font-size:12px; line-height:1.45; color:var(--ink); }
+  .fixnote { display:block; font-size:10.5px; color:#b23b3b; font-style:italic; margin-top:4px; }
+  .connector { text-align:center; color:#8a8a8a; font-size:12px; padding:10px 0 16px; }
+  .connector .arrow { font-size:18px; display:block; margin-bottom:2px; }
+  .connector .route { color:#555; max-width:640px; margin:0 auto; }
+
+  /* Orchestrator bus / timeline rail */
+  .arch-timeline { margin-top:8px; }
+  .orchestrator-head { display:flex; }
+  .head-rail { width:56px; flex-shrink:0; position:relative; display:flex; justify-content:center; }
+  .head-rail::after { content:""; position:absolute; top:34px; bottom:0; left:50%; width:3px; background:var(--green); transform:translateX(-50%); }
+  .head-label { flex:1; padding-left:18px; padding-bottom:18px; }
+  .head-pill { display:inline-flex; align-items:center; gap:8px; background:var(--green); color:var(--white); padding:9px 16px; border-radius:8px; font-size:13px; font-weight:700; letter-spacing:0.02em; }
+  .head-sub { font-size:11.5px; color:var(--slate); margin-top:6px; }
+  .timeline-row { display:flex; }
+  .rail { width:56px; flex-shrink:0; position:relative; display:flex; justify-content:flex-start; }
+  .rail::before { content:""; position:absolute; top:0; bottom:0; left:50%; width:3px; background:var(--green); transform:translateX(-50%); }
+  .rail.rail-last::before { top:0; bottom:auto; height:40px; }
+  .dot { position:relative; z-index:1; left:calc(50% - 8px); width:16px; height:16px; border-radius:50%; margin-top:24px; border:3px solid var(--white); box-shadow:0 0 0 1px var(--border); }
+  .dot-agent { background:var(--agent); }
+  .dot-script { background:var(--script); }
+  .dot-human { background:var(--human); }
+  .content { flex:1; min-width:0; padding-left:18px; }
+
+  /* Compliance detail / mitigation cards */
+  .comp-item { border:1px solid var(--border); border-radius:12px; padding:18px 22px; margin-bottom:14px; background:var(--script-bg); }
+  .comp-item h3 { font-size:15px; margin:0 0 8px; color:var(--ink); }
+  .comp-detail { font-size:12.5px; color:var(--slate); margin:0 0 12px; line-height:1.55; }
+  .comp-mitigation { border-radius:8px; padding:10px 14px; background:var(--green-bg); border:1px solid var(--green-border); }
+  .comp-mitigation.empty { background:transparent; border:1px dashed #C7CCD1; }
+  .comp-mit-label { font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; font-weight:700; color:var(--green-dark); display:block; margin-bottom:4px; }
+  .comp-mitigation.empty .comp-mit-label { color:#9AA0A6; }
+  .comp-mit-text { font-size:12.5px; color:var(--ink); margin:0; line-height:1.5; }
+  .comp-mit-text.placeholder { color:#9AA0A6; font-style:italic; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <nav class="sidebar">
+    <img class="brand-logo" src="data:image/png;base64,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" alt="Plugseal logo">
+    <div class="brand-sub">NBFC pitch portal</div>
+    <a href="/consulting/" style="display:inline-block;font-size:11px;color:var(--slate);text-decoration:none;margin-bottom:24px">&larr; creditintuition</a>
+    <ul class="navlist">
+      <li><button class="active" data-page="overview" onclick="showPage('overview')">Overview</button></li>
+      <div class="grp">Context</div>
+      <li><button data-page="architecture-detail" onclick="showPage('architecture-detail')">Full Architecture</button></li>
+      <li><button data-page="architecture" onclick="showPage('architecture')">Lifecycle Map</button></li>
+      <div class="grp">Deep Dives</div>
+      <li><button data-page="rcu" onclick="showPage('rcu')">RCU Agent</button></li>
+      <li><button data-page="collections" onclick="showPage('collections')">Collections Intelligence</button></li>
+      <div class="grp">Status</div>
+      <li><button data-page="poc" onclick="showPage('poc')">POC Readiness</button></li>
+      <li><button data-page="security" onclick="showPage('security')">Security & Compliance</button></li>
+      <div class="grp">Close</div>
+      <li><button data-page="team" onclick="showPage('team')">Team</button></li>
+      <li><button data-page="next" onclick="showPage('next')">Next Steps</button></li>
+    </ul>
+  </nav>
+
+  <main>
+
+    <!-- OVERVIEW / HERO -->
+    <section id="overview" class="page active">
+      <div class="hero">
+        <div class="hero-content">
+          <img class="hero-logo" src="data:image/png;base64,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" alt="Plugseal logo">
+          <h1 class="hero-title">Agentic AI for Lending Risk Operations</h1>
+          <p class="hero-sub">RCU, Document Verification, and Collections Intelligence — built for how your credit and risk teams already work.</p>
+          <div class="hero-cta">
+            <button class="cta-primary" onclick="showPage('architecture-detail')">See the architecture</button>
+            <button class="cta-secondary" onclick="showPage('rcu')">Jump to RCU Agent demo</button>
+          </div>
+        </div>
+      </div>
+      <div class="below-hero">
+        <h1 class="page-title">What this portal covers</h1>
+        <p class="page-sub">Use the sidebar to move between sections — this is built to be walked through live or reviewed on your own afterward.</p>
+        <div class="grid3">
+          <div class="card card-script"><h3>How it's built</h3><p>11 stages, sourcing through disbursal and RCU — see <em>Full Architecture</em>.</p></div>
+          <div class="card card-agent"><h3>What's live today</h3><p>RCU Agent and Call Intelligence Agent both have working demos — see <em>Deep Dives</em>.</p></div>
+          <div class="card card-human"><h3>What's still open</h3><p>Compliance framework and full team bios — flagged honestly, not glossed over.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FULL ARCHITECTURE (DETAILED, WITH TOOLS/RESOURCES/OUTPUT) -->
+    <section id="architecture-detail" class="page">
+      <h1 class="page-title">Full architecture — 11 stages, sourcing through disbursal and RCU</h1>
+      <p class="page-sub">Corrected: checklist and triangulation run as deterministic Script tables; RAG is used only where genuinely open-ended (Credit Agent I's risk-factor knowledge base)</p>
+      <div class="legend">
+        <span><span class="sw" style="background:var(--agent);"></span>AI agent — judgment / synthesis</span>
+        <span><span class="sw" style="background:var(--script);"></span>Script / rules / deterministic tool</span>
+        <span><span class="sw" style="background:var(--human);"></span>Human decision gate</span>
+      </div>
+
+      <div class="arch-timeline">
+        <div class="orchestrator-head">
+          <div class="head-rail"></div>
+          <div class="head-label">
+            <span class="head-pill">⚙ n8n Orchestrator</span>
+            <div class="head-sub">Every stage below connects to this bus — it routes each case, holds case state, and decides which agent runs next</div>
+          </div>
+        </div>
+
+        <div class="timeline-row">
+          <div class="rail"><div class="dot dot-agent"></div></div>
+          <div class="content">
+            <div class="stage stage-agent">
+              <div class="stage-header"><span class="stage-title">1. Sourcing agent</span><span class="badge">AI agent</span></div>
+              <div class="stage-sub">
+                <div class="sub-box"><div class="sub-label">Tools</div><div class="sub-text">extract_document, classify_entity_type, fetch_required_docs, match_checklist</div></div>
+                <div class="sub-box"><div class="sub-label">Resources</div><div class="sub-text">Document Universe table (Script DB)<span class="fixnote">fixed: was RAG, now deterministic lookup</span></div></div>
+                <div class="sub-box output"><div class="sub-label">Output</div><div class="sub-text">Lead → Application, docs linked in DMS, checklist status</div></div>
+              </div>
+            </div>
+            <div class="connector"><span class="arrow">↓</span><span class="route">Complete → create application, invoke Document Verification. Incomplete → back to sales agent for missing docs</span></div>
+          </div>
+        </div>
+
+        <div class="timeline-row">
+          <div class="rail"><div class="dot dot-script"></div></div>
+          <div class="content">
+            <div class="stage stage-script">
+              <div class="stage-header"><span class="stage-title">2. Document verification</span><span class="badge">Script + AI extraction</span></div>
+              <div class="stage-sub">
+                <div class="sub-box"><div class="sub-label">Tools</div><div class="sub-text">OCR / vision-LLM extraction, run_triangulation_rules</div></div>
+                <div class="sub-box"><div class="sub-label">Resources</div><div class="sub-text">Triangulation rules table (compiled Script)<span class="fixnote">fixed: was RAG, now compiled rules</span></div></div>
+                <div class="sub-box output"><div class="sub-label">Output</div><div class="sub-text">Extracted fields in LOS DB + risk tier (high / medium / low / none)</div></div>
+              </div>
+            </div>
+            <div class="connector"><span class="arrow">↓</span><span class="route">High → reject. Medium → back to Sourcing agent, state = Lead. Low / None → ML agent</span></div>
+          </div>
+        </div>
+
+        <div class="timeline-row">
+          <div class="rail"><div class="dot dot-script"></div></div>
+          <div class="content">
+            <div class="stage stage-script">
+              <div class="stage-header"><span class="stage-title">3. ML agent</span><span class="badge">Script / tool-caller</span></div>
+              <div class="stage-sub">
+                <div class="sub-box"><div class="sub-label">Tools</div><div class="sub-text">Bureau API, bank statement API, GST API, variable creation API, scoring API, line API</div></div>
+                <div class="sub-box"><div class="sub-label">Resources</div><div class="sub-text">Rule engine, loan-type / entity-type policy tables</div></div>
+                <div class="sub-box output"><div class="sub-label">Output</div><div class="sub-text">Risk tier + score + comments</div></div>
+              </div>
+            </div>
+            <div class="connector"><span class="arrow">↓</span><span class="route">High → reject. Medium / Low → Credit agent I, with comments attached</span></div>
+          </div>
+        </div>
+
+        <div class="timeline-row">
+          <div class="rail"><div class="dot dot-agent"></div></div>
+          <div class="content">
+            <div class="stage stage-agent">
+              <div class="stage-header"><span class="stage-title">4. Credit agent I</span><span class="badge">AI agent</span></div>
+              <div class="stage-sub">
+                <div class="sub-box"><div class="sub-label">Tools</div><div class="sub-text">query_risk_kb, prepare_cam</div></div>
+                <div class="sub-box"><div class="sub-label">Resources</div><div class="sub-text">Risk-factor knowledge base (RAG — correctly used here, factors are non-definitive)</div></div>
+                <div class="sub-box output"><div class="sub-label">Output</div><div class="sub-text">CAM with open queries</div></div>
+              </div>
+            </div>
+            <div class="connector"><span class="arrow">↓</span><span class="route">Always refers to a human for judgment</span></div>
+          </div>
+        </div>
+
+        <div class="timeline-row">
+          <div class="rail"><div class="dot dot-human"></div></div>
+          <div class="content">
+            <div class="stage stage-human">
+              <div class="stage-header"><span class="stage-title">5. Human credit agent — gate 1</span><span class="badge">Human gate</span></div>
+              <div class="stage-sub">
+                <div class="sub-box"><div class="sub-label">Tools</div><div class="sub-text">render_cam_summary</div></div>
+                <div class="sub-box"><div class="sub-label">Resources</div><div class="sub-text">CAM, full case file so far</div></div>
+                <div class="sub-box output"><div class="sub-label">Output</div><div class="sub-text">Reject, or invoke TVR for more information</div></div>
+              </div>
+            </div>
+            <div class="connector"><span class="arrow">↓</span><span class="route">Reject → terminal. Needs more info → TVR agent</span></div>
+          </div>
+        </div>
+
+        <div class="timeline-row">
+          <div class="rail"><div class="dot dot-agent"></div></div>
+          <div class="content">
+            <div class="stage stage-agent">
+              <div class="stage-header"><span class="stage-title">6. TVR agent</span><span class="badge">AI agent · conditional</span></div>
+              <div class="stage-sub">
+                <div class="sub-box"><div class="sub-label">Tools</div><div class="sub-text">place_call, transcribe_call, record_response</div></div>
+                <div class="sub-box"><div class="sub-label">Resources</div><div class="sub-text">Base question bank + CAM-specific queries</div></div>
+                <div class="sub-box output"><div class="sub-label">Output</div><div class="sub-text">Recorded responses, transcript</div></div>
+              </div>
+            </div>
+            <div class="connector"><span class="arrow">↓</span><span class="route">Feeds Credit agent II</span></div>
+          </div>
+        </div>
+
+        <div class="timeline-row">
+          <div class="rail"><div class="dot dot-agent"></div></div>
+          <div class="content">
+            <div class="stage stage-agent">
+              <div class="stage-header"><span class="stage-title">7. Credit agent II — senior reflection</span><span class="badge">AI agent</span></div>
+              <div class="stage-sub">
+                <div class="sub-box"><div class="sub-label">Tools</div><div class="sub-text">synthesize(credit_I, ML, TVR outputs)</div></div>
+                <div class="sub-box"><div class="sub-label">Resources</div><div class="sub-text">Full case history: Credit I, ML, TVR outputs</div></div>
+                <div class="sub-box output"><div class="sub-label">Output</div><div class="sub-text">Consolidated risk read, citing what each prior stage found</div></div>
+              </div>
+            </div>
+            <div class="connector"><span class="arrow">↓</span><span class="route">Low risk → FI agent. High risk → reject. Medium risk → Human credit agent, gate 2 (senior)</span></div>
+          </div>
+        </div>
+
+        <div class="timeline-row">
+          <div class="rail"><div class="dot dot-human"></div></div>
+          <div class="content">
+            <div class="stage stage-human">
+              <div class="stage-header"><span class="stage-title">8. Human credit agent — gate 2 (senior)</span><span class="badge">Human gate</span></div>
+              <div class="stage-sub">
+                <div class="sub-box"><div class="sub-label">Tools</div><div class="sub-text">render_case_summary</div></div>
+                <div class="sub-box"><div class="sub-label">Resources</div><div class="sub-text">Full case file including Credit II's consolidated read</div></div>
+                <div class="sub-box output"><div class="sub-label">Output</div><div class="sub-text">Proceed to FI, or reject</div></div>
+              </div>
+            </div>
+            <div class="connector"><span class="arrow">↓</span><span class="route">Proceed → FI agent, triggered once FI photo/report is uploaded</span></div>
+          </div>
+        </div>
+
+        <div class="timeline-row">
+          <div class="rail"><div class="dot dot-agent"></div></div>
+          <div class="content">
+            <div class="stage stage-agent">
+              <div class="stage-header"><span class="stage-title">9. FI agent</span><span class="badge">AI agent · conditional</span></div>
+              <div class="stage-sub">
+                <div class="sub-box"><div class="sub-label">Tools</div><div class="sub-text">match_lat_long, check_photo_authenticity, classify_pucca_kuchcha, check_inventory_vs_revenue</div></div>
+                <div class="sub-box"><div class="sub-label">Resources</div><div class="sub-text">FI photo store, KYC/KYB address records</div></div>
+                <div class="sub-box output"><div class="sub-label">Output</div><div class="sub-text">Risk tier + specific flags (photo fudge, kuchcha cap, address mismatch, inventory gap)</div></div>
+              </div>
+            </div>
+            <div class="connector"><span class="arrow">↓</span><span class="route">High → reject. Medium or kuchcha-house cap breach → Human credit agent, gate 2. Low → Fulfilment queue → Disbursal agent</span></div>
+          </div>
+        </div>
+
+        <div class="timeline-row">
+          <div class="rail"><div class="dot dot-script"></div></div>
+          <div class="content">
+            <div class="stage stage-script">
+              <div class="stage-header"><span class="stage-title">10. Disbursal agent</span><span class="badge">Script-heavy</span></div>
+              <div class="stage-sub">
+                <div class="sub-box"><div class="sub-label">Tools</div><div class="sub-text">triangulate_additional_docs, verify_nach, attach_affidavit</div></div>
+                <div class="sub-box"><div class="sub-label">Resources</div><div class="sub-text">DMS, legal document store, NACH verification API</div></div>
+                <div class="sub-box output"><div class="sub-label">Output</div><div class="sub-text">Disbursal-ready case, all conditions attached</div></div>
+              </div>
+            </div>
+            <div class="connector"><span class="arrow">↓</span><span class="route">Disbursed cases flow into RCU on an ongoing basis, not only at this point</span></div>
+          </div>
+        </div>
+
+        <div class="timeline-row">
+          <div class="rail rail-last"><div class="dot dot-agent"></div></div>
+          <div class="content">
+            <div class="stage stage-agent">
+              <div class="stage-header"><span class="stage-title">11. RCU agent</span><span class="badge">AI agent + Script sampling</span></div>
+              <div class="stage-sub">
+                <div class="sub-box"><div class="sub-label">Tools</div><div class="sub-text">court_record_check, pep_check, random_sample_selector (10%), reverify_updated_docs</div></div>
+                <div class="sub-box"><div class="sub-label">Resources</div><div class="sub-text">Court / PEP registries, full case history</div></div>
+                <div class="sub-box output"><div class="sub-label">Output</div><div class="sub-text">Escalated case file, or clean pass on sampled review</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARCHITECTURE -->
+    <section id="architecture" class="page">
+      <h1 class="page-title">One agent suite, mapped to your existing loan lifecycle</h1>
+      <p class="page-sub">Agents plug into each stage — none of them replace your credit or ops teams' final call</p>
+      <div class="lifecycle">
+        <div class="stagecol">
+          <div class="stagehead">Onboarding</div>
+          <div class="agentbox" style="background:var(--script-bg);border-color:var(--script-border);">Sourcing</div>
+          <div class="agentbox" style="background:var(--script-bg);border-color:var(--script-border);">Document Verification</div>
+        </div>
+        <div class="stagecol">
+          <div class="stagehead">Underwriting</div>
+          <div class="agentbox">Credit Agent</div>
+          <div class="agentbox">TVR Agent</div>
+          <div class="agentbox">FI Agent</div>
+        </div>
+        <div class="stagecol">
+          <div class="stagehead">Fraud Control</div>
+          <div class="agentbox">RCU Agent</div>
+        </div>
+        <div class="stagecol">
+          <div class="stagehead">Servicing & Collections</div>
+          <div class="agentbox">Calling Agent</div>
+          <div class="agentbox">Call Intelligence</div>
+        </div>
+      </div>
+      <div class="demo-note">Live demo today: RCU Agent · Call Intelligence Agent (see Deep Dives)</div>
+    </section>
+
+    <!-- RCU DEEP DIVE -->
+    <section id="rcu" class="page">
+      <h1 class="page-title">RCU Agent — live demo available today</h1>
+      <p class="page-sub">Document triangulation and fraud-pattern detection, scoped honestly across what's automatable and what stays human</p>
+      <div class="legend">
+        <span><span class="sw" style="background:var(--script);"></span>Script — deterministic</span>
+        <span><span class="sw" style="background:var(--agent);"></span>AI — genuine model capability</span>
+        <span><span class="sw" style="background:var(--human);"></span>Manual — stays with your team</span>
+      </div>
+      <div class="grid3">
+        <div class="card card-script">
+          <h3>Script — rules engine</h3>
+          <ul>
+            <li>Invoice vs. system price match</li>
+            <li>DP + LA reconciliation</li>
+            <li>RC date vs. sanction date</li>
+            <li>IoT distance-from-yard triggers</li>
+          </ul>
+        </div>
+        <div class="card card-agent">
+          <h3>AI — document & image understanding</h3>
+          <ul>
+            <li>ID / address / DL fraud detection</li>
+            <li>Photo fudging & tamper checks</li>
+            <li>Asset (vehicle) photo matching</li>
+            <li>Format-variant document extraction</li>
+          </ul>
+        </div>
+        <div class="card card-human">
+          <h3>Manual — stays with your team</h3>
+          <ul>
+            <li>Mystery shopping</li>
+            <li>Yard audits</li>
+            <li>Dealer field verification</li>
+            <li>SOP training & team competency</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- COLLECTIONS DEEP DIVE -->
+    <section id="collections" class="page">
+      <h1 class="page-title">Collections Calling Intelligence — live demo available today</h1>
+      <p class="page-sub">Calling Agent places the call; Call Intelligence Agent listens, understands, and knows when to hand off</p>
+      <div class="grid2">
+        <div class="card card-agent">
+          <h3>Calling Agent</h3>
+          <ul>
+            <li>Places pre-EMI reminder calls ahead of due date</li>
+            <li>Places early-delinquency calls on missed EMIs</li>
+            <li>Runs a base question / reminder script per product</li>
+            <li>Detects when the conversation turns negative in real time</li>
+            <li>Transfers live to a human collections agent on that signal — not a post-call flag</li>
+          </ul>
+        </div>
+        <div class="card card-script">
+          <h3>Call Intelligence Agent</h3>
+          <ul>
+            <li>Multilingual — understands regional-language responses, not English-only scripts</li>
+            <li>Intent identification — distinguishes "will pay Friday" from "can't pay, job loss"</li>
+            <li>SOP adherence — checks the human or AI caller followed required disclosures</li>
+            <li>Feeds structured call outcomes back into the collections queue for prioritization</li>
+          </ul>
+        </div>
+      </div>
+      <span class="card-note">Note: scoped from Plugseal's current "Calling Agent" + "Call Intelligence Agent" categories — confirm exact scoring methodology and thresholds before this goes in front of the client.</span>
+    </section>
+
+    <!-- POC -->
+    <section id="poc" class="page">
+      <h1 class="page-title">Where we are today</h1>
+      <p class="page-sub">&nbsp;</p>
+      <div class="rowlist">
+        <div class="row dark"><div class="dot-sm"></div><div class="rt">RCU Agent</div><div class="rd">Live demo ready</div></div>
+        <div class="row dark"><div class="dot-sm"></div><div class="rt">Call Intelligence Agent</div><div class="rd">Live demo ready</div></div>
+        <div class="row dark"><div class="dot-sm"></div><div class="rt">Credit Agent, Operations, Welcome Calling</div><div class="rd">On the near-term roadmap</div></div>
+      </div>
+    </section>
+
+    <!-- SECURITY -->
+    <section id="security" class="page">
+      <h1 class="page-title">Data security & compliance</h1>
+      <p class="page-sub">Organized around three questions any NBFC will ask first: where does our data live, does anyone else ever touch it, and is every vendor in the chain actually compliant. Items marked open are genuine decisions still to be made — not gaps we're hiding.</p>
+
+      <div class="comp-item">
+        <h3>1. Data residency & on-premise processing</h3>
+        <p class="comp-detail">Where case data, call recordings, extracted documents, and model logs are stored and processed — including whether any component routes data through infrastructure or model APIs outside India, or whether processing can run fully on the NBFC's own premises / VPC.</p>
+        <div class="comp-mitigation empty">
+          <span class="comp-mit-label">Mitigation — open</span>
+          <p class="comp-mit-text placeholder">Not yet decided — depends on final infra architecture (on-prem / VPC vs. hosted).</p>
+        </div>
+      </div>
+
+      <div class="comp-item">
+        <h3>2. No cross-client data use</h3>
+        <p class="comp-detail">Whether data or outputs from one NBFC client are ever used, directly or indirectly — including model fine-tuning or prompt calibration — to benefit another client.</p>
+        <div class="comp-mitigation">
+          <span class="comp-mit-label">Mitigation</span>
+          <p class="comp-mit-text">Per-client logical (and where required, physical) data isolation. No cross-client model training or fine-tuning on any client's case data, ever.</p>
+        </div>
+      </div>
+
+      <div class="comp-item">
+        <h3>3. Vendor / sub-processor DPDP & PII compliance</h3>
+        <p class="comp-detail">Any third-party service Plugseal itself depends on — OCR providers, LLM APIs, cloud hosting — becomes a sub-processor under DPDP and a reportable subcontractor under RBI's Outsourcing Directions. Each must independently meet DPDP safeguards and PII handling standards, not just Plugseal itself.</p>
+        <div class="comp-mitigation empty">
+          <span class="comp-mit-label">Mitigation — open</span>
+          <p class="comp-mit-text placeholder">Sub-processor list and their individual DPDP/PII compliance status to be finalized and disclosed.</p>
+        </div>
+      </div>
+
+      <div class="comp-item">
+        <h3>4. RBI vendor due diligence & audit rights</h3>
+        <p class="comp-detail">RBI's 2025 Outsourcing Directions treat any data-handling vendor as a "Service Provider," requiring documented due diligence and contractual rights for the NBFC, RBI, and auditors to inspect Plugseal's systems directly.</p>
+        <div class="comp-mitigation">
+          <span class="comp-mit-label">Mitigation</span>
+          <p class="comp-mit-text">Due-diligence pack (security architecture, data flow diagram, sub-processor list) prepared ahead of onboarding. Inspection rights for the NBFC, RBI, and auditors accepted contractually upfront.</p>
+        </div>
+      </div>
+
+      <div class="comp-item">
+        <h3>5. DPDP Data Processor obligations</h3>
+        <p class="comp-detail">The NBFC is the Data Fiduciary; Plugseal is a Data Processor bound by a Data Processing Agreement covering security safeguards and purpose limitation — Plugseal cannot use data beyond the contracted purpose.</p>
+        <div class="comp-mitigation">
+          <span class="comp-mit-label">Mitigation</span>
+          <p class="comp-mit-text">Standard DPA template ready ahead of client conversations, not drafted case-by-case under deal pressure. Purpose limitation committed contractually.</p>
+        </div>
+      </div>
+
+      <div class="comp-item">
+        <h3>6. Model auditability & AI governance (RBI FREE-AI framework)</h3>
+        <p class="comp-detail">RBI's FREE-AI report extends board accountability to third-party AI vendors — the NBFC's board remains accountable for what Plugseal's agents do, and expects the same rigor validating a vendor's models as its own.</p>
+        <div class="comp-mitigation">
+          <span class="comp-mit-label">Mitigation</span>
+          <p class="comp-mit-text">Every agent decision traceable to the specific rule or model/prompt version that produced it. Human sign-off gates at every stage already built into the architecture (see Full Architecture) — not added on request.</p>
+        </div>
+      </div>
+
+      <div class="comp-item">
+        <h3>7. Algorithmic bias / fair-lending exposure</h3>
+        <p class="comp-detail">A credit or fraud agent that treats demographic patterns (age, family structure) as a proxy risk signal — rather than a specific financial inconsistency — is exactly the embedded bias RBI's FREE-AI framework and DPDP's algorithm-screening provisions target.</p>
+        <div class="comp-mitigation">
+          <span class="comp-mit-label">Mitigation</span>
+          <p class="comp-mit-text">Every flag must be grounded in a stated financial fact (e.g., "co-applicant has no independent income for this loan size"), never a demographic pattern alone. Enforced at the prompt/schema level, not left to reviewer judgment.</p>
+        </div>
+      </div>
+
+      <div class="comp-item">
+        <h3>8. Breach notification timing</h3>
+        <p class="comp-detail">A single incident can trigger three overlapping notification clocks — CERT-In (6 hours), RBI's cybersecurity framework, and DPDP's Data Protection Board — each with different timelines and recipients.</p>
+        <div class="comp-mitigation">
+          <span class="comp-mit-label">Mitigation</span>
+          <p class="comp-mit-text">Incident response built around the tightest window — CERT-In's 6 hours — as the binding commitment in the vendor agreement, satisfying the other two by design.</p>
+        </div>
+      </div>
+
+      <div class="comp-item">
+        <h3>9. Retention vs. deletion conflicts</h3>
+        <p class="comp-detail">DPDP's purpose-limitation principle expects deletion once processing ends; RBI/KYC/PMLA rules require retention (commonly 7–10 years) for the same data. Getting this wrong in either direction is a violation.</p>
+        <div class="comp-mitigation">
+          <span class="comp-mit-label">Mitigation</span>
+          <p class="comp-mit-text">Plugseal's systems never auto-delete on a fixed timer — retention decisions defer to the NBFC's own regulatory basis, not an independent policy of ours.</p>
+        </div>
+      </div>
+
+      <div class="comp-item">
+        <h3>10. Vendor personnel due diligence</h3>
+        <p class="comp-detail">RBI's Outsourcing Directions require documented background-check evidence for any vendor staff with data access, plus tracking of "essential personnel" with backup arrangements.</p>
+        <div class="comp-mitigation empty">
+          <span class="comp-mit-label">Mitigation — open</span>
+          <p class="comp-mit-text placeholder">Background-check process and essential-personnel documentation to be defined.</p>
+        </div>
+      </div>
+
+      <div class="comp-item">
+        <h3>11. Subcontractor transparency & certifications</h3>
+        <p class="comp-detail">RBI requires that a vendor not subcontract without the NBFC's prior approval, and remains liable for subcontractors' conduct — including whatever model API providers Plugseal itself depends on.</p>
+        <div class="comp-mitigation empty">
+          <span class="comp-mit-label">Mitigation — open</span>
+          <p class="comp-mit-text placeholder">Subcontractor map and any security certifications (ISO 27001 / SOC 2 status) to be confirmed and disclosed.</p>
+        </div>
+      </div>
+
+      <span class="card-note">Regulatory basis: RBI (NBFC — Managing Risks in Outsourcing) Directions, 2025; RBI (Digital Lending) Directions, 2025; RBI FREE-AI framework (Aug 2025); DPDP Act & Rules (notified Nov 2025). Compiled July 2026 — re-verify before external use; recommend compliance/legal review before this goes in front of a client.</span>
+    </section>
+
+    <!-- TEAM -->
+    <section id="team" class="page">
+      <h1 class="page-title">Team</h1>
+      <p class="page-sub">&nbsp;</p>
+      <div class="grid3">
+        <div class="card card-script">
+          <div class="avatar"></div>
+          <h3>Varun</h3>
+          <p>Class of 2009 IIT Bombay alumnus with over 15 years of Data, Product, and Technology leadership across FinTech and ConsumerTech. Held CXO-1 roles at Money View, Paytm Money, Lendingkart, and Cars24.</p>
+        </div>
+        <div class="card card-script">
+          <div class="avatar"></div>
+          <h3>Vishwajeet</h3>
+          <p>A decade building lending infrastructure from the inside — taking loan books from ₹0 to 1000+ Cr AUM across personal loans, business loans, LAP, vehicle loans, and supply chain finance for 6+ Indian NBFCs. NIT Rourkela engineer.</p>
+        </div>
+        <div class="card card-script">
+          <div class="avatar"></div>
+          <h3>Saket</h3>
+          <p>CRO at Cars24 and Turno, Chief Analytics Officer at Lendingkart, and Chief Digital Officer at Manappuram Finance — leading risk, data science, and AI across some of India's most recognized NBFCs. Has personally built the AI agents this pitch describes — an LLM-based document fraud triangulation library and PTP triangulation for collections — alongside ML credit/collections models and RBI-facing ECL frameworks. Hired and managed risk and data science teams of up to 50 people.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEXT STEPS -->
+    <section id="next" class="page">
+      <h1 class="page-title">Proposed next step</h1>
+      <p class="page-sub">&nbsp;</p>
+      <ul class="steps">
+        <li><span class="stepnum">1</span><span>Run RCU Agent and Call Intelligence Agent as a live pilot against a defined slice of current cases</span></li>
+        <li><span class="stepnum">2</span><span>Agree success metrics upfront — turnaround time, flag precision, call-escalation accuracy</span></li>
+        <li><span class="stepnum">3</span><span>Human sign-off stays in place throughout the pilot; agents recommend, your team decides</span></li>
+        <li><span class="stepnum">4</span><span>Review results at 4 weeks before any wider rollout discussion</span></li>
+      </ul>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  function showPage(id) {
+    document.querySelectorAll('section.page').forEach(function(s){ s.classList.remove('active'); });
+    document.getElementById(id).classList.add('active');
+    document.querySelectorAll('.navlist button').forEach(function(b){ b.classList.remove('active'); });
+    var btn = document.querySelector('.navlist button[data-page="' + id + '"]');
+    if (btn) btn.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+</script>
+
+</body>
+</html>
