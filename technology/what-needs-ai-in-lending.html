@@ -12,7 +12,7 @@
 <meta property="og:title" content="What needs AI in a lending system &mdash; and what doesn&rsquo;t &mdash; creditintuition">
 <meta property="og:description" content="Most of a lending pipeline is deterministic. AI earns its place in only three kinds of work — reading messy inputs, synthesising non-definitive judgment, and open-ended retrieval. Everything else should be script, and every irreversible credit call keeps a human.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2022%2022%27%3E%3Cpath%20d%3D%27M2%2018%20C7%2018%208%206%2020%204%27%20stroke%3D%27%230B6E5F%27%20stroke-width%3D%272%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27/%3E%3Ccircle%20cx%3D%2720%27%20cy%3D%274%27%20r%3D%272%27%20fill%3D%27%230B6E5F%27/%3E%3C/svg%3E">
-<link rel="stylesheet" href="/assets/style.css">
+<link rel="stylesheet" href="/assets/style.css?v=20260720">
 </head>
 <body data-page="article" data-section="technology">
 <main><div class="wrap"><div class="lib"><article id="content" class="doc"><div class="eyebrow">working note · technology</div><h1>What needs AI in a lending system &mdash; and what doesn&rsquo;t</h1><div class="meta"><span>8 min</span><span>drawn from a live agentic build</span></div><p>The reflex, right now, is to put a model at every step. But look closely at a lending pipeline and most of it is not a judgment problem at all &mdash; it is a lookup, a rule, or a calculation. Those should stay deterministic. AI earns its place in a narrow set of tasks, and using it anywhere else quietly adds cost, latency, and a hallucination surface for no gain.</p><p>The cleanest way to design the stack is to sort every stage into one of three kinds of work.</p>
@@ -46,6 +46,6 @@
 <h2>Why the discipline matters</h2><p>A model dropped onto a deterministic step doesn&rsquo;t just cost more per call. It makes the step non-reproducible, harder to audit, and slower &mdash; and it introduces a small, permanent chance of a confidently wrong answer on work that had a correct answer all along. The credibility of an AI lending stack comes from being able to say exactly where a model is trusted and where it is not.</p><p>Put the model where judgment lives, keep everything knowable as script, and keep a human on every decision that cannot be taken back. The result is not less AI &mdash; it is AI that a risk committee, and a regulator, can actually stand behind.</p>
 
 <div class="author"><div class="avatar">SA</div><div><div style="font-size:15px">Saket Anand</div><div style="font-size:13px;color:var(--muted)">Quantitative-risk practitioner</div></div></div></article><nav id="sidenav" class="libnav" aria-label="Sections"></nav></div></div></main>
-<script src="/assets/app.js" defer></script>
+<script src="/assets/app.js?v=20260720" defer></script>
 </body>
 </html>
