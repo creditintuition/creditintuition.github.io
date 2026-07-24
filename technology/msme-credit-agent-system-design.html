@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MSME Credit Agent &mdash; System Design &mdash; creditintuition</title>
+<meta name="description" content="A visual system-design walkthrough of an MSME credit agent: what manual stage it replaces, the deterministic-plus-LLM architecture, the idiosyncratic persona panel modelled on real underwriters, and the Tier 2/3 risk knowledge base beneath it.">
+<meta name="author" content="Saket Anand">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#0B6E5F">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2022%2022%27%3E%3Cpath%20d%3D%27M2%2018%20C7%2018%208%206%2020%204%27%20stroke%3D%27%230B6E5F%27%20stroke-width%3D%272%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27/%3E%3Ccircle%20cx%3D%2720%27%20cy%3D%274%27%20r%3D%272%27%20fill%3D%27%230B6E5F%27/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#F6F8F7; --surface:#FFFFFF; --surface-2:#F0F3F1;
+    --ink:#16201D; --ink-soft:#48544F; --muted:#7C8783;
+    --line:#E2E7E4; --line-2:#CBD3CF;
+    --accent:#0B6E5F; --accent-ink:#064A3F; --accent-tint:rgba(11,110,95,.10);
+    --det:#5f6b7c; --det-bg:rgba(120,132,148,.14); --det-bd:rgba(120,132,148,.4);
+    --llm:#7c5cfc; --llm-bg:rgba(124,92,252,.13); --llm-bd:rgba(124,92,252,.42);
+    --rag:#0B6E5F; --rag-bg:rgba(11,110,95,.12); --rag-bd:rgba(11,110,95,.4);
+    --human:#c9820f; --human-bg:rgba(224,142,29,.15); --human-bd:rgba(224,142,29,.45);
+    --persona:#a8323f; --persona-bg:rgba(168,50,63,.10); --persona-bd:rgba(168,50,63,.38);
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"Cascadia Code","Cascadia Mono",Consolas,"SF Mono",Menlo,monospace;
+  }
+  [data-theme="dark"]{
+    --bg:#0E1311; --surface:#141B18; --surface-2:#1A2320;
+    --ink:#EAF0EC; --ink-soft:#AEB9B4; --muted:#7E8A85;
+    --line:#243029; --line-2:#33413A;
+    --accent:#3EB39A; --accent-ink:#BFE9DF; --accent-tint:rgba(62,179,154,.15);
+    --det:#9aa6b4; --det-bg:rgba(120,132,148,.16); --det-bd:rgba(120,132,148,.42);
+    --llm:#a48bff; --llm-bg:rgba(124,92,252,.18); --llm-bd:rgba(124,92,252,.46);
+    --rag:#3EB39A; --rag-bg:rgba(62,179,154,.15); --rag-bd:rgba(62,179,154,.42);
+    --human:#e0a94a; --human-bg:rgba(224,142,29,.18); --human-bd:rgba(224,142,29,.48);
+    --persona:#d9707c; --persona-bg:rgba(206,110,118,.15); --persona-bd:rgba(206,110,118,.44);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .app{display:flex;min-height:100vh}
+
+  /* Sidebar */
+  nav.side{width:262px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--line);padding:24px 18px;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .brand{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:14.5px;letter-spacing:-.01em;color:var(--ink);text-decoration:none;margin-bottom:2px}
+  .brand svg{flex-shrink:0}
+  .side .back{display:inline-block;font-size:11px;color:var(--muted);text-decoration:none;margin:2px 0 22px 31px;font-family:var(--mono)}
+  .side .back:hover{color:var(--accent-ink)}
+  .navlist{list-style:none;margin:0;padding:0}
+  .navlist li{margin-bottom:3px}
+  .navlist button{all:unset;cursor:pointer;display:flex;gap:11px;align-items:baseline;width:100%;padding:9px 12px;border-radius:9px;font-size:13.5px;color:var(--ink-soft);transition:background .14s,color .14s}
+  .navlist button .nn{font-family:var(--mono);font-size:11px;color:var(--muted);width:14px;flex-shrink:0}
+  .navlist button:hover{background:var(--surface-2);color:var(--ink)}
+  .navlist button.active{background:var(--accent-tint);color:var(--accent-ink);font-weight:500}
+  .navlist button.active .nn{color:var(--accent)}
+  [data-theme="dark"] .navlist button.active{color:var(--accent)}
+  .side-foot{margin-top:26px;padding-top:16px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .tbtn{font-family:var(--mono);font-size:11.5px;color:var(--ink-soft);background:none;border:1px solid var(--line-2);border-radius:7px;padding:5px 10px;cursor:pointer}
+  .tbtn:hover{color:var(--ink);border-color:var(--ink-soft)}
+  .side-foot .lab{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+  /* Main / pages */
+  main{flex:1;min-width:0;position:relative}
+  section.page{display:none;padding:48px 60px 90px;max-width:1080px;animation:fade .3s ease}
+  section.page.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){section.page{animation:none}}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);display:block;margin-bottom:10px}
+  [data-theme="dark"] .eyebrow{color:var(--accent)}
+  h1.pt{font-family:var(--serif);font-size:clamp(27px,3.4vw,38px);line-height:1.1;letter-spacing:-.015em;margin:0 0 12px;font-weight:500}
+  p.sub{font-size:16px;color:var(--ink-soft);margin:0 0 26px;max-width:66ch;line-height:1.65}
+  p.sub b{color:var(--ink);font-weight:600}
+  h2.sh{font-family:var(--serif);font-size:20px;margin:30px 0 12px;letter-spacing:-.01em;font-weight:500}
+  h2.sh:first-of-type{margin-top:8px}
+
+  /* legend */
+  .legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin:0 0 22px;font-size:12.5px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .legend i{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+  .i-det{background:var(--det)}.i-llm{background:var(--llm)}.i-rag{background:var(--rag)}.i-human{background:var(--human)}.i-persona{background:var(--persona)}
+
+  .tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.03em;text-transform:uppercase;padding:2px 7px;border-radius:5px;white-space:nowrap;display:inline-block;font-weight:600}
+  .t-det{background:var(--det-bg);color:var(--det)}
+  .t-llm{background:var(--llm-bg);color:var(--llm)}
+  .t-rag{background:var(--rag-bg);color:var(--rag)}
+  .t-human{background:var(--human-bg);color:var(--human)}
+  .t-persona{background:var(--persona-bg);color:var(--persona)}
+  [data-theme="dark"] .t-rag,[data-theme="dark"] .t-human{color:var(--ink)}
+
+  /* generic cards */
+  .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:18px 20px}
+  .card h3{font-family:var(--serif);font-size:17px;margin:0 0 7px;font-weight:500;line-height:1.25}
+  .card p{font-size:13px;color:var(--ink-soft);margin:0;line-height:1.55}
+  .card p b{color:var(--ink);font-weight:600}
+  .card .kk{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .card.hl{border-left:3px solid var(--accent)}
+  .card.persona-hl{border:1px solid var(--persona-bd);background:var(--persona-bg)}
+
+  /* stat row */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:4px 0 26px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:15px 16px}
+  .stat .v{font-family:var(--serif);font-size:26px;line-height:1;letter-spacing:-.01em;color:var(--accent-ink)}
+  [data-theme="dark"] .stat .v{color:var(--accent)}
+  .stat .l{font-size:12px;color:var(--ink-soft);margin-top:8px;line-height:1.4}
+
+  /* pipeline flow (page 2) */
+  .pipe-wrap{overflow-x:auto;padding:6px 0 12px;margin:0 -4px}
+  .pipe{display:flex;align-items:stretch;gap:0;min-width:920px}
+  .pstage{position:relative;flex:1;min-width:74px;display:flex;flex-direction:column}
+  .pchip{background:var(--surface);border:1px solid var(--line);border-top-width:3px;border-radius:9px;padding:10px 8px 11px;text-align:center;height:100%;display:flex;flex-direction:column;gap:5px;justify-content:flex-start}
+  .pchip .pn{font-family:var(--mono);font-size:9px;color:var(--muted)}
+  .pchip .plabel{font-size:11px;line-height:1.25;color:var(--ink);font-weight:500}
+  .pchip .pnat{font-family:var(--mono);font-size:8.5px;letter-spacing:.02em;text-transform:uppercase;margin-top:auto;color:var(--muted)}
+  .pchip.n-det{border-top-color:var(--det)}
+  .pchip.n-llm{border-top-color:var(--llm)}
+  .pchip.n-human{border-top-color:var(--human)}
+  .pchip.n-sys{border-top-color:var(--line-2)}
+  .pstage:not(:last-child)::after{content:"";position:absolute;top:44%;right:-1px;width:8px;height:1.5px;background:var(--line-2);z-index:2}
+  .replace-band{margin-top:9px;position:relative}
+  .replace-band .bar{height:26px;border:1.5px dashed var(--accent);border-radius:8px;background:var(--accent-tint);display:flex;align-items:center;justify-content:center}
+  .replace-band .bar span{font-family:var(--mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent-ink)}
+  [data-theme="dark"] .replace-band .bar span{color:var(--accent)}
+
+  /* old vs new (page 3) */
+  .compare{display:flex;flex-direction:column;gap:0;margin:6px 0 8px}
+  .crow{display:grid;grid-template-columns:120px 1fr 1fr 1fr;gap:12px;align-items:stretch;padding:12px 0}
+  .crow.head{padding-bottom:4px}
+  .crow.head .ch{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;align-self:end}
+  .crow.head .ch:first-child{text-align:left}
+  .clabel{font-family:var(--mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);align-self:center}
+  .cbox{border:1px solid var(--line);border-radius:11px;padding:13px 15px;background:var(--surface);font-size:12.5px;color:var(--ink-soft);line-height:1.5}
+  .cbox b{color:var(--ink);font-weight:600;display:block;margin-bottom:4px;font-size:13px}
+  .cbox.same{background:var(--surface-2);border-style:dashed}
+  .cbox.change{border-color:var(--accent);background:var(--accent-tint)}
+  .crow.old .cbox b{color:var(--ink)}
+
+  /* architecture flow (page 4) */
+  .arch{display:flex;flex-direction:column;gap:0;max-width:760px;margin:2px auto 0}
+  .ablock{border:1px solid var(--line);border-radius:12px;padding:14px 18px;background:var(--surface);border-left-width:3px}
+  .ablock.b-llm{border-left-color:var(--llm)}
+  .ablock.b-det{border-left-color:var(--det)}
+  .ablock.b-rag{border-left-color:var(--rag)}
+  .ablock.b-human{border-left-color:var(--human)}
+  .ablock.b-persona{border-left-color:var(--persona);border-color:var(--persona-bd);background:var(--persona-bg)}
+  .ahead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .ahead .an{font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .ahead h4{font-size:14.5px;margin:0;font-weight:600;color:var(--ink)}
+  .ablock p{font-size:12.5px;color:var(--ink-soft);margin:7px 0 0;line-height:1.5}
+  .ablock p b{color:var(--ink);font-weight:600}
+  .aconn{display:flex;justify-content:center;color:var(--muted);font-size:15px;padding:5px 0}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .split .ablock{border-left-width:3px}
+  .split-cap{text-align:center;font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:2px 0 8px}
+  .feedback{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}
+  .fb{border:1px dashed var(--line-2);border-radius:11px;padding:12px 15px;background:var(--surface-2)}
+  .fb .cad{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:5px}
+  [data-theme="dark"] .fb .cad{color:var(--accent)}
+  .fb p{font-size:12px;color:var(--ink-soft);margin:0;line-height:1.5}
+  .fb p b{color:var(--ink);font-weight:600}
+
+  /* persona panel (page 5) */
+  .votes{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:2px 0 8px}
+  .voter{border:1px solid var(--persona-bd);border-radius:12px;padding:14px 12px;text-align:center;background:var(--surface)}
+  .voter .face{width:38px;height:38px;border-radius:50%;margin:0 auto 9px;background:var(--persona-bg);color:var(--persona);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:600}
+  .voter .vname{font-size:11px;color:var(--ink-soft);margin-bottom:9px;line-height:1.3}
+  .voter .vote{font-family:var(--mono);font-size:10px;letter-spacing:.04em;text-transform:uppercase;padding:3px 0;border-radius:6px;font-weight:600}
+  .vote.approve{background:rgba(11,110,95,.14);color:var(--accent-ink)}
+  [data-theme="dark"] .vote.approve{color:var(--accent)}
+  .vote.decline{background:var(--persona-bg);color:var(--persona)}
+  .vote.medium{background:var(--human-bg);color:var(--human)}
+  [data-theme="dark"] .vote.medium{color:var(--ink)}
+  .gauge-row{display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin:4px 0}
+  .spread-demo{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+  .sd{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--surface)}
+  .sd .tally{font-family:var(--serif);font-size:22px;color:var(--ink);letter-spacing:.02em}
+  .sd .sdl{font-size:12px;color:var(--ink-soft);margin-top:4px}
+  .gate{display:flex;gap:14px;align-items:flex-start;padding:13px 0;border-top:1px solid var(--line)}
+  .gate:first-of-type{border-top:0}
+  .gate .gnum{width:26px;height:26px;border-radius:8px;background:var(--persona-bg);color:var(--persona);font-family:var(--mono);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .gate .gt{font-size:14px;color:var(--ink);font-weight:600;margin-bottom:2px}
+  .gate .gd{font-size:12.5px;color:var(--ink-soft);line-height:1.5}
+
+  /* tech stack table (page 6) */
+  .tblw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;margin:6px 0 18px}
+  table.ci{border-collapse:collapse;width:100%;font-size:12.5px;min-width:560px}
+  table.ci th,table.ci td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.ci th{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:400;background:var(--surface-2)}
+  table.ci td{color:var(--ink-soft)}
+  table.ci tr:last-child td{border-bottom:0}
+  table.ci b{color:var(--ink);font-weight:600}
+  .seq{display:flex;align-items:stretch;gap:10px;flex-wrap:wrap;margin:4px 0}
+  .seqstep{flex:1;min-width:150px;border:1px solid var(--line);border-radius:11px;padding:13px 15px;background:var(--surface)}
+  .seqstep .sq{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:5px}
+  [data-theme="dark"] .seqstep .sq{color:var(--accent)}
+  .seqstep .st{font-size:13.5px;color:var(--ink);font-weight:600;margin-bottom:3px}
+  .seqstep p{font-size:12px;color:var(--ink-soft);margin:0;line-height:1.45}
+  .seq .arw{align-self:center;color:var(--muted);font-family:var(--mono)}
+
+  /* knowledge base (page 7) */
+  .kbgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .kbcat{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--surface)}
+  .kbcat .cx{display:flex;align-items:baseline;gap:9px;margin-bottom:9px}
+  .kbcat .cx .cl{font-family:var(--mono);font-size:12px;color:var(--accent-ink);font-weight:600}
+  [data-theme="dark"] .kbcat .cx .cl{color:var(--accent)}
+  .kbcat .cx h4{font-size:13.5px;margin:0;font-weight:600;color:var(--ink)}
+  .kbcat ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+  .kbcat li{font-size:12px;color:var(--ink-soft);line-height:1.4;display:flex;gap:8px;align-items:baseline}
+  .kbcat li .dz{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px;background:var(--muted)}
+  .kbcat li.sensitive .dz{background:var(--persona)}
+  .kbcat li.sensitive{color:var(--ink)}
+  .kb-legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:12px;color:var(--muted);margin:2px 0 18px}
+  .kb-legend b{color:var(--ink-soft);font-weight:600}
+
+  .callout{background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;padding:15px 18px;margin:20px 0;max-width:70ch}
+  .callout h4{margin:0 0 8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:400}
+  .callout p{font-size:13.5px;color:var(--ink);margin:0;line-height:1.55}
+  .callout.warn{border-left-color:var(--persona)}
+  .note{font-size:12px;color:var(--muted);font-style:italic;margin:10px 0 0;max-width:70ch}
+
+  /* prev / next */
+  .pager{display:flex;justify-content:space-between;gap:12px;margin-top:40px;padding-top:22px;border-top:1px solid var(--line);max-width:920px}
+  .pager button{all:unset;cursor:pointer;font-family:var(--mono);font-size:12.5px;color:var(--ink-soft);border:1px solid var(--line-2);border-radius:9px;padding:9px 15px;transition:border-color .14s,color .14s}
+  .pager button:hover{color:var(--ink);border-color:var(--ink-soft)}
+  .pager button.hidden{visibility:hidden}
+  .pager button .dir{color:var(--muted)}
+
+  .author{display:flex;gap:13px;align-items:center;margin:30px 0 0;max-width:920px}
+  .avatar{width:40px;height:40px;border-radius:50%;background:var(--accent-tint);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px}
+  [data-theme="dark"] .avatar{color:var(--accent)}
+
+  /* mobile */
+  .menubtn{display:none}
+  @media (max-width:900px){
+    .app{flex-direction:column}
+    nav.side{width:100%;height:auto;position:sticky;top:0;z-index:30;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .brand{margin:0}
+    .side .back{display:none}
+    .menubtn{display:inline-flex;margin-left:auto;background:none;border:1px solid var(--line-2);border-radius:8px;padding:6px 9px;cursor:pointer;color:var(--ink-soft);font-family:var(--mono);font-size:12px}
+    .navlist{display:none;width:100%;order:3}
+    .navlist.open{display:block}
+    .side-foot{order:2;margin:0;padding:0;border:0}
+    section.page{padding:26px 20px 70px}
+    .grid2,.grid3,.grid4,.stats,.split,.feedback,.spread-demo,.kbgrid{grid-template-columns:1fr}
+    .votes{grid-template-columns:repeat(2,1fr)}
+    .crow{grid-template-columns:1fr;gap:6px}
+    .crow.head{display:none}
+    .clabel{margin-top:8px}
+    .seq{flex-direction:column}
+    .seq .arw{transform:rotate(90deg)}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="side">
+    <div style="width:100%">
+      <a class="brand" href="/"><svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true"><path d="M2 18 C7 18 8 6 20 4" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"></path><circle cx="20" cy="4" r="2" fill="var(--accent)"></circle></svg>creditintuition</a>
+      <a class="back" href="/technology/">&larr; Technology</a>
+    </div>
+    <button class="menubtn" id="menubtn" aria-label="Menu">menu</button>
+    <ul class="navlist" id="navlist">
+      <li><button class="active" data-page="0"><span class="nn">01</span>Overview</button></li>
+      <li><button data-page="1"><span class="nn">02</span>The stage we replace</button></li>
+      <li><button data-page="2"><span class="nn">03</span>Old system vs new</button></li>
+      <li><button data-page="3"><span class="nn">04</span>Agent architecture</button></li>
+      <li><button data-page="4"><span class="nn">05</span>Persona panel</button></li>
+      <li><button data-page="5"><span class="nn">06</span>Technical stack</button></li>
+      <li><button data-page="6"><span class="nn">07</span>Risk knowledge base</button></li>
+    </ul>
+    <div class="side-foot">
+      <span class="lab">System design</span>
+      <button class="tbtn" id="themebtn">dark</button>
+    </div>
+  </nav>
+
+  <main id="main">
+
+    <!-- 01 OVERVIEW -->
+    <section class="page active" data-page="0">
+      <span class="eyebrow">System design &middot; technology</span>
+      <h1 class="pt">MSME credit agent &mdash; system design</h1>
+      <p class="sub">Most of an MSME lending pipeline is already deterministic. One stage is not: <b>manual underwriting</b>, where the judgment rests on common knowledge that cannot be codified and lives &mdash; undocumented and unaudited &mdash; inside individual underwriters. This is the design for an agent that captures that stage, keeping every irreversible call with a human.</p>
+
+      <div class="stats">
+        <div class="stat"><div class="v">1</div><div class="l">stage replaced &mdash; manual underwriting through credit-memo drafting</div></div>
+        <div class="stat"><div class="v">28</div><div class="l">non-deterministic risk triggers in the Tier 2/3 knowledge base</div></div>
+        <div class="stat"><div class="v">2</div><div class="l">feedback cadences &mdash; weekly rule proposals, quarterly recalibration</div></div>
+        <div class="stat"><div class="v">100%</div><div class="l">final credit decisions still owned by a senior underwriter</div></div>
+      </div>
+
+      <h2 class="sh">What this deck covers</h2>
+      <div class="grid3">
+        <div class="card hl"><div class="kk">The problem</div><h3>The one human bottleneck</h3><p>Manual underwriting doesn&rsquo;t scale with headcount, is not centrally codified, and leaves no audit trail for the qualitative reasoning applied.</p></div>
+        <div class="card"><div class="kk">The build</div><h3>Deterministic where possible</h3><p>Anything checkable runs as <b>code</b>, not retrieval. LLMs read messy inputs and synthesise judgment. RAG is used only for genuinely gestalt calls.</p></div>
+        <div class="card persona-hl"><div class="kk">The unique piece</div><h3>The persona panel</h3><p>Optional agents, each modelled on a <b>specific real underwriter</b> with a proven track record, voting independently &mdash; with the vote spread preserved, not collapsed.</p></div>
+      </div>
+
+      <div class="callout"><h4>The persona panel &mdash; and where its knowledge comes from</h4><p>Each persona is not a generic model. It is trained on the <b>historical case decisions of a named senior underwriter</b> whose outcomes are genuinely strong after controlling for the mix of cases they were assigned. Two gates apply before any persona is trusted: the underwriter&rsquo;s track record must be real, and the AI must provably replicate <em>their</em> decisions on held-out cases &mdash; not just their writing style. See page 5.</p></div>
+
+      <h2 class="sh">How to read the diagrams</h2>
+      <div class="legend">
+        <span><i class="i-det"></i>Deterministic &mdash; rules, lookups, computed</span>
+        <span><i class="i-llm"></i>LLM &mdash; reading inputs / synthesising judgment</span>
+        <span><i class="i-rag"></i>RAG &mdash; precedent retrieval, gestalt only</span>
+        <span><i class="i-persona"></i>Persona panel &mdash; modelled on real underwriters</span>
+        <span><i class="i-human"></i>Human &mdash; the irreversible decision gate</span>
+      </div>
+
+      <div class="pager"><button class="hidden">&nbsp;</button><button data-goto="1"><span class="dir">next &rarr;</span> The stage we replace</button></div>
+    </section>
+
+    <!-- 02 CURRENT PROCESS -->
+    <section class="page" data-page="1">
+      <span class="eyebrow">01 &middot; current process</span>
+      <h1 class="pt">The one stage we replace</h1>
+      <p class="sub">End to end, the pipeline is mostly system and deterministic work that already exists or is in progress. The credit agent targets a single band &mdash; <b>manual underwriting through credit-memo drafting</b> &mdash; and leaves everything around it in place.</p>
+
+      <div class="legend">
+        <span><i class="i-det" style="background:var(--line-2)"></i>System</span>
+        <span><i class="i-det"></i>Deterministic</span>
+        <span><i class="i-llm"></i>Statistical / OCR+LLM</span>
+        <span><i class="i-human"></i>Human, qualitative</span>
+      </div>
+
+      <div class="pipe-wrap">
+        <div class="pipe">
+          <div class="pstage"><div class="pchip n-sys"><span class="pn">1</span><span class="plabel">Intake</span><span class="pnat">system</span></div></div>
+          <div class="pstage"><div class="pchip n-sys"><span class="pn">2</span><span class="plabel">Key-field extraction</span><span class="pnat">system</span></div></div>
+          <div class="pstage"><div class="pchip n-det"><span class="pn">3</span><span class="plabel">Dedupe</span><span class="pnat">rules</span></div></div>
+          <div class="pstage"><div class="pchip n-llm"><span class="pn">4</span><span class="plabel">Document validation</span><span class="pnat">OCR+rules</span></div></div>
+          <div class="pstage"><div class="pchip n-det"><span class="pn">5</span><span class="plabel">BRE</span><span class="pnat">rules</span></div></div>
+          <div class="pstage"><div class="pchip n-llm"><span class="pn">6</span><span class="plabel">ML risk engine</span><span class="pnat">model</span></div></div>
+          <div class="pstage"><div class="pchip n-det"><span class="pn">7</span><span class="plabel">Policy engine</span><span class="pnat">rules</span></div></div>
+          <div class="pstage"><div class="pchip n-human"><span class="pn">8</span><span class="plabel">Manual underwriting</span><span class="pnat">human</span></div></div>
+          <div class="pstage"><div class="pchip n-human"><span class="pn">9</span><span class="plabel">Credit memo + TVR</span><span class="pnat">human</span></div></div>
+          <div class="pstage"><div class="pchip n-human"><span class="pn">10</span><span class="plabel">TVR follow-up</span><span class="pnat">human</span></div></div>
+          <div class="pstage"><div class="pchip n-human"><span class="pn">11</span><span class="plabel">Senior UW decision</span><span class="pnat">human</span></div></div>
+          <div class="pstage"><div class="pchip n-sys"><span class="pn">12</span><span class="plabel">Operations</span><span class="pnat">system</span></div></div>
+        </div>
+      </div>
+      <div class="pipe-wrap" style="padding-top:0">
+        <div style="min-width:920px;display:grid;grid-template-columns:repeat(12,1fr)">
+          <div style="grid-column:8 / 11" class="replace-band"><div class="bar"><span>&larr;&nbsp;credit agent replaces this band&nbsp;&rarr;</span></div></div>
+        </div>
+      </div>
+
+      <div class="callout warn"><h4>Why this stage is the bottleneck</h4><p>Manual underwriting through credit-memo drafting depends entirely on individual judgment. It is <b>common knowledge that cannot be codified</b> &mdash; not written into any central rulebook, not scalable with headcount, and carrying no systematic audit trail for the qualitative reasoning applied. It is the stage where organisational knowledge lives and dies with individual underwriters.</p></div>
+
+      <p class="note">The senior underwriter&rsquo;s final decision (stage 11) is retained unchanged &mdash; the agent replaces the drafting and reasoning that feeds it, not the authority.</p>
+
+      <div class="pager"><button data-goto="0"><span class="dir">&larr; back</span> Overview</button><button data-goto="2"><span class="dir">next &rarr;</span> Old system vs new</button></div>
+    </section>
+
+    <!-- 03 OLD VS NEW -->
+    <section class="page" data-page="2">
+      <span class="eyebrow">02 &middot; proposed system</span>
+      <h1 class="pt">Old system vs new &mdash; only the middle changes</h1>
+      <p class="sub">Pre-underwriting and the final decision are unchanged in substance. What changes is the <b>nature of the underwriting work</b> &mdash; and, quietly, the skillset the senior underwriter needs to review it.</p>
+
+      <div class="compare">
+        <div class="crow head">
+          <div class="ch"></div><div class="ch">Pre-underwriting</div><div class="ch">Underwriting</div><div class="ch">Final decision</div>
+        </div>
+        <div class="crow old">
+          <div class="clabel">Old system</div>
+          <div class="cbox same"><b>Unchanged</b>Dedupe, document validation, BRE, ML risk, policy &mdash; as-is.</div>
+          <div class="cbox"><b>Human junior UW</b>Applies common, uncodifiable knowledge manually; drafts the memo and TVR list by hand.</div>
+          <div class="cbox"><b>Senior UW</b>Reviews a human-written memo and makes the final call.</div>
+        </div>
+        <div class="crow new">
+          <div class="clabel">New system</div>
+          <div class="cbox same"><b>Same</b>&hellip; with document validation upgraded to LLM multilingual extraction feeding the same deterministic triangulation.</div>
+          <div class="cbox change"><b>Credit agent</b>Deterministic triggers + precedent retrieval (RAG) + optional persona panel, synthesised by an LLM into a memo and TVR list.</div>
+          <div class="cbox"><b>Senior UW</b>Reviews an AI-generated memo with cited evidence and panel dissent &mdash; same authority.</div>
+        </div>
+      </div>
+
+      <div class="grid2" style="margin-top:22px">
+        <div class="card hl"><div class="kk">What is kept</div><h3>The human decision authority</h3><p>The senior underwriter remains the final decision-maker in both systems. No irreversible credit call is automated.</p></div>
+        <div class="card"><div class="kk">The change-management point</div><h3>A different review skillset</h3><p>The senior UW shifts from checking a colleague&rsquo;s reasoning to checking an <b>AI&rsquo;s evidence citations and reasoning trail</b>. That is a training and rollout issue, not just a technical one &mdash; and should be called out explicitly.</p></div>
+      </div>
+
+      <div class="pager"><button data-goto="1"><span class="dir">&larr; back</span> The stage we replace</button><button data-goto="3"><span class="dir">next &rarr;</span> Agent architecture</button></div>
+    </section>
+
+    <!-- 04 ARCHITECTURE -->
+    <section class="page" data-page="3">
+      <span class="eyebrow">03 &middot; credit agent architecture</span>
+      <h1 class="pt">Inside the agent &mdash; deterministic first, model where judgment lives</h1>
+      <p class="sub">The flow runs on a verified, classified application. Anything checkable is <b>computed as code</b>, because a silent recall failure in a retrieval system is worse than an explicit rule miss. RAG is reserved for genuinely gestalt calls.</p>
+
+      <div class="legend">
+        <span><i class="i-llm"></i>LLM</span><span><i class="i-det"></i>Deterministic</span><span><i class="i-rag"></i>RAG</span><span><i class="i-persona"></i>Persona panel</span><span><i class="i-human"></i>Human</span>
+      </div>
+
+      <div class="arch">
+        <div class="ablock b-llm"><div class="ahead"><span class="an">3.1</span><h4>Document extraction &amp; triangulation</h4><span class="tag t-llm">LLM</span><span class="tag t-det">+ rules</span></div><p><b>Vision + multilingual OCR</b> extracts a fixed field list (standard OCR breaks across Indian regional languages). Extracted fields then run a <b>rule-based triangulation engine</b> &mdash; not an LLM, not RAG &mdash; cross-referencing across documents and government databases to produce contradiction flags.</p></div>
+        <div class="aconn">&darr;</div>
+        <div class="ablock b-llm"><div class="ahead"><span class="an">3.2</span><h4>Business-type classification</h4><span class="tag t-llm">inference layer</span></div><p>An upstream step several checks depend on. Combines the GST category as a <b>weak prior</b>, LLM inference from corroborating signals, and retrieval against a curated local precedent set. Must output a <b>confidence / ambiguity indicator</b> &mdash; a wrong label here silently corrupts every downstream check.</p></div>
+        <div class="aconn">&darr;</div>
+
+        <div class="split-cap">3.3 &middot; common knowledge track &mdash; two parallel components</div>
+        <div class="split">
+          <div class="ablock b-det"><div class="ahead"><h4>Trigger evaluation</h4><span class="tag t-det">deterministic</span></div><p>A rules table covering the <b>atomic, relational, soft-cutoff and reference-list</b> triggers. Computed, not retrieved &mdash; anything checkable is executed as code so a failure is never silent.</p></div>
+          <div class="ablock b-rag"><div class="ahead"><h4>Precedent retrieval</h4><span class="tag t-rag">RAG</span></div><p>Case-based retrieval limited to genuinely <b>gestalt</b> triggers (scale-vs-turnover plausibility, seasonality) where no deterministic rule exists and judgment is precedent-based.</p></div>
+        </div>
+        <div class="aconn">&darr;</div>
+
+        <div class="ablock b-persona"><div class="ahead"><span class="an">3.4</span><h4>Idiosyncratic persona panel</h4><span class="tag t-persona">optional</span></div><p>Multiple agents, each modelled on a specific strong underwriter, vote independently with the spread preserved. Gated on two validation tests before going live &mdash; <b>detailed on the next page</b>.</p></div>
+        <div class="aconn">&darr;</div>
+
+        <div class="ablock b-llm"><div class="ahead"><span class="an">3.5</span><h4>Memo synthesis</h4><span class="tag t-llm">LLM</span></div><p>Combines fired triggers with evidence, retrieved precedents, persona output (if enabled) and the documents into a <b>draft credit memo</b> plus a TVR question list &mdash; a standard set for all applicants, and a risk-clarification set generated from this case&rsquo;s unresolved triggers.</p></div>
+        <div class="aconn">&darr;</div>
+
+        <div class="ablock b-det"><div class="ahead"><span class="an">3.6</span><h4>TVR loop</h4><span class="tag t-det">case-scoped</span></div><p>Customer answers feed a <b>rerun of memo synthesis for that same application</b>, producing an updated memo. Ephemeral per case &mdash; it never touches the knowledge base.</p></div>
+        <div class="aconn">&darr;</div>
+
+        <div class="ablock b-human"><div class="ahead"><span class="an">3.7</span><h4>Senior UW decision</h4><span class="tag t-human">human gate</span></div><p>Reviews the completed memo (post-TVR, with panel dissent if enabled) and makes the final call &mdash; same authority as today. Two feedback cycles then update the knowledge base:</p>
+          <div class="feedback">
+            <div class="fb"><div class="cad">Weekly</div><p><b>Candidate rule proposals</b> from patterns in UW corrections and agreement rates. Proposals only &mdash; changes require human review before shipping.</p></div>
+            <div class="fb"><div class="cad">Quarterly</div><p><b>Outcome-validated recalibration</b> against realised early-default (DPD) performance. The slower, higher-confidence gate &mdash; and where personas are re-validated.</p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pager"><button data-goto="2"><span class="dir">&larr; back</span> Old system vs new</button><button data-goto="4"><span class="dir">next &rarr;</span> Persona panel</button></div>
+    </section>
+
+    <!-- 05 PERSONA PANEL -->
+    <section class="page" data-page="4">
+      <span class="eyebrow">3.4 &middot; the unique extension</span>
+      <h1 class="pt">The idiosyncratic persona panel</h1>
+      <p class="sub">The distinctive piece of the design. Rather than one averaged model, a panel of agents &mdash; each a faithful replica of a <b>specific, named underwriter</b> &mdash; votes independently, and the disagreement between them is treated as signal, not noise.</p>
+
+      <div class="callout"><h4>Where the knowledge comes from</h4><p>Each persona is built from the <b>historical case decisions of a real senior underwriter</b> whose track record is genuinely strong after controlling for case-mix. The source is that person&rsquo;s own decision history &mdash; the very tribal knowledge that otherwise stays locked inside them &mdash; turned into an agent that can be interrogated, audited and re-validated.</p></div>
+
+      <h2 class="sh">Five validated agents vote independently</h2>
+      <div class="votes">
+        <div class="voter"><div class="face">U1</div><div class="vname">Underwriter A</div><div class="vote approve">Approve</div></div>
+        <div class="voter"><div class="face">U2</div><div class="vname">Underwriter B</div><div class="vote approve">Approve</div></div>
+        <div class="voter"><div class="face">U3</div><div class="vname">Underwriter C</div><div class="vote medium">Medium</div></div>
+        <div class="voter"><div class="face">U4</div><div class="vname">Underwriter D</div><div class="vote approve">Approve</div></div>
+        <div class="voter"><div class="face">U5</div><div class="vname">Underwriter E</div><div class="vote decline">Decline</div></div>
+      </div>
+
+      <h2 class="sh">The spread is preserved, never collapsed</h2>
+      <p class="sub" style="margin-bottom:12px">A 5&ndash;0 and a 3&ndash;2 outcome carry different information for the senior UW even when the headline recommendation is identical. Aggregation keeps the distribution and shows it as a visual gauge alongside the memo.</p>
+      <div class="spread-demo">
+        <div class="sd"><div class="tally">5 &ndash; 0</div><div class="sdl">Unanimous approve &mdash; high confidence, little to probe.</div></div>
+        <div class="sd"><div class="tally">3 &ndash; 2</div><div class="sdl">Same headline &ldquo;approve&rdquo;, but genuine dissent &mdash; a flag for the senior UW to look closer.</div></div>
+      </div>
+
+      <h2 class="sh">Two validation gates &mdash; before any persona is trusted</h2>
+      <div class="card" style="padding:6px 20px">
+        <div class="gate"><div class="gnum">1</div><div><div class="gt">Track-record validity</div><div class="gd">The underlying underwriter&rsquo;s performance is genuinely good &mdash; controlling for the kind of cases they were assigned, not just raw portfolio outcome. Case allocation must be reasonably uniform across the underwriters being compared for the comparison to be valid.</div></div></div>
+        <div class="gate"><div class="gnum">2</div><div><div class="gt">Persona fidelity</div><div class="gd">The AI persona actually replicates that underwriter&rsquo;s <b>judgment</b> &mdash; not just their comment-writing style. Tested by predicting the underwriter&rsquo;s historical decisions on held-out cases before the persona&rsquo;s vote is trusted.</div></div></div>
+      </div>
+
+      <p class="note">Personas require periodic re-validation &mdash; proposed on the quarterly outcome-recalibration cycle &mdash; since case-mix and underwriter performance drift over time. The panel is a later extension, gated on both tests, not part of the initial build.</p>
+
+      <div class="pager"><button data-goto="3"><span class="dir">&larr; back</span> Agent architecture</button><button data-goto="5"><span class="dir">next &rarr;</span> Technical stack</button></div>
+    </section>
+
+    <!-- 06 TECH STACK -->
+    <section class="page" data-page="5">
+      <span class="eyebrow">04 &middot; technical architecture</span>
+      <h1 class="pt">Proposed stack &mdash; component by component</h1>
+      <p class="sub">Existing systems (BRE, ML risk, policy) remain as-is and appear only for interface context. Each new component is chosen so that <b>deterministic logic stays testable independent of any LLM</b>.</p>
+
+      <div class="tblw">
+        <table class="ci">
+          <thead><tr><th>Component</th><th>Approach</th><th>Note</th></tr></thead>
+          <tbody>
+            <tr><td><b>Document extraction</b> <span class="tag t-llm">LLM</span></td><td>Vision model with multilingual OCR (e.g. Claude API vision)</td><td>Replaces language-limited OCR; structured JSON per fixed field list.</td></tr>
+            <tr><td><b>Triangulation engine</b> <span class="tag t-det">rules</span></td><td>Deterministic rules service, versioned and testable</td><td>Implements RCU match types &mdash; base/exact/fuzzy/threshold/date/portal/visual.</td></tr>
+            <tr><td><b>Dedupe engine</b> <span class="tag t-det">rules</span></td><td>Exact on PAN &amp; phone; fuzzy address routed to review</td><td>Address match is noisier &mdash; joint families, shared premises. Not auto-reject.</td></tr>
+            <tr><td><b>Business-type classifier</b> <span class="tag t-llm">hybrid</span></td><td>LLM + retrieval over a curated local precedent set</td><td>Confidence output &mdash; must not be a forced single label.</td></tr>
+            <tr><td><b>Rules knowledge base</b> <span class="tag t-det">rules</span></td><td>Versioned rules table, one entry per trigger</td><td>Separate from the precedent library. Atomic/relational/soft-cutoff/reference-list.</td></tr>
+            <tr><td><b>Precedent library</b> <span class="tag t-rag">RAG</span></td><td>Vector store of curated case exemplars</td><td>Gestalt triggers only &mdash; never atomic/relational, to avoid silent recall failure.</td></tr>
+            <tr><td><b>Persona panel</b> <span class="tag t-persona">optional</span></td><td>Parallel LLM agents, one per validated persona</td><td>Requires the two-gate validation before any persona is live.</td></tr>
+            <tr><td><b>Memo synthesis</b> <span class="tag t-llm">LLM</span></td><td>Reasoning agent combining triggers, precedent, votes, documents</td><td>Produces memo + TVR question list as structured output.</td></tr>
+            <tr><td><b>Human review UI</b> <span class="tag t-human">human</span></td><td>Surfaces memo, cited evidence, panel dissent, TVR trail</td><td>Explainability &mdash; reasoning traceable to specific evidence, not a narrative.</td></tr>
+            <tr><td><b>Feedback + KB pipeline</b> <span class="tag t-det">batch</span></td><td>Weekly candidate-proposal (human-gated) + quarterly recalibration</td><td>Both write to the same KB under different confidence/approval regimes.</td></tr>
+            <tr><td><b>Audit &amp; versioning</b> <span class="tag t-det">rules</span></td><td>Full version history; every decision traceable to the KB version used</td><td>Required given regulatory explainability expectations for lending.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 class="sh">Suggested build sequencing</h2>
+      <div class="seq">
+        <div class="seqstep"><div class="sq">Phase 1</div><div class="st">Tier 1 + common knowledge</div><p>Extraction + triangulation and the trigger/precedent track. Validated against junior-UW agreement rate.</p></div>
+        <div class="arw">&rarr;</div>
+        <div class="seqstep"><div class="sq">Phase 2</div><div class="st">Persona panel</div><p>A later extension, gated on the two validation tests &mdash; not part of the initial build.</p></div>
+      </div>
+
+      <div class="pager"><button data-goto="4"><span class="dir">&larr; back</span> Persona panel</button><button data-goto="6"><span class="dir">next &rarr;</span> Risk knowledge base</button></div>
+    </section>
+
+    <!-- 07 KNOWLEDGE BASE -->
+    <section class="page" data-page="6">
+      <span class="eyebrow">Appendix A &middot; Tier 2/3 knowledge base</span>
+      <h1 class="pt">The 28 non-deterministic risk triggers</h1>
+      <p class="sub">Organisation-level known signals (Tier 2) and idiosyncratic gestalt patterns (Tier 3). Tier 1 items &mdash; document extraction, government-database matching, RCU triangulation &mdash; sit in the architecture, not here.</p>
+
+      <div class="kb-legend">
+        <span><b>Atomic</b> single-source</span><span><b>Relational</b> joins sources</span><span><b>Soft-cutoff</b> threshold + judgment</span><span><b>Gestalt</b> precedent-based</span><span><b>Reference-list</b> maintained list</span>
+        <span style="width:100%;margin-top:2px"><i class="i-persona" style="width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px"></i><b style="color:var(--persona)">Human sign-off required</b> &mdash; high evidentiary bar before any automated weight is attached</span>
+      </div>
+
+      <div class="kbgrid">
+        <div class="kbcat"><div class="cx"><span class="cl">A</span><h4>Identity &amp; applicant structuring</h4></div><ul>
+          <li class="sensitive"><span class="dz"></span>Proxy ownership &mdash; the true operator appears absent from the application</li>
+          <li class="sensitive"><span class="dz"></span>Bureau-driven applicant substitution &mdash; cleaner-profile family member made primary for the same business</li>
+          <li><span class="dz"></span>PAN series vs. declared-age implausibility</li>
+        </ul></div>
+
+        <div class="kbcat"><div class="cx"><span class="cl">B</span><h4>Promoter &amp; entity network</h4></div><ul>
+          <li><span class="dz"></span>Multiple entities, same promoter, overlapping activity</li>
+          <li><span class="dz"></span>Two businesses, same address, different names</li>
+          <li><span class="dz"></span>Related-party transactions beyond narration match</li>
+        </ul></div>
+
+        <div class="kbcat"><div class="cx"><span class="cl">C</span><h4>Banking behaviour &amp; cash-flow</h4></div><ul>
+          <li><span class="dz"></span>Round-tripping &mdash; route to review, never auto-reject</li>
+          <li><span class="dz"></span>Rising / unstable cash-to-revenue ratio</li>
+          <li><span class="dz"></span>Fake credits, genuine invoices (fraud-ring scope)</li>
+        </ul></div>
+
+        <div class="kbcat"><div class="cx"><span class="cl">D</span><h4>Revenue &amp; turnover plausibility</h4></div><ul>
+          <li><span class="dz"></span>Bank turnover vs. GST-reported revenue mismatch</li>
+          <li><span class="dz"></span>Margin vs. industry benchmark</li>
+          <li><span class="dz"></span>Scale / setup vs. declared turnover implausibility</li>
+          <li><span class="dz"></span>Declared scale vs. inventory / setup mismatch</li>
+        </ul></div>
+
+        <div class="kbcat"><div class="cx"><span class="cl">E</span><h4>Compliance &amp; filing</h4></div><ul>
+          <li><span class="dz"></span>GST registration recency vs. claimed vintage</li>
+          <li><span class="dz"></span>GSTR-1 / GSTR-3B mismatch</li>
+          <li><span class="dz"></span>Filing irregularity</li>
+        </ul></div>
+
+        <div class="kbcat"><div class="cx"><span class="cl">F</span><h4>Cross-source reconciliation</h4></div><ul>
+          <li><span class="dz"></span>Bureau EMI with no matching bank debit</li>
+          <li><span class="dz"></span>Bank debit with no matching bureau track</li>
+        </ul></div>
+
+        <div class="kbcat"><div class="cx"><span class="cl">G</span><h4>Site &amp; field investigation</h4></div><ul>
+          <li><span class="dz"></span>No permanent setup + recent vintage (AND-condition)</li>
+          <li><span class="dz"></span>Location quality vs. declared scale</li>
+          <li><span class="dz"></span>Residence-cum-office premises &mdash; weight, don&rsquo;t cut off</li>
+          <li><span class="dz"></span>Residence-cum-office + new business / new address (compound)</li>
+          <li><span class="dz"></span>Address instability</li>
+          <li><span class="dz"></span>Residence-to-office distance implausibility</li>
+        </ul></div>
+
+        <div class="kbcat"><div class="cx"><span class="cl">H&ndash;I</span><h4>Image integrity &amp; sector checks</h4></div><ul>
+          <li><span class="dz"></span>Photo / image tampering on ID documents</li>
+          <li><span class="dz"></span>Sector-level legal / compliance exposure</li>
+          <li class="sensitive"><span class="dz"></span>PEP &mdash; deterministic KYC gate, not the fuzzy layer</li>
+        </ul></div>
+
+        <div class="kbcat"><div class="cx"><span class="cl">J</span><h4>Idiosyncratic / gestalt (Tier 3)</h4></div><ul>
+          <li><span class="dz"></span>Business seasonality &mdash; TVR narrative + precedent</li>
+        </ul></div>
+
+        <div class="kbcat" style="border-color:var(--llm-bd)"><div class="cx"><span class="cl" style="color:var(--llm)">K</span><h4>Business-type classification</h4></div><ul>
+          <li><span class="dz" style="background:var(--llm)"></span>Architecturally distinct &mdash; an upstream inference layer several checks depend on, not a risk flag (see architecture 3.2)</li>
+        </ul></div>
+      </div>
+
+      <div class="callout warn"><h4>Some triggers must never fire on their own</h4><p>Proxy ownership and applicant substitution demand a <b>high evidentiary bar and human sign-off</b> &mdash; they must never fire on family structure alone, and carry a real risk of penalising genuine family-run businesses if applied mechanically. PEP screening is pulled out entirely as a <b>deterministic regulatory gate</b> under RBI KYC directions, never left inside the fuzzy layer.</p></div>
+
+      <div class="author"><div class="avatar">SA</div><div><div style="font-size:14.5px">Saket Anand</div><div style="font-size:12.5px;color:var(--muted)">Quantitative-risk practitioner &middot; creditintuition</div></div></div>
+
+      <div class="pager"><button data-goto="5"><span class="dir">&larr; back</span> Technical stack</button><button data-goto="0"><span class="dir">restart &#8635;</span> Overview</button></div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  try{var st=localStorage.getItem('ci-theme'); if(st) root.setAttribute('data-theme',st);}catch(e){}
+  var tb=document.getElementById('themebtn');
+  function syncLabel(){ tb.textContent = root.getAttribute('data-theme')==='dark' ? 'light' : 'dark'; }
+  syncLabel();
+  tb.addEventListener('click',function(){ var d=root.getAttribute('data-theme')==='dark'; root.setAttribute('data-theme',d?'light':'dark'); try{localStorage.setItem('ci-theme',d?'light':'dark');}catch(e){} syncLabel(); });
+
+  var pages=[].slice.call(document.querySelectorAll('section.page'));
+  var btns=[].slice.call(document.querySelectorAll('.navlist button[data-page]'));
+  var navlist=document.getElementById('navlist');
+  function show(i){
+    i=Math.max(0,Math.min(pages.length-1,i));
+    pages.forEach(function(p){ p.classList.toggle('active', +p.getAttribute('data-page')===i); });
+    btns.forEach(function(b){ b.classList.toggle('active', +b.getAttribute('data-page')===i); });
+    navlist.classList.remove('open');
+    document.getElementById('main').scrollTop=0; window.scrollTo(0,0);
+  }
+  btns.forEach(function(b){ b.addEventListener('click',function(){ show(+b.getAttribute('data-page')); }); });
+  document.addEventListener('click',function(e){ var t=e.target.closest('[data-goto]'); if(t){ show(+t.getAttribute('data-goto')); } });
+  document.addEventListener('keydown',function(e){
+    if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+    var cur=pages.findIndex(function(p){return p.classList.contains('active');});
+    if(e.key==='ArrowRight') show(cur+1);
+    if(e.key==='ArrowLeft') show(cur-1);
+  });
+  var mb=document.getElementById('menubtn');
+  mb.addEventListener('click',function(){ navlist.classList.toggle('open'); });
+})();
+</script>
+</body>
+</html>
