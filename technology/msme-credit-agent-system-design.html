@@ -99,6 +99,12 @@
   .card.hl{border-left:3px solid var(--accent)}
   .card.persona-hl{border:1px solid var(--persona-bd);background:var(--persona-bg)}
 
+  /* schematic */
+  .schem{margin:6px 0 26px;border:1px solid var(--line);border-radius:14px;padding:22px 24px 16px;background:var(--surface);overflow-x:auto}
+  .schem svg{display:block;width:100%;min-width:680px;height:auto}
+  .schem-cap{font-size:12.5px;color:var(--ink-soft);line-height:1.55;margin:14px 0 0;max-width:74ch}
+  .schem-cap b{color:var(--ink);font-weight:600}
+
   /* stat row */
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:4px 0 26px}
   .stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:15px 16px}
@@ -283,6 +289,83 @@
       <span class="eyebrow">System design &middot; technology</span>
       <h1 class="pt">MSME credit agent &mdash; system design</h1>
       <p class="sub">Most of an MSME lending pipeline is already deterministic. One stage is not: <b>manual underwriting</b>, where the judgment rests on common knowledge that cannot be codified and lives &mdash; undocumented and unaudited &mdash; inside individual underwriters. This is the design for an agent that captures that stage, keeping every irreversible call with a human.</p>
+
+      <h2 class="sh" style="margin-top:6px">The shape of the system</h2>
+      <div class="schem">
+        <svg viewBox="0 0 940 380" role="img" aria-label="Schematic: verified application flows into a common-knowledge track combining deterministic triggers and RAG retrieval over a precedent knowledge base, then into a persona panel of idiosyncratic agents each built from one underwriter's LOS and case comments plus case decisions, then into LLM memo synthesis and the senior-underwriter decision.">
+          <style>
+            .sd-t{font-family:var(--sans);fill:var(--ink);font-size:12px;font-weight:600}
+            .sd-m{font-family:var(--sans);fill:var(--ink);font-size:11px}
+            .sd-s{font-family:var(--mono);fill:var(--muted);font-size:8px;letter-spacing:.08em}
+            .sd-z{font-family:var(--mono);fill:var(--muted);font-size:9px;letter-spacing:.1em}
+          </style>
+          <defs>
+            <marker id="ah" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--muted)"></path></marker>
+          </defs>
+
+          <!-- zone containers -->
+          <rect x="150" y="34" width="226" height="322" rx="12" fill="none" stroke="var(--line-2)" stroke-dasharray="4 5"></rect>
+          <text class="sd-z" x="263" y="26" text-anchor="middle">COMMON KNOWLEDGE TRACK</text>
+          <rect x="398" y="34" width="250" height="322" rx="12" fill="none" stroke="var(--persona-bd)" stroke-dasharray="4 5"></rect>
+          <text class="sd-z" x="523" y="26" text-anchor="middle" style="fill:var(--persona)">PERSONA PANEL &middot; IDIOSYNCRATIC AGENTS</text>
+          <rect x="670" y="34" width="252" height="322" rx="12" fill="none" stroke="var(--line-2)" stroke-dasharray="4 5"></rect>
+          <text class="sd-z" x="796" y="26" text-anchor="middle">SYNTHESIS &amp; DECISION</text>
+
+          <!-- input -->
+          <rect x="10" y="146" width="126" height="72" rx="9" fill="var(--surface)" stroke="var(--line-2)"></rect>
+          <text class="sd-m" x="73" y="172" text-anchor="middle">Verified &amp;</text>
+          <text class="sd-m" x="73" y="187" text-anchor="middle">classified</text>
+          <text class="sd-m" x="73" y="202" text-anchor="middle">application</text>
+
+          <!-- zone 1: common knowledge -->
+          <rect x="166" y="60" width="196" height="52" rx="8" fill="var(--det-bg)" stroke="var(--det-bd)"></rect>
+          <text class="sd-t" x="264" y="84" text-anchor="middle">Trigger engine</text>
+          <text class="sd-s" x="264" y="99" text-anchor="middle">DETERMINISTIC RULES &middot; COMPUTED</text>
+
+          <rect x="166" y="132" width="196" height="48" rx="8" fill="var(--rag-bg)" stroke="var(--rag-bd)"></rect>
+          <text class="sd-t" x="264" y="153" text-anchor="middle">RAG retrieval</text>
+          <text class="sd-s" x="264" y="168" text-anchor="middle">GESTALT PRECEDENTS ONLY</text>
+
+          <!-- precedent knowledge base cylinder -->
+          <path d="M196,250 V296 A75,8 0 0 0 346,296 V250" fill="var(--rag-bg)" stroke="var(--rag-bd)"></path>
+          <ellipse cx="271" cy="250" rx="75" ry="8" fill="var(--rag-bg)" stroke="var(--rag-bd)"></ellipse>
+          <text class="sd-t" x="271" y="272" text-anchor="middle" style="fill:var(--rag)">Precedent</text>
+          <text class="sd-m" x="271" y="287" text-anchor="middle">knowledge base</text>
+          <line x1="271" y1="242" x2="266" y2="184" stroke="var(--rag)" stroke-width="1.4" marker-end="url(#ah)"></line>
+
+          <!-- zone 2: persona panel -->
+          <rect x="414" y="60" width="218" height="30" rx="7" fill="var(--persona-bg)" stroke="var(--persona-bd)"></rect>
+          <text class="sd-m" x="523" y="79" text-anchor="middle">Persona agent &middot; Underwriter A</text>
+          <rect x="414" y="98" width="218" height="30" rx="7" fill="var(--persona-bg)" stroke="var(--persona-bd)"></rect>
+          <text class="sd-m" x="523" y="117" text-anchor="middle">Persona agent &middot; Underwriter B</text>
+          <rect x="414" y="136" width="218" height="30" rx="7" fill="var(--persona-bg)" stroke="var(--persona-bd)"></rect>
+          <text class="sd-m" x="523" y="155" text-anchor="middle">Persona agent &middot; Underwriter C</text>
+
+          <!-- idiosyncratic source cylinder -->
+          <path d="M414,250 V304 A109,8 0 0 0 632,304 V250" fill="var(--persona-bg)" stroke="var(--persona-bd)"></path>
+          <ellipse cx="523" cy="250" rx="109" ry="8" fill="var(--persona-bg)" stroke="var(--persona-bd)"></ellipse>
+          <text class="sd-t" x="523" y="270" text-anchor="middle" style="fill:var(--persona)">Idiosyncratic knowledge</text>
+          <text class="sd-m" x="523" y="285" text-anchor="middle">LOS / case comments + case decisions</text>
+          <text class="sd-s" x="523" y="299" text-anchor="middle">PER INDIVIDUAL UNDERWRITER</text>
+          <line x1="523" y1="242" x2="523" y2="172" stroke="var(--persona)" stroke-width="1.4" marker-end="url(#ah)"></line>
+
+          <!-- zone 3: synthesis + decision -->
+          <rect x="690" y="104" width="212" height="54" rx="8" fill="var(--llm-bg)" stroke="var(--llm-bd)"></rect>
+          <text class="sd-t" x="796" y="128" text-anchor="middle">Memo synthesis</text>
+          <text class="sd-s" x="796" y="143" text-anchor="middle">LLM &middot; MEMO + TVR LIST</text>
+
+          <rect x="690" y="212" width="212" height="54" rx="8" fill="var(--human-bg)" stroke="var(--human-bd)"></rect>
+          <text class="sd-t" x="796" y="236" text-anchor="middle">Senior underwriter</text>
+          <text class="sd-s" x="796" y="251" text-anchor="middle">FINAL CALL &middot; HUMAN GATE</text>
+          <line x1="796" y1="158" x2="796" y2="210" stroke="var(--muted)" stroke-width="1.2" marker-end="url(#ah)"></line>
+
+          <!-- flow arrows between zones -->
+          <line x1="138" y1="158" x2="164" y2="140" stroke="var(--muted)" stroke-width="1.2" marker-end="url(#ah)"></line>
+          <line x1="364" y1="120" x2="412" y2="108" stroke="var(--muted)" stroke-width="1.4" marker-end="url(#ah)"></line>
+          <line x1="634" y1="108" x2="688" y2="120" stroke="var(--muted)" stroke-width="1.4" marker-end="url(#ah)"></line>
+        </svg>
+        <p class="schem-cap">The common-knowledge track runs <b>deterministic triggers</b> alongside <b>RAG retrieval</b> over a precedent knowledge base. Its output feeds the <b>persona panel</b> &mdash; a set of idiosyncratic agents, each built from one underwriter&rsquo;s <b>LOS / case comments and case decisions</b> &mdash; before an LLM synthesises the memo for the senior underwriter. The panel is an optional extension; the track and synthesis run with or without it.</p>
+      </div>
 
       <div class="stats">
         <div class="stat"><div class="v">1</div><div class="l">stage replaced &mdash; manual underwriting through credit-memo drafting</div></div>
