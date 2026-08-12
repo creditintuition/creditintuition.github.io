@@ -49,6 +49,9 @@
  // home
  var rec=document.getElementById('recent');
  if(rec){ var all=[]; SITE.sections.forEach(function(s){ s.items.forEach(function(it){ all.push({s:s,it:it}); }); });
+   var MO={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+   function dscore(d){ d=(d||'').toLowerCase(); var y=(d.match(/\d{4}/)||[0])[0]*1; var m=0; for(var k in MO){ if(d.indexOf(k)>=0){m=MO[k];break;} } return y*100+m; }
+   all.sort(function(a,b){ return dscore(b.it.date)-dscore(a.it.date); });
    rec.innerHTML = all.map(function(x){ return postCard(x.s,x.it); }).join(''); }
  var sc=document.getElementById('sectioncards');
  if(sc){ sc.innerHTML = SITE.sections.map(function(s){ var n=s.items.length; var cnt=n?(n+' note'+(n>1?'s':'')):'in preparation'; return '<a class="themecard" href="/'+s.slug+'/" style="text-decoration:none"><span class="no">'+s.tag+'</span><h3>'+s.title+'</h3><p>'+s.desc+'</p><span class="n">'+cnt+' &rarr;</span></a>'; }).join(''); }
