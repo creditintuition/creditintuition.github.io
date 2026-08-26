@@ -3,183 +3,172 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ECL and EIR &mdash; recognition timing and its implications &mdash; creditintuition</title>
-<meta name="description" content="An assessment of the Indian transition to expected credit loss and effective interest rate recognition, and the case for parameter standardisation.">
+<title>ECL and EIR &mdash; creditintuition</title>
+<meta name="description" content="What actually changed in how Indian lenders report their loan books, what it does to reported profit and capital, and where the correction has overshot. EIR is arithmetic; ECL with floors is policy.">
 <meta name="author" content="Saket Anand">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#0B6E5F">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ECL and EIR &mdash; recognition timing and its implications &mdash; creditintuition">
-<meta property="og:description" content="An assessment of the Indian transition to expected credit loss and effective interest rate recognition, and the case for parameter standardisation.">
+<meta property="og:title" content="ECL and EIR &mdash; what actually changed">
+<meta property="og:description" content="What actually changed in how Indian lenders report their loan books, what it does to reported profit and capital, and where the correction has overshot. EIR is arithmetic; ECL with floors is policy.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2022%2022%27%3E%3Cpath%20d%3D%27M2%2018%20C7%2018%208%206%2020%204%27%20stroke%3D%27%230B6E5F%27%20stroke-width%3D%272%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27/%3E%3Ccircle%20cx%3D%2720%27%20cy%3D%274%27%20r%3D%272%27%20fill%3D%27%230B6E5F%27/%3E%3C/svg%3E">
 <link rel="stylesheet" href="/assets/style.css?v=20260812b">
+<style>
+  /* — scoped styling for the ECL/EIR note — */
+  .doc h3{font-family:var(--serif);font-size:17px;margin:22px 0 6px;letter-spacing:-.01em;color:var(--ink)}
+  .doc .lede{font-size:17px;color:var(--ink)}
+  .doc .tbl-wrap{overflow-x:auto;margin:20px 0;max-width:var(--read)}
+  .doc table.ci{min-width:0}
+  .doc .opinion{border-left:3px solid var(--accent);padding-left:16px;margin:18px 0;max-width:var(--read)}
+  .doc .opinion .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px}
+</style>
 </head>
 <body data-page="article" data-section="market-structure">
-<main><div class="wrap"><div class="lib"><article id="content" class="doc"><div class="eyebrow">working note &middot; market structure</div><h1>ECL and EIR &mdash; recognition timing and its implications</h1><div class="meta"><span>11 min</span><span>the case for parameter standardisation</span></div>
+<main><div class="wrap"><div class="lib"><article id="content" class="doc">
+<div class="eyebrow">working note · market structure</div>
+<h1>ECL and EIR</h1>
+<div class="meta"><span>12 min</span><span>what changed, what it does to the books, where it has overcorrected</span><span>Aug 2026</span></div>
 
-<p>This note separates three things: the mechanics of the two changes, which are established; their implications for reported financials, capital and pricing, which follow from the mechanics; and an assessment of whether the correction is calibrated correctly, which is opinion and is labelled as such in the final section.</p>
+<h2>1&ensp;&nbsp;The two changes, and why they landed nine years apart</h2>
 
-<h2>1. Scope and background</h2>
+<p>Two things changed in how Indian lenders report their loan books. They are usually discussed separately. Together they do something neither does alone.</p>
 
-<p>Two changes to recognition timing have been introduced into Indian lending, roughly nine years apart.</p>
+<p><b>EIR changed when income is recognised.</b> Take a loan of &#8377;100 with a 3% processing fee. Earlier, the &#8377;3 was booked as income on the day of disbursal. Under the effective interest rate method it cannot be. The lender has actually parted with &#8377;97 of cash, so the loan goes onto the balance sheet at &#8377;97, not &#8377;100. The borrower still repays on the full &#8377;100 at the contractual rate. The same repayments now discount back to a smaller carrying amount, which means the implied yield is higher than the rate on the sanction letter. The fee has not disappeared — it has been reclassified from fee income to interest income and released over the life of the loan.</p>
 
-<p>Non-banking financial companies (NBFCs) adopted Ind AS 109 under the Ministry of Corporate Affairs roadmap of March 2016 &mdash; entities with net worth above &#8377;500 crore from FY2018-19, the remainder from FY2019-20. Banks were scheduled for the same period, deferred by RBI in April 2018 and again in March 2019. The stated obstacle was statutory: bank financial statement formats are prescribed in the Third Schedule to the Banking Regulation Act, 1949, and accommodating Ind AS presentation required amendment that did not follow.</p>
+<p>So the mechanics are: fee netted off, smaller asset, higher yield. The causality runs in that order. <b>The yield is the output, not the cause.</b></p>
 
-<p>RBI issued the Commercial Banks (Asset Classification, Provisioning and Income Recognition) Directions, 2026 on 27 April 2026, effective 1 April 2027. The Directions prescribe expected credit loss (ECL) provisioning and effective interest rate (EIR) income recognition directly under Sections 21 and 35A of the Banking Regulation Act, rather than by adopting Ind AS. Loans outstanding at 31 March 2027 must be brought under EIR by 31 March 2030, and the incremental provisioning impact may be spread over four years to 31 March 2031, with common equity tier 1 (CET1) capital add-backs during the transition. Small Finance Banks, Payments Banks and Local Area Banks are outside scope.</p>
+<p><b>ECL changed when losses are recognised.</b> Under IRAC, provisioning followed the event. A loan was provided against once it had gone bad, conventionally at 90 days past due. Under expected credit loss, the lender provides at origination. Loans sit in three stages — performing, significantly deteriorated since origination, and credit-impaired. Stage 1 carries a provision for losses expected over the next twelve months. From Stage 2 it steps up to lifetime expected loss. RBI has also set minimum provisions irrespective of what a lender's model produces: <b>0.40% in Stage 1 and 5.00% in Stage 2</b> for standard corporate and retail exposures.</p>
 
-<p>The first change concerns income recognition. A processing fee was previously recognised at disbursal. Under the effective interest rate method it is treated as part of the instrument&rsquo;s yield.</p>
+<h3>On the sequencing</h3>
 
-<div class="callout"><h4>The fee, restated</h4><p style="margin:0">A loan of &#8377;100 against which &#8377;3 is collected upfront represents &#8377;97 of cash disbursed, and is recognised at &#8377;97. The contractual repayments are unchanged, so discounting them to a lower carrying amount produces a higher effective yield. The fee is reclassified from fee income to interest income and released over the life of the exposure.</p></div>
+<p>NBFCs went first, by roughly nine years — Ind AS 109 from FY2018-19 for the larger ones, FY2019-20 for the rest. Banks are only now coming in, under RBI's Directions of April 2026, effective April 2027.</p>
 
-<p>The second concerns loss recognition. Under the Income Recognition, Asset Classification and Provisioning (IRAC) framework, provisioning followed identification of impairment, conventionally at 90 days past due. Under expected credit loss, provision is recognised at origination. Exposures are classified in three stages &mdash; performing, significantly deteriorated since origination, and credit-impaired &mdash; with twelve-month expected loss in Stage 1 and lifetime expected loss from Stage 2. The 2026 Directions impose minimum provisions irrespective of model output: <b>0.40% in Stage 1 and 5.00% in Stage 2</b> for standard corporate and retail exposures.</p>
+<p>This was not a judgement about who was ready. NBFCs are companies, so MCA's Ind AS roadmap swept them in automatically. Banks report in a format fixed by the Third Schedule of the Banking Regulation Act, which Ind AS presentation does not fit, and the amendment never came — which is why the 2026 Directions prescribe ECL and EIR directly under Sections 21 and 35A rather than adopting Ind AS at all. It also helped that 2018-19 was the trough of the asset quality review, when public sector banks were in no position to absorb a day-one equity hit.</p>
 
-<p>Both changes address the same distortion in opposite directions. IRAC recognised losses after the fact; upfront fee recognition recognised income before it was earned. <b>Both overstated the reported position of a lender originating heavily in the current period.</b></p>
+<p>The result is that the entities with the thinnest data, the least model governance and the smallest audit budgets went first. <b>That was an accident of company law.</b></p>
 
-<h2>2. Effective interest rate: mechanics and limitations</h2>
+<h2>2&ensp;&nbsp;Both changes correct the same distortion</h2>
 
-<p>Over the full life of an exposure, EIR has no effect. The cash received from the borrower is unchanged, and total income recognised is identical under both methods. Only the period of recognition differs, with a portion of first-year income displaced into later years.</p>
+<p>Under IRAC, losses were recognised late. Under upfront fee recognition, income was recognised early. Both flattered the lender writing a lot of new business right now.</p>
 
-<p>On a portfolio that is not growing, the period effect also disappears. Fees deferred on new originations are offset by fees released from seasoned exposures. The unamortised balance stabilises and the annual effect is nil.</p>
+<p>So the direction is coherent: income was being pulled forward, losses were being pushed back, and both are now being forced toward the period they economically belong to.</p>
 
-<p>EIR is therefore a measurement change rather than a charge. Income is recognised as the exposure earns it.</p>
+<p>But the two are not the same kind of thing, and this is where most of the confusion sits.</p>
 
-<p><b>Effect on growing portfolios.</b> Where originations exceed run-off, deferrals exceed releases in every period and the offset does not arise. A lender in build phase, or one whose entire book is young, reports lower income than it would have until growth flattens. Underlying profitability is unchanged; the reported figure is displaced.</p>
+<div class="callout"><h4>One is arithmetic, the other is policy</h4><p style="margin:0 0 10px"><b>EIR is matching.</b> It creates no buffer, changes no economics, and leaves lifetime income exactly as it was. It is a measurement correction.</p><p style="margin:0"><b>ECL with regulatory floors is conservatism.</b> It recognises a loss before one has occurred, and the floors deliberately provide more than the expected loss. It is a prudential buffer.</p></div>
 
-<p><b>Two limitations on the &ldquo;no net effect&rdquo; proposition.</b> The proposition holds only where the exposure runs to contractual maturity. Prepayment terminates the exposure early and the unamortised balance is recognised in that period. Default terminates it without the fee being earned.</p>
+<h2>3&ensp;&nbsp;What EIR does to the books</h2>
 
-<p>More significantly, EIR requires an estimate of expected rather than contractual life, which imports an assumption about prepayment behaviour. Ind AS 109 requires revisions to estimated cash flows to be reflected by restating the gross carrying amount, with the adjustment recognised in profit or loss. In Indian retail lending, where prepayment rates move with rate cycles and balance-transfer activity, this is a live source of earnings variation.</p>
-
-<p>This qualifies a common characterisation. <b>EIR is not purely arithmetic</b> &mdash; it contains a behavioural estimate, and that estimate generates volatility of its own. The distinction from ECL is one of degree of model dependence, not its presence or absence.</p>
-
-<h2>3. Expected credit loss: origin and rationale</h2>
-
-<p>The condition ECL was designed to address is documented and specific.</p>
-
-<p>Under IRAC, loss recognition lagged origination by two to three years in most retail and MSME portfolios. A lender growing quickly recognised full income across the growth period while the associated defaults surfaced later. Reported profitability in the early years was systematically overstated relative to the eventual outcome.</p>
-
-<p>The consequence was not confined to measurement. It created an incentive structure in which growth was rewarded before its credit outcome was observable. The Indian unsecured lending cycle of 2022 to 2024 is consistent with this pattern, though attribution to accounting treatment alone would be an overstatement &mdash; distribution economics, bureau saturation and funding availability were also operative.</p>
-
-<p>ECL removes the lag by requiring provision at origination on the basis of expected loss.</p>
-
-<h2>4. Expected credit loss: the absence of an amortising principle</h2>
-
-<p>The design question is not whether losses should be recognised early. It is whether recognising twelve months of expected loss at origination, with no corresponding spreading mechanism, is proportionate.</p>
-
-<p>EIR spreads the fee across the life of the exposure, tracking the amortising balance. ECL recognises the twelve-month loss immediately, for an exposure whose losses may emerge across a longer horizon. There is no equivalent recognition profile.</p>
-
-<p>The standard already contains the alternative. For purchased or originated credit-impaired financial assets, Ind AS 109 applies a <b>credit-adjusted effective interest rate</b>, in which expected credit losses are incorporated into the estimated cash flows used to determine the rate. Expected loss is then recognised across the asset&rsquo;s life through the yield. The mechanism exists; it is confined to one category of asset.</p>
-
-<p>It was also once proposed generally. The International Accounting Standards Board (IASB) Exposure Draft ED/2009/12, <i>Financial Instruments: Amortised Cost and Impairment</i>, published in November 2009, proposed integrating expected credit losses into the effective interest rate for all financial assets measured at amortised cost. It was not adopted. The reasons recorded were operational &mdash; the loss-adjusted rate had to be determined at initial recognition, and revisions to expected loss required catch-up adjustments &mdash; and the post-crisis policy preference was for earlier recognition rather than better matching.</p>
-
-<p>The proposition here is therefore narrower than a general objection to conservatism: <b>the amortising principle is available within the standard, was proposed for general application, and was set aside for reasons that were practical rather than conceptual.</b></p>
-
-<h2>5. Comparative implications for AUM, equity and capital</h2>
-
-<p>The two changes are frequently discussed together. Their implications for assets under management (AUM), equity and capital differ.</p>
-
-<div class="tbl-wrap"><table class="ci"><thead><tr><th></th><th>EIR</th><th>ECL</th></tr></thead><tbody>
-<tr><td><b>AUM</b></td><td>Reduces the asset directly. The fee is netted against the gross carrying amount at initial recognition &mdash; equivalent to a higher yield on a lower carrying value.</td><td>Gross AUM is unaffected; the allowance is carried against it. Net carrying value falls, but the gross AUM figure reported to investors does not.</td></tr>
-<tr><td><b>Equity</b></td><td>Reduces. Assets fall, liabilities are unchanged, and the difference is absorbed in retained earnings.</td><td>Reduces, by the same route. Higher allowance, unchanged liabilities.</td></tr>
-<tr><td><b>P&amp;L at transition</b></td><td>Nil. A change in accounting policy is not a transaction; Ind AS 8 requires retrospective application against opening retained earnings.</td><td>Nil, on the same basis.</td></tr>
-<tr><td><b>P&amp;L after transition</b></td><td>Nets to nil on a stable book. Negative while growing.</td><td>A recurring charge in each period. Stage 2 floors establish a persistent credit cost.</td></tr>
-<tr><td><b>Reversibility</b></td><td>Fully reversible. If the book runs off, the entire deferred balance is recognised as income and the equity effect unwinds. A timing entry.</td><td>Reverses only to the extent losses do not materialise. An estimate of loss, not a timing entry.</td></tr>
+<div class="tbl-wrap"><table class="ci"><thead><tr><th></th><th>Mechanism</th><th>Effect</th></tr></thead><tbody>
+<tr><td><b>AUM</b></td><td>The fee is netted off the carrying amount at origination. &#8377;100 disbursed less &#8377;3 collected is a &#8377;97 asset.</td><td><b>Down.</b> The same thing as saying the yield goes up and therefore the value of the asset goes down.</td></tr>
+<tr><td><b>Equity</b></td><td>The asset falls but the liability does not change. Something has to absorb the difference.</td><td><b>Down.</b> The difference comes out of retained earnings.</td></tr>
+<tr><td><b>P&amp;L</b></td><td>The restatement is a change in accounting policy, not a transaction, so it goes to opening reserves.</td><td><b>No hit at transition.</b> But since the entire fee was earlier charged upfront, profit and revenue will look lower in the coming years.</td></tr>
 </tbody></table></div>
 
-<p>The final row is the substantive distinction. On a flow basis the two are similar &mdash; both neutral in steady state, both negative during growth. On a stock basis they differ: <b>EIR defers income, ECL absorbs capital.</b></p>
+<h3>Where the logic holds</h3>
 
-<p>Two consequences of the transition treatment merit attention.</p>
+<p>Over the life of the loan EIR makes no difference at all. The lender collects the same rupees from the same borrower and total income is identical. Only the period of recognition changes.</p>
 
-<p>First, the absence of a P&amp;L effect does not limit the capital effect. Retained earnings form part of CET1 capital, and reserves constrain dividend capacity.</p>
+<p>On a book that is not growing, even that disappears. Fees deferred on new loans are offset by fees released from older ones. The unamortised balance settles at a stable level and the annual effect is nil.</p>
 
-<p>Second, because the transition adjustment is never recognised in any period&rsquo;s income statement, it does not appear in any reported return on assets (ROA) or return on equity (ROE) series. Returns before and after transition are not directly comparable, and the discontinuity is not flagged in the primary statements. Restating comparatives would address this; it is not standard practice.</p>
+<p>This is not a bad outcome. It allows revenue to be recognised when it is truly earned.</p>
 
-<p>Not all of this is presentational. The two changes differ most in whether the effect stops at the reported number.</p>
+<h3>Where the logic breaks</h3>
 
-<p><b>EIR&rsquo;s effect is largely presentational.</b> Lifetime income is unchanged, the deferred balance is recoverable, and no cash moves. What changes is the period in which income appears.</p>
+<p>All of the above assumes the loan runs to term. Two things stop it. A borrower who prepays extinguishes the loan early, and the whole unamortised balance is recognised in that period. A borrower who defaults extinguishes it too, and the fee is never earned at all.</p>
 
-<p><b>ECL&rsquo;s effect is economic.</b> The capital absorbed is not recovered unless the losses fail to materialise. Reduced CET1 reduces the volume a lender can carry at a given leverage, so provisioning at origination raises the capital cost of growth itself &mdash; a decision variable rather than a reporting outcome. A lender that must provision on day one has also to price for that provision, which alters the rate required on new business, most sharply in segments where expected loss is large relative to margin. Where floors bind, the required rate is set by the floor rather than by the lender&rsquo;s own loss estimate, which compresses the risk-based pricing gradient at the lower-quality end.</p>
+<p>More awkwardly, EIR requires an estimate of <i>expected</i> life, not contractual life, which means an assumption about prepayment behaviour. When actual behaviour diverges — and in Indian retail lending prepayment moves sharply with rate cycles and balance-transfer competition — the carrying amount is restated and the difference runs through P&amp;L as a catch-up.</p>
 
-<p>The transition adjustment sits between the two. It bypasses the income statement, but it consumes CET1, constrains dividend capacity and reduces lending capacity from the date of recognition.</p>
+<p>So EIR is not purely arithmetic either. It carries a behavioural estimate inside it. <b>The difference from ECL is one of degree of model dependence, not its presence or absence.</b></p>
 
-<h2>6. Implications for growing portfolios</h2>
+<h2>4&ensp;&nbsp;Why ECL was introduced</h2>
 
-<p>The neutrality results in Sections 2 and 5 hold in steady state. Few Indian lenders are in steady state.</p>
+<p>The problem it was built to solve was real.</p>
 
-<p>Where originations exceed run-off, neither change is offset. Deferrals exceed releases and new provisions exceed releases from run-off in each period until growth flattens. The two effects are additive, and the ECL component is the larger of the two, because provisions scale with the full exposure while deferred fees scale only with the fee.</p>
+<p>Under IRAC, NPAs were recorded on a back-ended basis. A lender could grow aggressively, book full income across the growth years, and let the defaults surface two or three years later — by which point the track record was already established and, usually, already rewarded.</p>
 
-<p>A secondary consequence has received little attention: <b>the direction of reporting bias has reversed.</b> Under IRAC, growth improved reported earnings and contraction exposed accumulated losses. Under ECL and EIR the reverse applies &mdash; growth depresses reported earnings, while a contracting book releases both deferred fee and provision stock into the income statement, improving reported returns as the portfolio shrinks.</p>
+<p>It was easy to book profits in the early years while the defaults built up at a later stage. That is a misaligned incentive, not just a measurement problem. Anyone who watched Indian unsecured lending between 2022 and 2024 has seen what it looks like in practice.</p>
 
-<p>This is a change in the sign of the cyclical reporting bias. It does not appear to have been incorporated into how Indian lenders or analysts read reported returns across the cycle.</p>
+<p>ECL removes the lag. Provide for what you expect to lose from the day you lend.</p>
 
-<p>Whether it constitutes a defect is arguable. A lender growing rapidly is originating exposure faster than outcomes can be observed, and provisioning at origination reinstates a discipline that delayed recognition had removed. The effect is nonetheless real and warrants explicit adjustment when comparing lenders at different points in their growth cycle.</p>
+<h2>5&ensp;&nbsp;But ECL is the other extreme</h2>
 
-<h2>7. Model dependence and parameter variation</h2>
+<p>The objection is not to recognising losses early. It is that ECL corrects a back-ended regime by front-loading everything, with no amortising principle attached to it.</p>
 
-<p>A separate issue, and over a longer horizon possibly a more consequential one, is the variability of ECL outputs.</p>
+<p>EIR spreads the fee across the life of the loan, tracking the balance as it amortises. Income arrives as the exposure earns it. ECL does the reverse — it recognises twelve months of expected loss immediately, at origination, for a loan whose losses may in fact emerge across three years. There is no equivalent spreading over the period in which the loss actually occurs.</p>
 
-<p>Two lenders holding materially similar portfolios can report materially different provisions through differing treatment of the probability of default (PD) term structure, the significant increase in credit risk (SICR) trigger, the forward-looking macroeconomic overlay, and &mdash; for revolving exposures &mdash; the exposure period, which Ind AS 109 permits to extend beyond the contractual period where the lender&rsquo;s exposure is not limited to contractual notice. There is no natural anchor for the latter.</p>
+<h3>What I would want instead</h3>
 
-<p>There is precedent for how supervisors respond to this. The Basel Committee withdrew the Advanced Measurement Approach for operational risk in the December 2017 finalisation of Basel III, citing the complexity of the approach and the lack of comparability arising from a wide range of internal modelling practices. The advanced internal ratings-based (AIRB) approach was restricted for several exposure classes in the same package, and an aggregate output floor of 72.5% of the standardised result was introduced. The direction of regulatory travel over the preceding decade was away from internal models.</p>
+<p>If expected loss is a known cost of the yield, it should be recognised on the same profile as the yield — amortised along the loss-emergence path. That is true recognition, consistent with what EIR already does for the fee.</p>
 
-<p>The AMA precedent has a limit, and it should be stated. AMA and IRB are capital frameworks, administered by supervisors, with comparability and prudence as objectives. ECL is an accounting requirement, administered by standard setters, with faithful representation as its objective. Expected loss is entity-specific by construction. There is no equivalent withdrawal mechanism.</p>
+<p>What I would <i>not</i> want, and this distinction matters: I am not asking for provisions to build up gradually as vintages season. That is just NPA recognition in different clothing — recognition would lag emergence again, which is the exact failure ECL was written to fix. <b>The point is to amortise a loss that is known at origination, not to defer recognising it until it shows up.</b></p>
 
-<p>The constraint is therefore applied through floors rather than through replacement of the approach. RBI&rsquo;s Stage 1 and Stage 2 minima are a form of standardisation, imposed as a binding minimum.</p>
+<p>The standard already contains the mechanism. For purchased or originated credit-impaired assets, Ind AS 109 applies a credit-adjusted EIR, where expected loss is embedded in the yield and recognised across the asset's life — exactly as the fee is. The logic is conceded and then confined to one narrow category. The arbitrary thing is the ring-fence, not the principle.</p>
 
-<div class="callout"><h4>The risk in floor-based standardisation</h4><p style="margin:0">Where the floor binds for a substantial proportion of exposures, model output ceases to determine the reported provision. The result is the cost of a modelled framework without the discriminating benefit of one. Whether the floors bind in practice is an empirical question that current disclosure does not resolve; portfolio-level Stage 2 data would settle it.</p></div>
+<p>And it was once proposed generally. The IASB's exposure draft of November 2009 proposed integrating expected losses into the effective interest rate for all financial assets at amortised cost. It was abandoned on operational grounds — the loss-adjusted rate had to be fixed at origination and every revision generated catch-up adjustments — and because the G20, after the financial crisis, wanted losses recognised earlier rather than better matched. <b>It was not abandoned because the principle was wrong.</b></p>
 
-<p>An alternative design would publish reference parameters by product and ticket size, calibrated on system-wide data, against which lenders model and disclose deviation. Comparability is obtained through the disclosed deviation rather than through a binding minimum, and the deviation becomes the object of audit and supervisory review. Bank of Spain&rsquo;s Annex IX operates on a comparable principle, providing supervisor-calibrated provisioning parameters as an alternative to internal estimates.</p>
+<p>All of it helps risk management. But it is more punitive than it needs to be.</p>
 
-<h2>8. Assessment</h2>
+<h2>6&ensp;&nbsp;Stable books are fine. Growing books are not.</h2>
 
-<p><i>This section is opinion. The preceding sections are not.</i></p>
+<p>In a stable state ECL reaches the same effect — provisions approximate actual credit losses, and the charge in each period is roughly the loss in that period. The same holds for EIR: new deferrals offset old releases and the annual effect is nil. So on a stable book none of these mechanics matter much.</p>
 
-<p><b>EIR is directionally correct.</b> It recognises revenue as it is earned. Its costs are borne disproportionately by growing and early-stage portfolios, and the prepayment and default cases qualify the claim that it is economically neutral over the life of an exposure. On balance the trade is reasonable.</p>
+<p>A growing book has no such offset. Originations exceed run-off, so deferrals exceed releases and new provisions exceed releases from run-off, every single period, until growth flattens. The two effects stack. ECL is the larger of the two, because provisions scale with the whole exposure while deferred fees scale only with the fee.</p>
 
-<p><b>ECL addresses a real defect and appears overcorrected in execution.</b> The regime it replaced permitted income to be recognised ahead of the credit outcome. Replacing back-loaded recognition with fully front-loaded recognition, absent any amortising mechanism, is a prudential judgement rather than a measurement one &mdash; particularly given that the standard applies precisely that mechanism to credit-impaired assets and declines to extend it.</p>
+<p>The lender is not less profitable than before. It is <b>pre-funding the profit of its future steady state.</b> But reported earnings are worse, and analysts do not adjust for it.</p>
 
-<p><b>Parameter variability remains unresolved.</b> Without standardisation by product and ticket size, ECL produces either provisions that are not comparable across lenders or provisions determined by floors, in which case the modelling apparatus is redundant. The current trajectory is toward the second outcome, and it does not appear to have been selected deliberately.</p>
+<div class="callout"><h4>The reporting bias has inverted</h4><p style="margin:0">Under IRAC, growth flattered earnings and contraction exposed the losses. Under ECL and EIR the opposite holds — growth is penalised in reported earnings, and a shrinking book releases deferred fee and provision stock into P&amp;L, so returns improve as the franchise contracts. That is a change in the sign of the bias across the credit cycle.</p></div>
 
-<h2>Glossary</h2>
+<h2>7&ensp;&nbsp;The model dependence problem</h2>
 
-<div class="tbl-wrap"><table class="ci"><thead><tr><th>Acronym</th><th>Expansion</th><th>Meaning as used here</th></tr></thead><tbody>
-<tr><td><b>AIRB</b></td><td>Advanced Internal Ratings-Based approach</td><td>Basel variant in which the bank estimates LGD and EAD itself, not only PD. Restricted for several exposure classes in 2017.</td></tr>
-<tr><td><b>AMA</b></td><td>Advanced Measurement Approach</td><td>Basel&rsquo;s internal-model approach to operational risk capital. Withdrawn in the December 2017 finalisation.</td></tr>
-<tr><td><b>AUM</b></td><td>Assets Under Management</td><td>Loan book size. Reported gross by most NBFCs; carried net of allowance on the balance sheet.</td></tr>
-<tr><td><b>BCBS</b></td><td>Basel Committee on Banking Supervision</td><td>Standard-setting body for international bank regulation, hosted at the BIS.</td></tr>
-<tr><td><b>CET1</b></td><td>Common Equity Tier 1</td><td>The highest-quality regulatory capital: paid-up equity and retained earnings.</td></tr>
-<tr><td><b>ECL</b></td><td>Expected Credit Loss</td><td>Impairment model requiring provision at origination for expected, not incurred, losses.</td></tr>
-<tr><td><b>EIR</b></td><td>Effective Interest Rate</td><td>The rate that discounts estimated cash flows to the net carrying amount; the basis for interest income recognition.</td></tr>
-<tr><td><b>IASB</b></td><td>International Accounting Standards Board</td><td>Independent body that issues IFRS. Distinct from ICAI, which drafts Ind AS, and MCA, which notifies them.</td></tr>
-<tr><td><b>IFRS</b></td><td>International Financial Reporting Standards</td><td>The IASB&rsquo;s standards. IFRS 9 is the source standard for Ind AS 109.</td></tr>
-<tr><td><b>Ind AS</b></td><td>Indian Accounting Standards</td><td>India&rsquo;s IFRS-converged standards, notified by MCA under the Companies Act.</td></tr>
-<tr><td><b>IRAC</b></td><td>Income Recognition, Asset Classification and Provisioning</td><td>RBI&rsquo;s incurred-loss framework, in which provisioning follows identification of impairment.</td></tr>
-<tr><td><b>IRB</b></td><td>Internal Ratings-Based approach</td><td>Basel framework permitting banks to use internal credit models for regulatory capital.</td></tr>
-<tr><td><b>LGD</b></td><td>Loss Given Default</td><td>Proportion of exposure not recovered following default.</td></tr>
-<tr><td><b>MCA</b></td><td>Ministry of Corporate Affairs</td><td>Notifies Ind AS and set the adoption roadmap that brought NBFCs in from FY2018-19.</td></tr>
-<tr><td><b>MSME</b></td><td>Micro, Small and Medium Enterprises</td><td>Statutory small-business classification; a distinct exposure class for provisioning and risk weights.</td></tr>
-<tr><td><b>NBFC</b></td><td>Non-Banking Financial Company</td><td>RBI-regulated lender that is a company under the Companies Act and is not a bank.</td></tr>
-<tr><td><b>PD</b></td><td>Probability of Default</td><td>Likelihood of default over a defined horizon &mdash; twelve months in Stage 1, lifetime from Stage 2.</td></tr>
-<tr><td><b>RBI</b></td><td>Reserve Bank of India</td><td>Central bank and regulator of banks and NBFCs.</td></tr>
-<tr><td><b>ROA / ROE</b></td><td>Return on Assets / Return on Equity</td><td>Standard profitability ratios. Neither reflects the transition adjustment, which bypasses the income statement.</td></tr>
-<tr><td><b>SICR</b></td><td>Significant Increase in Credit Risk</td><td>The trigger moving an exposure from Stage 1 to Stage 2, and from twelve-month to lifetime ECL.</td></tr>
-</tbody></table></div>
+<p>Separate from timing, and over a longer horizon possibly more consequential. ECL is model dependent, and the estimates can vary a great deal with the assumptions and the model. Three specific problems.</p>
 
-<h2>References</h2>
+<h3>Manipulation runs both ways</h3>
 
-<ul>
-<li>Reserve Bank of India, <i>Commercial Banks (Asset Classification, Provisioning and Income Recognition) Directions, 2026</i>, RBI/DOR/2026-27/398, DOR.STR.REC.No.6/21.06.011/2026-27, 27 April 2026</li>
-<li>Ministry of Corporate Affairs, <i>Companies (Indian Accounting Standards) Rules</i> &mdash; financial sector roadmap, 30 March 2016</li>
-<li>Ind AS 109, <i>Financial Instruments</i> &mdash; three-stage impairment model, credit-adjusted effective interest rate, revolving facility exposure period, revision of estimated cash flows</li>
-<li>Ind AS 8, <i>Accounting Policies, Changes in Accounting Estimates and Errors</i> &mdash; retrospective application of policy changes</li>
-<li>International Accounting Standards Board (IASB), Exposure Draft ED/2009/12, <i>Financial Instruments: Amortised Cost and Impairment</i>, November 2009</li>
-<li>Basel Committee on Banking Supervision, <i>Basel III: Finalising post-crisis reforms</i>, December 2017</li>
-<li>Banking Regulation Act, 1949 &mdash; Third Schedule; Sections 21 and 35A</li>
-<li>Banco de Espa&ntilde;a, Circular 4/2017, Annex IX &mdash; supervisory provisioning parameters</li>
-</ul>
+<p>IRAC discretion was one-way — under-provide, evergreen, restructure. ECL discretion runs in both directions, which allows earnings smoothing either way. That is a harder supervisory problem, not an easier one.</p>
 
-<p class="srcnote">Saket Anand works on credit risk frameworks in Indian and frontier markets, covering ECL modelling, alternative data and balance sheet management. Views are personal.</p>
+<h3>Subjectivity begins at Stage 2</h3>
 
-<div class="author"><div class="avatar">SA</div><div><div style="font-size:15px">Saket Anand</div><div style="font-size:13px;color:var(--muted)">Quantitative-risk practitioner</div></div></div></article><nav id="sidenav" class="libnav" aria-label="Sections"></nav></div></div></main>
+<p>The Stage 1 twelve-month PD is actually the most estimable parameter available — vintage curves observe it directly. It is the SICR trigger and the lifetime PD that are subjective, because lifetime PD needs a term structure and a macro overlay extrapolated well past any observable horizon.</p>
+
+<h3>EAD, and revolving exposures</h3>
+
+<p>EAD is hard to determine and particularly cumbersome for a line of credit. Ind AS 109 permits the exposure period on a revolving facility to run beyond the contractual period. That means behavioural EAD with no natural anchor. Two lenders with identical books can produce materially different numbers.</p>
+
+<h3>The supervisory precedent, and its limit</h3>
+
+<p>We have seen where this leads. Basel rolled back the AMA — the advanced measurement approach for operational risk — in the December 2017 finalisation, because there were too many subjective calls being taken by banks and the numbers were not comparable across them. The advanced IRB approach was restricted at the same time and an output floor of 72.5% imposed. Fifteen years of regulatory direction has been a retreat from internal models. ECL arrives now, going the other way.</p>
+
+<p>The AMA analogy has a limit worth stating. AMA and IRB are <i>capital</i> frameworks, owned by supervisors, where the objective is comparability. ECL is <i>accounting</i>, owned by the IASB, where the objective is faithful representation. Expected loss is entity-specific by construction, so there is no rollback mechanism. IASB will not revert IFRS 9 and RBI cannot.</p>
+
+<p>So the retreat comes through floors instead — and that is the risk in the current design. If the 5% Stage 2 floor binds for most portfolios most of the time, the model output stops determining the reported provision. India then arrives at a standardised approach wearing ECL clothing: <b>full modelling cost, no modelling benefit.</b></p>
+
+<h2>8&ensp;&nbsp;What is needed</h2>
+
+<p>Some standardisation of ECL parameters by product and ticket size.</p>
+
+<p>The real problem is not comparability in the abstract — it is that most NBFCs simply do not have enough data to map Stage 2 and Stage 3 lifetime risk from their own book. A single lender sees too few migrations, censored at its observation window, and loses sight of the account entirely once it leaves the book.</p>
+
+<p>Bureau data is the natural pooling layer for exactly this. It is market-wide, it observes DPD across all lenders, and it captures cure. Transition matrices and vintage curves built on it are a far more defensible anchor for lifetime PD than anything a mid-sized NBFC can construct alone, and they are transparent in a way an internal model is not.</p>
+
+<p>Two limits should be stated honestly. Bureau data gives PD; it gives nothing on LGD or EAD, which are the two harder parameters. And India's bureau era contains no clean downturn — COVID was policy-distorted by moratorium and ECLGS — so pooling fixes small samples but does not create a stress observation that does not exist in anyone's data.</p>
+
+<p><b>The better design is to standardise the benchmark, not the model.</b> Publish a reference PD term structure by product and ticket size, calibrated on system-wide data. Lenders model freely but must disclose and justify deviation from the reference. Comparability then comes from the disclosed deviation rather than from a binding floor, and the deviation is what gets audited.</p>
+
+<p>RBI's Stage 1 and Stage 2 minima are already standardisation — just imposed as a hard floor rather than as a benchmark, which is the version that makes the models redundant.</p>
+
+<h2>9&ensp;&nbsp;In my view</h2>
+
+<div class="opinion"><span class="lbl">Opinion</span><p style="margin:0">This section is opinion. The preceding sections are not.</p></div>
+
+<p><b>EIR.</b> A step in the right direction, but it penalises growth portfolios and early-stage portfolios. Prepayment and default qualify the claim that it is neutral over the life of a loan. On balance the trade is reasonable — revenue gets recognised when it is truly earned.</p>
+
+<p><b>ECL.</b> Right in spirit, but going to the opposite extreme, without the amortising effect. The old regime rewarded lenders for booking income early and defaults late, and that had to be fixed. But the answer to a back-ended regime is not a fully front-loaded one — particularly when the standard already applies the amortising principle to credit-impaired assets and simply declines to generalise it.</p>
+
+<p><b>Model dependence remains unresolved.</b> Without standardisation by product and ticket size, ECL produces either numbers that are not comparable across lenders, or numbers set by floors, in which case the modelling apparatus is decoration. The industry is drifting toward the second without having chosen it.</p>
+
+<div class="author"><div class="avatar">SA</div><div><div style="font-size:15px">Saket Anand</div><div style="font-size:13px;color:var(--muted)">Quantitative-risk practitioner</div></div></div>
+</article><nav id="sidenav" class="libnav" aria-label="Sections"></nav></div></div></main>
 <script src="/assets/app.js?v=20260812b" defer></script>
 </body>
 </html>
