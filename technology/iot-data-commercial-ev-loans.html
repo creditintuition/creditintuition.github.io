@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IoT data for commercial electric-vehicle loans &mdash; creditintuition</title>
+<meta name="description" content="A connected electric vehicle is a continuous physical signal about the collateral and about how the borrower earns from it. Where that signal actually changes a lending decision — origination, collections, fraud, repossession and the depreciation curve — and where it only looks as though it does.">
+<meta name="author" content="Saket Anand">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#0B6E5F">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IoT data for commercial electric-vehicle loans &mdash; creditintuition">
+<meta property="og:description" content="A connected electric vehicle is a continuous physical signal about the collateral and about how the borrower earns from it. Where that signal actually changes a lending decision — origination, collections, fraud, repossession and the depreciation curve — and where it only looks as though it does.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2022%2022%27%3E%3Cpath%20d%3D%27M2%2018%20C7%2018%208%206%2020%204%27%20stroke%3D%27%230B6E5F%27%20stroke-width%3D%272%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27/%3E%3Ccircle%20cx%3D%2720%27%20cy%3D%274%27%20r%3D%272%27%20fill%3D%27%230B6E5F%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/assets/style.css?v=20260916">
+</head>
+<body data-page="article" data-section="technology">
+<main><div class="wrap"><div class="lib"><article id="content" class="doc"><div class="eyebrow">working note &middot; technology</div><h1>IoT data for commercial electric-vehicle loans</h1><div class="meta"><span>11 min</span><span>Sep 2026</span></div>
+
+<p>Telematics in vehicle finance has been available for years, but until recently it was thin. What a lender received was a latitude-and-longitude feed from a GPS unit, used almost entirely for repossession. With electric vehicles the picture is materially richer, because the battery management system is itself a sensor and the vehicle is connected by design rather than by retrofit.</p>
+
+<p>The practical consequence is that the lender now has a continuous, borrower-specific, <b>physical</b> signal about the collateral and about how the borrower earns money from it. Nothing in traditional credit assessment produces that. The question this piece addresses is where that signal actually changes a decision, and where it only looks as though it does.</p>
+
+<h2>1. What is available</h2>
+
+<div class="tbl-wrap"><table class="ci"><thead><tr><th>Data family</th><th>Fields</th><th>Derived measures</th></tr></thead><tbody>
+<tr><td><b>Connectivity</b></td><td>GPS active / inactive, last ping timestamp</td><td>Ping-gap distribution, tamper flag</td></tr>
+<tr><td><b>Positional</b></td><td>Latitude, longitude, speed, acceleration, timestamp</td><td>Distance travelled, night location cluster, stationary-time clusters, jerk</td></tr>
+<tr><td><b>Battery</b></td><td>State of Health (SoH), State of Charge (SoC), pack temperature</td><td>Charge and discharge rate (C-rate), depth of discharge, degradation curve</td></tr>
+<tr><td><b>Other subsystems</b></td><td>Varies by level of vehicle connectivity &mdash; motor controller, error codes, service flags</td><td>Fault frequency, service adherence</td></tr>
+</tbody></table></div>
+
+<p>Vehicles vary in how much they expose. The battery and positional families are close to universal on connected electric two- and three-wheelers; everything else depends on the original equipment manufacturer (OEM) and the telematics stack.</p>
+
+<h2>2. Origination and credit assessment</h2>
+
+<p>The central input in commercial vehicle credit is income, and income is the input lenders are least able to verify. For a commercial vehicle the natural surrogate is <b>utilisation</b>: distance travelled, and where that distance is travelled.</p>
+
+<p><b>Proposed measure.</b> Replace the conventional EMI-to-income ratio with <b>EMI per unit distance travelled</b>, measured over a median month, optionally conditioned on the location cluster the vehicle operates in. Distance and the fare or freight rate prevailing in that cluster together give an upper bound on the loan amount that can be serviced.</p>
+
+<p>The measure is not available on day one of a new book. It is built over time from the vehicles already financed, and it has to be conditioned on region &mdash; a rupee of EMI per kilometre means something different in a metro fare market than in a district freight market. The usable artefact is therefore a calibration grid, populated from the lender&rsquo;s own portfolio rather than assumed:</p>
+
+<div class="tbl-wrap"><table class="ci"><thead><tr><th>Region</th><th>Risk grade</th><th class="num">EMI/distance &mdash; bin 1</th><th class="num">EMI/distance &mdash; bin 2</th><th class="num">EMI/distance &mdash; bin 3</th><th class="num">EMI/distance &mdash; bin 4</th></tr></thead><tbody>
+<tr><td><b>Region 1</b></td><td>A</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">&mdash;</td></tr>
+<tr><td></td><td>B</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">&mdash;</td></tr>
+<tr><td></td><td>C</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">&mdash;</td></tr>
+<tr><td><b>Region 2</b></td><td>A / B / C</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">&mdash;</td></tr>
+<tr><td><b>Region 3</b></td><td>A / B / C</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">&mdash;</td></tr>
+</tbody></table></div>
+<p class="srcnote">Cells carry the observed default rate for each region &times; grade &times; EMI-per-distance bin. Populated from the live book; the grid is the deliverable, not the formula.</p>
+
+<h2>3. Collections early warning</h2>
+
+<h3>3.1 Distance travelled</h3>
+<p>A fall in monthly distance travelled by a commercial vehicle is the single most informative monitoring signal in this dataset. The vehicle is the borrower&rsquo;s means of production; when it stops moving, the cash flow servicing the loan has stopped. The cause is usually either a vehicle problem or a borrower problem, and both merit a field visit before the account rolls forward.</p>
+
+<p>The operational value is in the <b>lead time</b>. A distance drop is observable within days; a missed instalment is observable only at the due date, and a bucket movement later still.</p>
+
+<h3>3.2 Connectivity loss</h3>
+<p>Loss of GPS signal is conventionally treated as the first warning of default. It should be treated as a trigger for <b>verification</b> rather than as evidence of intent, because device faults, fuse removal, network dead zones and a fully discharged auxiliary battery all produce the same observation.</p>
+
+<p>Whether it is predictive at all is an empirical question, and one worth settling before the signal is given weight. It is equally plausible that tampering <i>follows</i> delinquency rather than preceding it, in which case the signal is confirmatory, not predictive. A simple lead-lag analysis of connectivity loss against days past due decides it.</p>
+
+<h3>3.3 Location clustering</h3>
+<p>Two clustering approaches produce different and complementary information:</p>
+<ul>
+<li><b>Night clustering.</b> Positions filtered to the 23:00&ndash;05:00 window identify where the vehicle is habitually parked. For a personal vehicle this is normally the residence.</li>
+<li><b>Stationary clustering.</b> Positions filtered to periods of non-movement, weighted by dwell frequency, identify the locations the vehicle actually works from &mdash; an office for a personal vehicle; an auto stand, aggregation point, charging point or filling station for a commercial one.</li>
+</ul>
+
+<p>Charging locations deserve separate treatment: a cluster where State of Charge is rising over a sustained period is a charging point, and the set of charging points a borrower uses is itself a behavioural profile.</p>
+
+<h2>4. Fraud and the risk containment unit</h2>
+
+<h3>4.1 Third-party usage</h3>
+<p>At least one stationary or night cluster should coincide with the borrower&rsquo;s recorded address. Where none does, third-party usage is one explanation.</p>
+
+<p>It is not the only one, and the base rate matters. Stale know-your-customer addresses, borrower migration, and shared or communal night parking &mdash; common for commercial three-wheelers &mdash; produce exactly the same observation. This belongs in the book as a verification trigger, not as a probability statement, until an investigated-case hit rate exists to quote.</p>
+
+<h3>4.2 Dealer-originated fraud</h3>
+<p>Where distance travelled is negligible in the first three months after disbursement on a commercial vehicle, the economic premise of the loan is absent: nobody buys a commercial vehicle and leaves it idle. Triangulating this against location data sharpens the inference considerably. If the vehicle is sitting at the dealer yard, the likely explanation is a transaction funded out of dealer margin against a borrower who does not exist or does not operate.</p>
+
+<p>This is among the cleanest applications in the dataset, because the two signals are independent and both are unambiguous.</p>
+
+<h2>5. Asset condition, servicing and driver behaviour</h2>
+
+<h3>5.1 Service adherence</h3>
+<p>Electric vehicle warranties are typically tied to adherence to a servicing schedule. Customers under-utilise servicing, warranty cover lapses, and the resulting failure becomes a loss the lender absorbs through a non-performing account and a degraded asset. Distance-based service reminders driven off odometer data are a cheap intervention &mdash; cheap enough to justify on asset-preservation grounds alone. The further link from service reminders to reduced credit loss is plausible but untested, and is better left as a hypothesis than asserted.</p>
+
+<h3>5.2 Charging and discharge behaviour</h3>
+<p>Battery life depends on charging behaviour, charge and discharge rate, and operating temperature. Three measures are directly observable:</p>
+<ul>
+<li><b>Depth of discharge.</b> How often the State of Charge falls below roughly 10 per cent before charging begins. Habitual deep discharge accelerates degradation.</li>
+<li><b>Discharge rate.</b> Sustained high C-rates indicate fast driving, overloading, or gradient-heavy routes. (1C is the rate at which the pack would fully charge or discharge in one hour.) The threshold has to be set empirically from the portfolio: a 2C trigger looks high for the packs in a typical L5 three-wheeler book, where peak draw is nearer 1C, and as written would almost never fire.</li>
+<li><b>Temperature.</b> Indian ambient conditions sit well above the optimal operating band for lithium iron phosphate cells for much of the year, so pack temperature is elevated as a matter of course. Cross-sectional variance is low &mdash; every vehicle in a given city sees roughly the same ambient conditions &mdash; which makes temperature a <b>systematic factor</b> relevant to portfolio-level loss given default, not a variable that ranks borrowers.</li>
+</ul>
+
+<h3>5.3 Jerk</h3>
+<p>Jerk is the third derivative of position with respect to time, and it separates smooth driving from rash driving more cleanly than speed or acceleration alone. It bears on accident probability, on asset deterioration, and therefore on recovery value and expected credit loss.</p>
+
+<p>Computing true jerk, however, needs accelerometer sampling well above typical GPS reporting frequency, and Indian road surface quality is a substantial confound. The practical substitute is the harsh-event count already published by most telematics stacks, and that is how the measure should be framed in a policy document.</p>
+
+<h2>6. Repossession and yard audit</h2>
+
+<p>Verifying a repossessed vehicle is one of the least instrumented processes in vehicle finance, and one of the most exposed to leakage. A risk manager needs three assurances, and each maps to a specific measure:</p>
+
+<div class="tbl-wrap"><table class="ci"><thead><tr><th>Assurance</th><th>Measure</th><th>Expected reading</th></tr></thead><tbody>
+<tr><td><b>(a) The vehicle is in the yard</b></td><td>Reported position against the yard&rsquo;s coordinates</td><td>Match, within GPS tolerance</td></tr>
+<tr><td><b>(b) It is not being used from the yard</b></td><td>Distance travelled between repossession date and audit date</td><td>Near zero</td></tr>
+<tr><td><b>(c) It has not deteriorated in custody</b></td><td>State of Health from repossession date to audit date</td><td>Within a calendar-ageing tolerance band</td></tr>
+</tbody></table></div>
+
+<div class="callout"><h4>A caution on test (c)</h4><ul>
+<li>State of Health <b>does</b> change in storage. Calendar ageing continues, and storage at high State of Charge in Indian ambient temperatures degrades lithium iron phosphate cells measurably.</li>
+<li>Separately, most battery management systems only re-estimate SoH after a reasonably deep cycle, so a stationary vehicle may report a <b>stale</b> value that appears reassuringly stable.</li>
+<li>A flat-SoH test can therefore give false comfort in both directions. The defensible version is a tolerance band derived from the calendar-ageing rate, with an explicit flag for stale estimates.</li>
+</ul></div>
+
+<p>This is the section with the least existing literature and, in my view, the strongest claim to originality.</p>
+
+<h2>7. Depreciation, recovery value and provisioning</h2>
+
+<p>The battery is roughly half the value of an electric vehicle, which means the collateral value of the book is largely a function of aggregate State of Health. That is directly measurable, which is not true of any conventional depreciation assumption.</p>
+
+<p>The estimation problem is that a single vehicle produces a noisy and short SoH series. The solution is cross-sectional rather than longitudinal: control for make, model and variant, then bin vehicles by distance travelled and by vintage, and read the degradation curve off the population. Two curves fall out &mdash; SoH against distance, and SoH against vintage &mdash; and together they separate <b>cycle ageing</b> from <b>calendar ageing</b>.</p>
+
+<p>Charge and discharge behaviour, and driver behaviour, then enter as conditioning variables on the same curves. The output feeds net realisable value, loss given default and, ultimately, the expected credit loss estimate. The detailed treatment of degradation modelling belongs in a separate piece.</p>
+
+<p>It is worth being explicit about where this connects. An empirically grounded depreciation curve is exactly the input that <a href="/risk/ltv-more-than-recovery-ratio.html">the LTV note</a> and <a href="/quant-insights/tenor-and-amount-framework.html">the tenor-and-amount framework</a> currently take as stylised, and it is the measurable leg of the recovery assumption sitting inside <a href="/market-structure/ecl-eir-recognition-timing.html">an ECL estimate</a>. Telematics does not make those frameworks work &mdash; it replaces one of their assumptions with an observation.</p>
+
+<div class="callout"><h4>Where the signal earns its place</h4><ul>
+<li><b>Strongest:</b> dealer-originated fraud (idle vehicle plus yard location), distance-drop early warning, and the population SoH degradation curve.</li>
+<li><b>Useful with calibration:</b> EMI per unit distance at origination, depth of discharge and C-rate, harsh-event counts.</li>
+<li><b>Verification trigger only:</b> connectivity loss, address-cluster mismatch. Both have benign explanations with a high base rate.</li>
+<li><b>Portfolio-level, not borrower-level:</b> pack temperature. It moves LGD for the book, it does not rank applicants.</li>
+</ul></div>
+
+<div class="author"><div class="avatar">SA</div><div><div style="font-size:15px">Saket Anand</div><div style="font-size:13px;color:var(--muted)">Quantitative-risk practitioner</div></div></div></article><nav id="sidenav" class="libnav" aria-label="Sections"></nav></div></div></main>
+<script src="/assets/app.js?v=20260916" defer></script>
+</body>
+</html>
