@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Standard of living from an FI photo &mdash; an AI proof of concept &mdash; creditintuition</title>
+<meta name="description" content="Checking whether a borrower's standard of living matches the declared income is a subjective, often-contested step in field investigation. A proof of concept that matches an FI photo against reference homes of known income, with image embeddings and nearest-neighbour search, and returns an income band, a level and the evidence behind it.">
+<meta name="author" content="Saket Anand">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#0B6E5F">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Standard of living from an FI photo &mdash; an AI proof of concept &mdash; creditintuition">
+<meta property="og:description" content="Matching an FI photo against reference homes of known income to turn a subjective standard-of-living call into an evidence-backed comparison.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2022%2022%27%3E%3Cpath%20d%3D%27M2%2018%20C7%2018%208%206%2020%204%27%20stroke%3D%27%230B6E5F%27%20stroke-width%3D%272%27%20fill%3D%27none%27%20stroke-linecap%3D%27round%27/%3E%3Ccircle%20cx%3D%2720%27%20cy%3D%274%27%20r%3D%272%27%20fill%3D%27%230B6E5F%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/assets/style.css?v=20260925">
+</head>
+<body data-page="article" data-section="technology">
+<main><div class="wrap"><div class="lib"><article id="content" class="doc"><div class="eyebrow">proof of concept &middot; technology</div><h1>Standard of living from an FI photo &mdash; an AI proof of concept</h1><div class="meta"><span>7 min</span><span>Sep 2026</span></div>
+
+<p>Every field investigation ends with a judgment that no bureau score supplies: <b>does the way this household lives match the income on the application, and the loan being asked for?</b> A declared &#8377;80,000 a month sits awkwardly beside a single room with a tin roof; a modest declared income beside a fully furnished flat raises a different question. The check is critical &mdash; it is one of the few defences against inflated income &mdash; but it is also the most subjective call in the file.</p>
+<p>That subjectivity is the problem. Two FI officers will grade the same house differently. There is no reference point to argue from, so a negative call is easy for Sales to contest as one person&rsquo;s opinion, and a positive one leaves nothing on record to review later. This proof of concept asks a narrow question: <b>can a model turn &ldquo;it doesn&rsquo;t look like &#8377;X&rdquo; into &ldquo;it looks like these five homes, which earn Y&rdquo;?</b></p>
+
+<div class="btnrow" style="margin:18px 0 6px"><a class="btn primary" href="/FI_SOL_predictor/">Try the tool &rarr;</a></div>
+<p class="srcnote">Runs entirely in the browser; an uploaded photo is not sent anywhere. Research prototype &mdash; not used for credit decisions.</p>
+
+<h2>What the tool does</h2>
+<p>Upload a photo of a home &mdash; the exterior, the kitchen, the floor, a living room. The tool returns an <b>estimated monthly income and a likely range</b>, an <b>income level</b> (four levels, grouped into Low, Medium and High), the <b>five reference households it most resembles</b> with their photos and incomes, and a <b>confidence</b> reading. When nothing in the reference set looks much like the photo, it says so and asks for manual review instead of producing a confident-looking number.</p>
+
+<h2>How it was built &mdash; seven steps</h2>
+<ol>
+<li><b>A reference set with known incomes.</b> About 850 photos of 43 Indian households, each with a recorded monthly income, spread across four income levels from subsistence to affluent. Every photo is tagged by type: exterior, street, front door, living room, kitchen, floor, wall, roof, ceiling, bedroom, toilet, and assets such as fan or AC, TV, fridge, two-wheeler and car.</li>
+<li><b>Labels on the right scale.</b> Income is modelled on a log scale, so &ldquo;off by 2&times;&rdquo; means the same thing at &#8377;5,000 as at &#8377;5 lakh. Households are grouped into four levels and three tiers &mdash; Low (levels 1&ndash;2), Medium (3), High (4).</li>
+<li><b>Photos into vectors.</b> Each photo is passed through an image-embedding model (CLIP, ViT-B/32), which turns it into 512 numbers. Photos that look alike &mdash; bare earth floors, tiled floors, modular kitchens &mdash; end up close together. The vectors are stored in a vector index.</li>
+<li><b>Nearest-neighbour matching.</b> A new photo is embedded the same way and compared with every reference photo <i>of the same type</i> by cosine similarity. Each household keeps only its best-matching photo, so no single home dominates, and the five closest households are kept.</li>
+<li><b>The estimate.</b> A similarity-weighted median of those five households&rsquo; incomes. The spread of their incomes, and how close the best match is, set the confidence.</li>
+<li><b>Honest testing.</b> Each household was hidden in turn and predicted only from the other 42 &mdash; <i>leave-one-household-out</i>. Splitting by photo instead would have let the model recognise a second shot of the same kitchen and look far better than it is.</li>
+<li><b>Guardrails and deployment.</b> A &ldquo;no close match&rdquo; threshold, a photo-type override for when the type is misread, exact detection of photos already in the reference set, and a browser-only build so that an applicant&rsquo;s photo never leaves the device.</li>
+</ol>
+
+<h2>How well it works</h2>
+<div class="tbl-wrap"><table class="ci"><thead><tr><th></th><th class="num">Tier correct</th><th class="num">Low called High (or reverse)</th><th class="num">Within 2&times; of true income</th><th class="num">Typical error</th></tr></thead><tbody>
+<tr><td>Guessing the typical household</td><td class="num">51%</td><td class="num">8 of 43</td><td class="num">33%</td><td class="num">&times;2.9</td></tr>
+<tr><td><b>Photo matching (this POC)</b></td><td class="num"><b>74%</b></td><td class="num"><b>0</b></td><td class="num">56%</td><td class="num">&times;1.9</td></tr>
+</tbody></table></div>
+<p class="srcnote">43 households, each predicted with its own photos hidden from the reference set. Measured on the compressed model that runs in the browser; the full-precision model scores slightly better (77% tier correct).</p>
+<p>The headline is the middle column. The model <b>never confused a Low household with a High one</b> &mdash; the error that matters most for catching inflated income. Its weak spot is the Medium/High boundary: a tiled, furnished urban home often reads as High even when the household is Medium, and estimates are pulled toward the middle at both extremes.</p>
+
+<h2>Three results</h2>
+<figure class="slidefig"><img loading="lazy" src="/assets/technology/fi-sol/result-shack.png" alt="Tool result for a makeshift house with a tin roof: estimated $170 a month, Level 2, Low, medium confidence"></figure>
+<p><b>A makeshift dwelling</b> &mdash; timber and tin, tarpaulin, open ground. Estimated Level 2 &middot; Low, with four of the five closest households in the bottom two levels. This is the case the tool handles best: the visual signal at the bottom of the distribution is unmistakable, and 60% of the vote lands on one level.</p>
+<figure class="slidefig"><img loading="lazy" src="/assets/technology/fi-sol/result-apartment-block.png" alt="Tool result for a multi-storey residential block: estimated $526 a month, Level 3, Medium, low confidence, with a no-close-match warning"></figure>
+<p><b>A multi-storey residential block</b> shot from above. Estimated Level 3 &middot; Medium, but with a split vote and a <b>&ldquo;no close match&rdquo; warning</b>: nothing in the reference set was photographed from this angle. This is the guardrail doing its job &mdash; the tool is telling the officer not to lean on it.</p>
+<figure class="slidefig"><img loading="lazy" src="/assets/technology/fi-sol/result-furnished-flat.png" alt="Tool result for a furnished flat with vitrified tiles and wooden furniture: estimated $3,611 a month, Level 4, High"></figure>
+<p><b>A furnished flat</b> &mdash; vitrified tiles, wooden furniture, false ceiling. Estimated Level 4 &middot; High, with every vote on the top level. Confidence is still marked low because the closest reference homes are not very close; a direction, not a number to underwrite on.</p>
+<p class="srcnote">Income is shown as monthly income per adult-equivalent in purchasing-power-adjusted US dollars, the unit of the reference set. Converting to a declared household income in rupees is a policy step, not a model step.</p>
+
+<h2>Why this helps the Sales&ndash;Credit conversation</h2>
+<ul>
+<li><b>From opinion to comparison.</b> The output is not &ldquo;I don&rsquo;t think so&rdquo; but &ldquo;this home most resembles these five, which earn between X and Y.&rdquo; Sales can contest the comparison, but it is a comparison, with the photos on the table.</li>
+<li><b>Consistency across officers.</b> The same photo gives the same answer on every desk, in every branch.</li>
+<li><b>An audit trail.</b> The matched homes, the similarity scores and the confidence are all recordable &mdash; useful when a file is reviewed after it goes bad.</li>
+<li><b>It knows when it doesn&rsquo;t know.</b> The no-close-match warning routes unusual cases to a person instead of forcing a number.</li>
+</ul>
+<p>The decision stays human. The tool narrows the argument; it does not settle it.</p>
+
+<div class="callout"><h4>Limits of the proof of concept</h4><ul>
+<li><b>Small reference set.</b> 43 households, only 8 in the Low tier. Every conclusion above carries that caveat.</li>
+<li><b>One photo is noisy.</b> A household is better judged from several photos &mdash; exterior, kitchen, floor, living room &mdash; than from any single one.</li>
+<li><b>Colour and camera angle leak in.</b> A brightly painted roof or an overhead shot can move the estimate more than construction quality does.</li>
+<li><b>A photo is a weak proxy for income.</b> Renters versus owners, joint families, rural wealth held in land, and frugal households all break the link. This supports a judgment; it cannot replace one.</li>
+</ul></div>
+
+<h2>What a production version needs</h2>
+<ol>
+<li><b>A lender&rsquo;s own reference set</b> &mdash; past FI photos with verified income or repayment outcomes, which would lift accuracy far more than a bigger model.</li>
+<li><b>Fixed photo slots</b> in the FI app (exterior, kitchen, living room, floor), with the model checking each photo matches its slot, and one combined estimate per household.</li>
+<li><b>A readable attribute layer</b> &mdash; roof material, floor type, wall finish, visible assets &mdash; so every estimate comes with reasons, not just neighbours.</li>
+<li><b>The final comparison</b> against the declared income and the requested EMI, returning <i>Consistent</i>, <i>Needs review</i> or <i>Inconsistent</i> &mdash; with the evidence attached for Credit and Sales to see.</li>
+</ol>
+
+<div class="btnrow" style="margin:22px 0 6px"><a class="btn primary" href="/FI_SOL_predictor/">Try the tool &rarr;</a></div>
+
+<div class="author"><div class="avatar">SA</div><div><div style="font-size:15px">Saket Anand</div><div style="font-size:13px;color:var(--muted)">Quantitative-risk practitioner</div></div></div></article><nav id="sidenav" class="libnav" aria-label="Sections"></nav></div></div></main>
+<script src="/assets/app.js?v=20260925" defer></script>
+</body>
+</html>

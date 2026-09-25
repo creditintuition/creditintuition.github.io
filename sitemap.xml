@@ -61,6 +61,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://creditintuition.github.io/technology/fi-standard-of-living-poc.html</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://creditintuition.github.io/FI_SOL_predictor/</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://creditintuition.github.io/technology/iot-data-commercial-ev-loans.html</loc>
     <lastmod>2026-09-16</lastmod>
     <changefreq>monthly</changefreq>
